@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="background_button_unpressed">#8080FF</color>
+    <color name="background_button_pressed">#8000FF</color>
+    <color name="background_dialog_separation_line">#A5D8F5</color>
+</resources>

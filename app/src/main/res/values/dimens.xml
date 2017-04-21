@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="size_text_title_large">25sp</dimen>
+    <dimen name="dialog_base_padding_left">30dp</dimen>
+    <dimen name="dialog_base_padding_top">50dp</dimen>
+    <dimen name="size_text_activity">16sp</dimen>
+</resources>
