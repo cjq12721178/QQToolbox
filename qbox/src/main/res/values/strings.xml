@@ -1,5 +1,5 @@
 <resources>
-    <string name="aar_name">QBox</string>
+    <string name="app_name">QBox</string>
     <string name="yes">是</string>
     <string name="no">否</string>
     <string name="ok">确定</string>

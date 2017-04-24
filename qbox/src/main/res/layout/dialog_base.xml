@@ -7,5 +7,6 @@
     <ViewStub
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/vs_title_dialog_base"/>
+        android:id="@+id/vs_title_dialog_base"
+        android:layout="@layout/dialog_title"/>
 </LinearLayout>

@@ -1,11 +1,5 @@
 apply plugin: 'com.android.library'
 
-def buildTime() {
-    def date = new Date()
-    def formattedDate = date.format('yyyyMMdd')
-    return formattedDate
-}
-
 android {
     compileSdkVersion 24
     buildToolsVersion "25.0.0"
@@ -13,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 1
-        versionName "0.1.0"
+        versionCode 2
+        versionName "0.1.1"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -33,9 +27,9 @@ android {
             def fileName
             if (outputFile != null && outputFile.name.endsWith('.aar')) {
                 if (variant.buildType.name.equals('release')) {
-                    fileName = "com.cjq.tool.qbox_${defaultConfig.versionName}_${buildTime()}.aar"
+                    fileName = "com.cjq.tool.qbox-${defaultConfig.versionName}.aar"
                 } else if (variant.buildType.name.equals('debug')) {
-                    fileName = "debug_${defaultConfig.versionName}}.aar"
+                    fileName = "debug-${defaultConfig.versionName}.aar"
                 }
                 output.outputFile = new File(outputFile.parent, fileName)
             }

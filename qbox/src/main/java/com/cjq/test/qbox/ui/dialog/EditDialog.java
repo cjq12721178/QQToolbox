@@ -1,10 +1,10 @@
 package com.cjq.test.qbox.ui.dialog;
 
-import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.util.TypedValue;
@@ -23,7 +23,8 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
         boolean onReceive(EditDialog dialog, String oldValue, String newValue);
     }
 
-    private static final String ARGUMENT_KEY_CONTENT = "in_content";
+    private static final String ARGUMENT_KEY_CONTENT_STRING = "in_content_string";
+    private static final String ARGUMENT_KEY_CONTENT_RESOURCE = "in_content_resource";
     private EditText mEtText;
 
     public static class Decorator extends BaseDialog.Decorator {
@@ -40,34 +41,47 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
 
         @DimenRes
         public int getEditTextSize() {
-            return R.dimen.size_text_dialog_view;
+            return 0;
         }
     }
 
     @Override
-    protected void onSetContentView(View content, Decorator decorator, @Nullable Bundle savedInstanceState) {
+    protected void onSetContentView(View content,
+                                    Decorator decorator,
+                                    @Nullable Bundle savedInstanceState) {
         mEtText = (EditText)content.findViewById(decorator.getEditId());
-        mEtText.setText(getArguments().getString(ARGUMENT_KEY_CONTENT));
-        if (!decorator.completeCustomForContentView()) {
-            Resources resources = getResources();
+        mEtText.setText(getContent());
+        int textSizeRes = decorator.getEditTextSize();
+        if (textSizeRes != 0) {
             mEtText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    resources.getDimensionPixelSize(decorator.getEditTextSize()));
+                    getResources().getDimensionPixelSize(textSizeRes));
         }
     }
 
     @Override
-    protected boolean onOkClick() {
+    protected boolean onConfirm() {
         OnContentReceiver receiver = getListener(OnContentReceiver.class);
         return receiver != null ?
                 receiver.onReceive(this,
                         getArguments().
-                        getString(ARGUMENT_KEY_CONTENT),
+                        getString(ARGUMENT_KEY_CONTENT_STRING),
                         mEtText.getText().toString()) :
                 true;
     }
 
     public void setContent(String content) {
-        getArguments().putString(ARGUMENT_KEY_CONTENT, content);
+        getArguments().putString(ARGUMENT_KEY_CONTENT_STRING, content);
+    }
+
+    public void setContent(@StringRes int contentRes) {
+        getArguments().putInt(ARGUMENT_KEY_CONTENT_RESOURCE, contentRes);
+    }
+
+    private String getContent() {
+        int contentRes = getArguments().getInt(ARGUMENT_KEY_CONTENT_RESOURCE);
+        return contentRes != 0 ?
+                getString(contentRes) :
+                getArguments().getString(ARGUMENT_KEY_CONTENT_STRING);
     }
 
     public void show(FragmentManager manager, String tag, String title, String content) {
@@ -78,5 +92,15 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
     public int show(FragmentTransaction transaction, String tag, String title, String content) {
         setContent(content);
         return super.show(transaction, tag, title);
+    }
+
+    public void show(FragmentManager manager, String tag, @StringRes int titleRes, @StringRes int contentRes) {
+        setContent(contentRes);
+        super.show(manager, tag, titleRes);
+    }
+
+    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, @StringRes int contentRes) {
+        setContent(contentRes);
+        return super.show(transaction, tag, titleRes);
     }
 }

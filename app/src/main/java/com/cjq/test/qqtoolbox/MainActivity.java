@@ -88,11 +88,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
 
                     @Override
-                    public boolean isEnableExitGroupDetailSetting() {
-                        return false;
-                    }
-
-                    @Override
                     public int getBaseLeftPadding() {
                         return R.dimen.dialog_base_padding_left;
                     }
@@ -142,11 +137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     @Override
                     public int getEditId() {
                         return R.id.et_custom;
-                    }
-
-                    @Override
-                    public boolean completeCustomForContentView() {
-                        return true;
                     }
                 });
                 editDialog2.show(getSupportFragmentManager(),

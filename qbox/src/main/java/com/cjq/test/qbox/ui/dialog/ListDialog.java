@@ -2,7 +2,9 @@ package com.cjq.test.qbox.ui.dialog;
 
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
+import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
+import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
@@ -33,6 +35,11 @@ public class ListDialog
             return R.layout.dialog_content_list;
         }
 
+        @IdRes
+        public int getListId() {
+            return R.id.rv_items;
+        }
+
         @DimenRes
         public int getItemVerticalInterval() {
             return R.dimen.list_item_interval_vertical;
@@ -43,7 +50,7 @@ public class ListDialog
     protected void onSetContentView(View content, Decorator decorator, @Nullable Bundle savedInstanceState) {
         setCancelable(false);
         setExitType(EXIT_TYPE_NULL);
-        RecyclerView rvItems = (RecyclerView)content.findViewById(R.id.rv_items);
+        RecyclerView rvItems = (RecyclerView)content.findViewById(decorator.getListId());
         int itemIntervalDimenRes = decorator.getItemVerticalInterval();
         if (itemIntervalDimenRes != 0) {
             rvItems.addItemDecoration(new SpaceItemDecoration(getResources().
@@ -68,6 +75,16 @@ public class ListDialog
     public void show(FragmentManager manager, String tag, String title, String[] items) {
         setItems(items);
         super.show(manager, tag, title);
+    }
+
+    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, String[] items) {
+        setItems(items);
+        return super.show(transaction, tag, titleRes);
+    }
+
+    public void show(FragmentManager manager, String tag, @StringRes int titleRes, String[] items) {
+        setItems(items);
+        super.show(manager, tag, titleRes);
     }
 
     @Override

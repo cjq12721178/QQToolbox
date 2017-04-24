@@ -45,7 +45,8 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     protected static final int EXIT_TYPE_NULL = 0;
     protected static final int EXIT_TYPE_OK_CANCEL = 1;
     protected static final int EXIT_TYPE_OK = 2;
-    private static final String ARGUMENT_KEY_TITLE = "in_title";
+    private static final String ARGUMENT_KEY_TITLE_STRING = "in_title_string";
+    private static final String ARGUMENT_KEY_TITLE_RESOURCE = "in_title_resource";
     private static final String ARGUMENT_KEY_EXIT_TYPE = "in_exit_type";
     private static final String ARGUMENT_KEY_CUSTOM_DECORATOR = "in_custom_decorator";
     private static final String FLAG_SEPARATION_LINE = "line";
@@ -111,24 +112,16 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
     public static class Decorator implements Serializable {
 
-        //当返回true时，所有对contentView本身样式的设置均无效
-        public boolean completeCustomForContentView() {
-            return false;
-        }
-
         @LayoutRes
         public int getContentLayout() {
             return 0;
         }
 
         //以下三个方法与标题设置有关
-        //若要自定义标题，除了需要重写getTitleLayoutRes()方法外，
-        //还需重写getTitleId()方法，并且getTitleTextSize()方法将无效
-        //若不重写getTitleId()方法，则不要重写getTitleLayoutRes()方法
-        //除非getTitleLayoutRes()所代表的布局为TextView
+        //若要自定义title，需重载Decorator的getTitleLayout()和getTitleId()方法
         @LayoutRes
         public int getTitleLayout() {
-            return R.layout.dialog_title;
+            return 0;
         }
 
         @IdRes
@@ -136,20 +129,13 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             return 0;
         }
 
+        //返回0时，采用默认设置的字体大小，若要自定义字体大小，重载即可
         @DimenRes
         public int getTitleTextSize() {
-            return R.dimen.size_text_dialog_title;
+            return 0;
         }
 
-        //以下12个方法与确认/取消组键设置有关
-        //若为false，则以下方法将不起作用
-        //getExitButtonTextSize()
-        //getExitButtonBackground()
-        //getExitButtonTextColor()
-        public boolean isEnableExitGroupDetailSetting() {
-            return true;
-        }
-
+        //以下11个方法与确认/取消组键设置有关
         @LayoutRes
         public int getOkCancelLayout() {
             return R.layout.group_ok_cancel;
@@ -172,22 +158,22 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
         @StringRes
         public int getOkLabel() {
-            return R.string.ok;
+            return 0;
         }
 
         @StringRes
         public int getCancelLabel() {
-            return R.string.cancel;
+            return 0;
         }
 
         @DimenRes
         public int getExitButtonTextSize() {
-            return R.dimen.size_text_dialog_view;
+            return 0;
         }
 
         @DrawableRes
         public int getExitButtonBackground() {
-            return R.drawable.selector_start_setup;
+            return 0;
         }
 
         @ColorRes
@@ -274,22 +260,21 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         D decorator = getDecorator();
-        LinearLayout liBase = inflateBaseView(inflater, decorator, savedInstanceState);
+        LinearLayout liBase = inflateBaseView(inflater, decorator);
         //设置内容
         onCreateContentView(inflater, liBase, decorator, savedInstanceState);
         //设置标题（可选）
-        onCreateTitle(inflater, liBase, decorator);
+        onCreateTitle(liBase, decorator);
         //设置确定/取消按钮及其事件
         onCreateExitGroup(inflater, liBase, decorator);
         return liBase;
     }
 
     private LinearLayout inflateBaseView(LayoutInflater inflater,
-                                         D decorator,
-                                         @Nullable Bundle savedInstanceState) {
+                                         D decorator) {
         LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.dialog_base, null);
         int background = getDecorator().getBackground();
-        if (background > 0) {
+        if (background != 0) {
             layout.setBackgroundResource(background);
         }
         Resources resources = getResources();
@@ -336,31 +321,34 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         }
     }
 
-    private void onCreateTitle(LayoutInflater inflater,
-                               LinearLayout baseView,
+    private void onCreateTitle(LinearLayout baseView,
                                D decorator) {
         ViewStub vsTitle = (ViewStub) baseView.findViewById(R.id.vs_title_dialog_base);
-        String title = getArguments().getString(ARGUMENT_KEY_TITLE);
+        String title = getTitle();
         if (!TextUtils.isEmpty(title)) {
-            vsTitle.setLayoutResource(decorator.getTitleLayout());
             TextView tvTitle;
             View attachView;
-            if (decorator.getTitleId() == 0) {
-                tvTitle = (TextView) vsTitle.inflate();
-                tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        getResources().getDimensionPixelSize(decorator.getTitleTextSize()));
-                attachView = tvTitle;
-            } else {
+            int titleLayoutRes = decorator.getTitleLayout();
+            int titleId = decorator.getTitleId();
+            if (titleLayoutRes != 0 && titleId != 0) {
+                vsTitle.setLayoutResource(titleLayoutRes);
                 attachView = vsTitle.inflate();
-                tvTitle = (TextView) attachView.findViewById(decorator.getTitleId());
+                tvTitle = (TextView) attachView.findViewById(titleId);
+            } else {
+                tvTitle = (TextView) vsTitle.inflate();
+                attachView = tvTitle;
+            }
+            int titleSizeRes = decorator.getTitleTextSize();
+            if (titleSizeRes != 0) {
+                tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+                        getResources().getDimensionPixelSize(titleSizeRes));
             }
             tvTitle.setText(title);
-            inflateSeparationLine(inflater, baseView, attachView, decorator, false);
+            inflateSeparationLine(baseView, attachView, decorator, false);
         }
     }
 
-    private void inflateSeparationLine(LayoutInflater inflater,
-                                       LinearLayout baseView,
+    private void inflateSeparationLine(LinearLayout baseView,
                                        View attachView,
                                        D decorator,
                                        boolean isAbove) {
@@ -418,7 +406,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             if (exitType == EXIT_TYPE_OK_CANCEL) {
                 setExitButton(grpExit, decorator, false);
             }
-            inflateSeparationLine(inflater, baseView, grpExit, decorator, true);
+            inflateSeparationLine(baseView, grpExit, decorator, true);
         }
     }
 
@@ -426,16 +414,23 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                                D decorator,
                                boolean okOrCancel) {
         Button btn = (Button)group.findViewById(decorator.getExitButtonId(okOrCancel));
-        btn.setText(decorator.getExitButtonLabel(okOrCancel));
+        int buttonLabelRes = decorator.getExitButtonLabel(okOrCancel);
+        if (buttonLabelRes != 0) {
+            btn.setText(buttonLabelRes);
+        }
         btn.setOnClickListener(this);
-        if (decorator.isEnableExitGroupDetailSetting()) {
+        int textSizeRes = decorator.getExitButtonTextSize();
+        if (textSizeRes != 0) {
             btn.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    getResources().getDimensionPixelSize(decorator.getExitButtonTextSize()));
-            int textColorRes = decorator.getExitButtonTextColor();
-            if (textColorRes > 0) {
-                btn.setTextColor(ContextCompat.getColor(getActivity(), textColorRes));
-            }
-            btn.setBackgroundResource(decorator.getExitButtonBackground());
+                    getResources().getDimensionPixelSize(textSizeRes));
+        }
+        int textColorRes = decorator.getExitButtonTextColor();
+        if (textColorRes != 0) {
+            btn.setTextColor(ContextCompat.getColor(getActivity(), textColorRes));
+        }
+        int backgroundRes = decorator.getExitButtonBackground();
+        if (backgroundRes != 0) {
+            btn.setBackgroundResource(backgroundRes);
         }
     }
 
@@ -448,14 +443,24 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         int id = v.getId();
         D decorator = getDecorator();
         if (id == decorator.getOkId()) {
-            if (onOkClick()) {
+            if (onConfirm()) {
                 dismiss();
             }
         } else if (id == decorator.getCancelId()) {
-            if (onCancelClick()) {
+            if (onCancel()) {
                 dismiss();
             }
         }
+    }
+
+    @Override
+    public void show(FragmentManager manager, String tag) {
+        throw new UnsupportedOperationException("use show(FragmentManager manager, String tag, String title) for instead");
+    }
+
+    @Override
+    public int show(FragmentTransaction transaction, String tag) {
+        throw new UnsupportedOperationException("use show(FragmentTransaction transaction, String tag, String title) for instead");
     }
 
     public void show(FragmentManager manager, String tag, String title) {
@@ -468,8 +473,29 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         return super.show(transaction, tag);
     }
 
+    public void show(FragmentManager manager, String tag, @StringRes int titleRes) {
+        setTitle(titleRes);
+        super.show(manager, tag);
+    }
+
+    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes) {
+        setTitle(titleRes);
+        return super.show(transaction, tag);
+    }
+
     public void setTitle(String title) {
-        getArguments().putString(ARGUMENT_KEY_TITLE, title);
+        getArguments().putString(ARGUMENT_KEY_TITLE_STRING, title);
+    }
+
+    public void setTitle(@StringRes int titleRes) {
+        getArguments().putInt(ARGUMENT_KEY_TITLE_RESOURCE, titleRes);
+    }
+
+    private String getTitle() {
+        int titleRes = getArguments().getInt(ARGUMENT_KEY_TITLE_RESOURCE);
+        return titleRes != 0 ?
+                getString(titleRes) :
+                getArguments().getString(ARGUMENT_KEY_TITLE_STRING);
     }
 
     public void setExitType(int type) {
@@ -479,15 +505,15 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     //绑定布局中的view
     protected abstract void onSetContentView(View content, D decorator, @Nullable Bundle savedInstanceState);
 
-    protected boolean onOkClick() {
-        OnOkClickListener listener = getListener(OnOkClickListener.class);
-        return listener != null ? listener.onOkClick(this) : true;
+    protected boolean onConfirm() {
+        OnDialogConfirmListener listener = getListener(OnDialogConfirmListener.class);
+        return listener != null ? listener.onConfirm(this) : true;
     }
 
-    protected boolean onCancelClick() {
-        OnCancelClickListener listener = getListener(OnCancelClickListener.class);
+    protected boolean onCancel() {
+        OnDialogCancelListener listener = getListener(OnDialogCancelListener.class);
         if (listener != null) {
-            listener.onCancelClick(this);
+            listener.onCancel(this);
         }
         return true;
     }
@@ -508,14 +534,14 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
     @Override
     public void onCancel(DialogInterface dialog) {
-        onCancelClick();
+        onCancel();
     }
 
-    public interface OnOkClickListener {
-        boolean onOkClick(BaseDialog dialog);
+    public interface OnDialogConfirmListener {
+        boolean onConfirm(BaseDialog dialog);
     }
 
-    public interface OnCancelClickListener {
-        void onCancelClick(BaseDialog dialog);
+    public interface OnDialogCancelListener {
+        void onCancel(BaseDialog dialog);
     }
 }
