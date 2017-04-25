@@ -2,8 +2,8 @@
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:state_pressed="false"
-        android:drawable="@drawable/shape_button_backgound_unpressed" />
+        android:drawable="@drawable/qbox_shape_button_background_unpressed" />
     <item
         android:state_pressed="true"
-        android:drawable="@drawable/shape_button_background_pressed" />
+        android:drawable="@drawable/qbox_shape_button_background_pressed" />
 </selector>

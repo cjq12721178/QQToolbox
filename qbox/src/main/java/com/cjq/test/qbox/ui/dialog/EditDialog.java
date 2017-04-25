@@ -31,7 +31,7 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
 
         @Override
         public int getContentLayout() {
-            return R.layout.dialog_content_edit;
+            return R.layout.qbox_dialog_content_edit;
         }
 
         @IdRes

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="padding_edit_text">4dp</dimen>
-    <dimen name="padding_dialog_base">8dp</dimen>
-    <dimen name="size_text_dialog_view">12sp</dimen>
-    <dimen name="size_text_dialog_title">16sp</dimen>
-    <dimen name="list_item_interval_vertical">6dp</dimen>
-    <dimen name="dialog_separation_line_width_fixed">2dp</dimen>
-    <dimen name="dialog_view_interval_vertical">9dp</dimen>
+    <dimen name="qbox_padding_edit_text">4dp</dimen>
+    <dimen name="qbox_padding_dialog_base">8dp</dimen>
+    <dimen name="qbox_size_text_dialog_view">12sp</dimen>
+    <dimen name="qbox_size_text_dialog_title">16sp</dimen>
+    <dimen name="qbox_list_item_interval_vertical">6dp</dimen>
+    <dimen name="qbox_dialog_separation_line_width_fixed">2dp</dimen>
+    <dimen name="qbox_dialog_view_interval_vertical">9dp</dimen>
 </resources>

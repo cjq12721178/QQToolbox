@@ -138,12 +138,12 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         //以下11个方法与确认/取消组键设置有关
         @LayoutRes
         public int getOkCancelLayout() {
-            return R.layout.group_ok_cancel;
+            return R.layout.qbox_group_ok_cancel;
         }
 
         @LayoutRes
         public int getOkLayout() {
-            return R.layout.group_ok;
+            return R.layout.qbox_group_ok;
         }
 
         @IdRes
@@ -194,12 +194,12 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         //整体背景
         @DrawableRes
         public int getBackground() {
-            return R.drawable.ic_dialog_background;
+            return R.drawable.qbox_ic_dialog_background;
         }
 
         @DimenRes
         public int getBasePadding() {
-            return R.dimen.padding_dialog_base;
+            return R.dimen.qbox_padding_dialog_base;
         }
 
         @DimenRes
@@ -229,17 +229,17 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
         @DrawableRes
         public int getSeparationLineBackground() {
-            return R.color.background_dialog_separation_line;
+            return R.color.qbox_background_dialog_separation_line;
         }
 
         @DimenRes
         public int getSeparationLineWidth() {
-            return R.dimen.dialog_separation_line_width_fixed;
+            return R.dimen.qbox_dialog_separation_line_width_fixed;
         }
 
         @DimenRes
         public int getViewVerticalInterval() {
-            return R.dimen.dialog_view_interval_vertical;
+            return R.dimen.qbox_dialog_view_interval_vertical;
         }
     }
 
@@ -272,7 +272,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
     private LinearLayout inflateBaseView(LayoutInflater inflater,
                                          D decorator) {
-        LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.dialog_base, null);
+        LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.qbox_dialog_base, null);
         int background = getDecorator().getBackground();
         if (background != 0) {
             layout.setBackgroundResource(background);

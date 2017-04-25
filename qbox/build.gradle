@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 2
-        versionName "0.1.1"
+        versionCode 3
+        versionName "0.1.2"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -16,7 +16,7 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            //proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
     //打包后应用名称
@@ -26,9 +26,9 @@ android {
             def outputFile = output.outputFile
             def fileName
             if (outputFile != null && outputFile.name.endsWith('.aar')) {
-                if (variant.buildType.name.equals('release')) {
+                if (variant.buildType.name == 'release') {
                     fileName = "com.cjq.tool.qbox-${defaultConfig.versionName}.aar"
-                } else if (variant.buildType.name.equals('debug')) {
+                } else if (variant.buildType.name == 'debug') {
                     fileName = "debug-${defaultConfig.versionName}.aar"
                 }
                 output.outputFile = new File(outputFile.parent, fileName)
@@ -45,4 +45,25 @@ dependencies {
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:recyclerview-v7:24.2.1'
+}
+
+task copyAar(type: Copy) {
+    from "${buildDir}/outputs/aar/"
+    into "${projectDir}"
+    exclude 'debug*'
+    include "*${android.defaultConfig.versionName}.aar"
+    println "aar back-up completed"
+}
+
+afterEvaluate {
+    tasks.matching {
+        // 以process开头以ReleaseJavaRes或DebugJavaRes结尾的task
+        it.name == "assembleRelease" &&
+        it.project.name == "qbox"
+    }.each { task ->
+        //task.dependsOn(testAssembleRelease)  // 任务依赖：执行task之前需要执行dependsOn指定的任务
+        task.doLast {
+            tasks.copyAar.execute()
+        }
+    }
 }

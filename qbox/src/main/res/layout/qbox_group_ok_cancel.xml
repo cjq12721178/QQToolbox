@@ -12,9 +12,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btn_ok"
-            android:text="@string/ok"
-            android:textSize="@dimen/size_text_dialog_view"
-            android:background="@drawable/selector_button"
+            android:text="@string/qbox_ok"
+            android:textSize="@dimen/qbox_size_text_dialog_view"
+            android:background="@drawable/qbox_selector_button"
             android:layout_centerInParent="true"/>
     </RelativeLayout>
     <RelativeLayout
@@ -25,9 +25,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btn_cancel"
-            android:text="@string/cancel"
-            android:textSize="@dimen/size_text_dialog_view"
-            android:background="@drawable/selector_button"
+            android:text="@string/qbox_cancel"
+            android:textSize="@dimen/qbox_size_text_dialog_view"
+            android:background="@drawable/qbox_selector_button"
             android:layout_centerInParent="true"/>
     </RelativeLayout>
 </LinearLayout>

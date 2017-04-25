@@ -32,7 +32,7 @@ public class ListDialog
     public static class Decorator extends BaseDialog.Decorator {
         @Override
         public int getContentLayout() {
-            return R.layout.dialog_content_list;
+            return R.layout.qbox_dialog_content_list;
         }
 
         @IdRes
@@ -42,7 +42,7 @@ public class ListDialog
 
         @DimenRes
         public int getItemVerticalInterval() {
-            return R.dimen.list_item_interval_vertical;
+            return R.dimen.qbox_list_item_interval_vertical;
         }
     }
 
@@ -107,7 +107,7 @@ public class ListDialog
         @Override
         public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             return new ViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.list_dialog_item, parent, false), this);
+                    .inflate(R.layout.qbox_list_dialog_item, parent, false), this);
         }
 
         @Override
