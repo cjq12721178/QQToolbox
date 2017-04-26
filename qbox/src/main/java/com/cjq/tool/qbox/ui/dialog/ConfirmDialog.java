@@ -1,4 +1,4 @@
-package com.cjq.test.qbox.ui.dialog;
+package com.cjq.tool.qbox.ui.dialog;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

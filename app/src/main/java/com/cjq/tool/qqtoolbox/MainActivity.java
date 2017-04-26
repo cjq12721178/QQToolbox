@@ -1,13 +1,12 @@
-package com.cjq.test.qqtoolbox;
+package com.cjq.tool.qqtoolbox;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.cjq.test.qbox.ui.dialog.BaseDialog;
-import com.cjq.test.qbox.ui.dialog.ConfirmDialog;
-import com.cjq.test.qbox.ui.dialog.EditDialog;
-import com.cjq.test.qbox.ui.dialog.ListDialog;
+import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
+import com.cjq.tool.qbox.ui.dialog.EditDialog;
+import com.cjq.tool.qbox.ui.dialog.ListDialog;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 

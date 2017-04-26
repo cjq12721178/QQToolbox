@@ -1,4 +1,4 @@
-package com.cjq.test.qbox.ui.dialog;
+package com.cjq.tool.qbox.ui.dialog;
 
 import android.app.Activity;
 import android.content.DialogInterface;
@@ -26,7 +26,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.cjq.test.qbox.R;
+import com.cjq.tool.qbox.R;
 
 import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;

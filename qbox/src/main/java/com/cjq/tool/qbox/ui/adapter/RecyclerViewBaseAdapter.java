@@ -1,4 +1,4 @@
-package com.cjq.test.qbox.ui.adapter;
+package com.cjq.tool.qbox.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

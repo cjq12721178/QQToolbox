@@ -1,4 +1,4 @@
-package com.cjq.test.qbox.ui.dialog;
+package com.cjq.tool.qbox.ui.dialog;
 
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
@@ -11,7 +11,7 @@ import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
 
-import com.cjq.test.qbox.R;
+import com.cjq.tool.qbox.R;
 
 
 /**

@@ -1,4 +1,4 @@
-package com.cjq.test.qbox.ui.dialog;
+package com.cjq.tool.qbox.ui.dialog;
 
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
@@ -14,9 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.cjq.test.qbox.R;
-import com.cjq.test.qbox.ui.adapter.RecyclerViewBaseAdapter;
-import com.cjq.test.qbox.ui.decoration.SpaceItemDecoration;
+import com.cjq.tool.qbox.R;
+import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
+import com.cjq.tool.qbox.ui.decoration.SpaceItemDecoration;
 
 /**
  * Created by KAT on 2017/4/11.

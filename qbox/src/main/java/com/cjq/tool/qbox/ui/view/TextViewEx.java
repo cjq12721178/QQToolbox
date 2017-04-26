@@ -1,4 +1,4 @@
-package com.cjq.test.qbox.ui.view;
+package com.cjq.tool.qbox.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,7 +6,7 @@ import android.graphics.drawable.Drawable;
 import android.support.v7.widget.AppCompatTextView;
 import android.util.AttributeSet;
 
-import com.cjq.test.qbox.R;
+import com.cjq.tool.qbox.R;
 
 
 /**

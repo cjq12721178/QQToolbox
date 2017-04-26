@@ -1,4 +1,4 @@
-package com.cjq.test.qbox.ui.decoration;
+package com.cjq.tool.qbox.ui.decoration;
 
 import android.graphics.Rect;
 import android.support.v7.widget.RecyclerView;
