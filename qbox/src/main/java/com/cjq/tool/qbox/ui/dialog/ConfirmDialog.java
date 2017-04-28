@@ -17,7 +17,7 @@ public class ConfirmDialog extends BaseDialog<ConfirmDialog.Decorator> {
     }
 
     @Override
-    protected void onSetContentView(View content, Decorator decorator, @Nullable Bundle savedInstanceState) {
+    protected void onSetContentView(View contentView, Decorator decorator, @Nullable Bundle savedInstanceState) {
 
     }
 

@@ -30,26 +30,36 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
     public static class Decorator extends BaseDialog.Decorator {
 
         @Override
-        public int getContentLayout() {
-            return R.layout.qbox_dialog_content_edit;
+        public void reset() {
+            super.reset();
+            setContentLayout(R.layout.qbox_dialog_content_edit);
+            setEditId(R.id.il_text);
         }
 
         @IdRes
         public int getEditId() {
-            return R.id.il_text;
+            return mParameters.getInt("dp_edit_id");
+        }
+
+        public void setEditId(@IdRes int editId) {
+            mParameters.putInt("dp_edit_id", editId);
         }
 
         @DimenRes
         public int getEditTextSize() {
-            return 0;
+            return mParameters.getInt("dp_edit_text_size");
+        }
+
+        public void setEditTextSize(@DimenRes int textSizeRes) {
+            mParameters.putInt("dp_edit_text_size", textSizeRes);
         }
     }
 
     @Override
-    protected void onSetContentView(View content,
+    protected void onSetContentView(View contentView,
                                     Decorator decorator,
                                     @Nullable Bundle savedInstanceState) {
-        mEtText = (EditText)content.findViewById(decorator.getEditId());
+        mEtText = (EditText) contentView.findViewById(decorator.getEditId());
         mEtText.setText(getContent());
         int textSizeRes = decorator.getEditTextSize();
         if (textSizeRes != 0) {

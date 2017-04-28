@@ -30,27 +30,39 @@ public class ListDialog
     private ItemAdapter mItemAdapter;
 
     public static class Decorator extends BaseDialog.Decorator {
+
         @Override
-        public int getContentLayout() {
-            return R.layout.qbox_dialog_content_list;
+        public void reset() {
+            super.reset();
+            setContentLayout(R.layout.qbox_dialog_content_list);
+            setListId(R.id.rv_items);
+            setItemVerticalInterval(R.dimen.qbox_list_item_interval_vertical);
         }
 
         @IdRes
         public int getListId() {
-            return R.id.rv_items;
+            return mParameters.getInt("dp_list_id");
+        }
+
+        public void setListId(@IdRes int listId) {
+            mParameters.putInt("dp_list_id", listId);
         }
 
         @DimenRes
         public int getItemVerticalInterval() {
-            return R.dimen.qbox_list_item_interval_vertical;
+            return mParameters.getInt("dp_item_view_vertical_interval");
+        }
+
+        public void setItemVerticalInterval(@DimenRes int intervalRes) {
+            mParameters.putInt("dp_item_view_vertical_interval", intervalRes);
         }
     }
 
     @Override
-    protected void onSetContentView(View content, Decorator decorator, @Nullable Bundle savedInstanceState) {
+    protected void onSetContentView(View contentView, Decorator decorator, @Nullable Bundle savedInstanceState) {
         setCancelable(false);
         setExitType(EXIT_TYPE_NULL);
-        RecyclerView rvItems = (RecyclerView)content.findViewById(decorator.getListId());
+        RecyclerView rvItems = (RecyclerView) contentView.findViewById(decorator.getListId());
         int itemIntervalDimenRes = decorator.getItemVerticalInterval();
         if (itemIntervalDimenRes != 0) {
             rvItems.addItemDecoration(new SpaceItemDecoration(getResources().

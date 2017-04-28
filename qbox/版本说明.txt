@@ -1,0 +1,22 @@
+﻿20170421-0.1.0(1):
+qbox.aar是我个人封装的工具包，目前主要包括一个Recyclerview.Adapter的简
+单封装（使其拥有item点击、长按功能，以及自动记录上次点击的item）和常用
+dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及为了
+方便使用要附带的decorator
+
+20170424-0.1.1(2):
+1. ui包新增view包，view包新增TextViewEx，用于为CompoundDrawable设置size
+2. 规范化命名
+3. 删除部分无用资源
+4. 修改BaseDialog.Decorator，使自定义样式更简便
+
+20170424-0.1.2(3):
+1. 所有资源文件、ID之前附加前缀“qbox_”以避免冲突
+2. 取消proguardFiles
+
+20170426-0.1.3(4):
+1. 更改包名，从com.cjq.test.qbox改为com.cjq.tool.qbox
+
+20170427-0.1.4(5):
+1. 修正BaseDialog中onSetContentView的参数content
+2. 进一步简化Dialog.Decorator的使用，baseOverallDecorator修饰所有dialog，overallDecorator修饰所有该Decorator所在Dialog及其子类，customDecorator修饰该Decorator所在Dialog的单个实例

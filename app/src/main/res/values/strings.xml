@@ -1,4 +1,5 @@
 <resources>
     <string name="app_name">QQToolbox</string>
     <string name="hao">好的</string>
+    <string name="custom_cancel">怎么可能</string>
 </resources>

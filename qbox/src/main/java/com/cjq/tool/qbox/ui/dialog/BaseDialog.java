@@ -28,7 +28,6 @@ import android.widget.TextView;
 
 import com.cjq.tool.qbox.R;
 
-import java.io.Serializable;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -48,137 +47,287 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     private static final String ARGUMENT_KEY_TITLE_STRING = "in_title_string";
     private static final String ARGUMENT_KEY_TITLE_RESOURCE = "in_title_resource";
     private static final String ARGUMENT_KEY_EXIT_TYPE = "in_exit_type";
-    private static final String ARGUMENT_KEY_CUSTOM_DECORATOR = "in_custom_decorator";
+    private static final String ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS = "in_custom_decorator_paras";
+    //private static final String ARGUMENT_KEY_CUSTOM_DECORATOR = "in_custom_decorator";
     private static final String FLAG_SEPARATION_LINE = "line";
 
     private static final Map<String, Decorator> overallDecorator = new HashMap<>();
+    private D mCustomDecorator;
 
-    public static void setOverallDecorator(Decorator decorator) {
-        if (decorator != null) {
-            //取相应dialog类名为key
-            String decoratorName = getDecoratorName(decorator);
-            overallDecorator.put(decoratorName, decorator);
-        }
+//    public static void setOverallDecorator(Decorator decorator) {
+//        if (decorator != null) {
+//            //取相应dialog类名为key
+//            String decoratorName = getDecoratorName(decorator);
+//            overallDecorator.put(decoratorName, decorator);
+//        }
+//    }
+//
+//    private static String getDecoratorName(Decorator decorator) {
+//        Class decoratorClass = decorator.getClass();
+//        Class enclosingClass = decoratorClass.getEnclosingClass();
+//        while (!BaseDialog.class.isAssignableFrom(enclosingClass)) {
+//            decoratorClass = decoratorClass.getSuperclass();
+//            enclosingClass = decoratorClass.getEnclosingClass();
+//        }
+//        return enclosingClass.getSimpleName();
+//    }
+
+    //Decorator无法在Dialog类外部通过实例化获得，
+    //只能通过getOverallDecorator(Class<DL>)和getCustomDecorator()方法获得
+    //用于获取每一类Dialog的总体Decorator，即该Decorator做出的样式改变将影响所有该类及其子类的dialog
+    //另外，若采用getOverallDecorator(BaseDialog.class)方式获得的Decorator将影响所有继承自BaseDialog的dialog
+    //此外，也可以使用getBaseOverallDecorator()方法
+    public static Decorator getBaseOverallDecorator() {
+        return getOverallDecorator(BaseDialog.class);
     }
 
-    private static String getDecoratorName(Decorator decorator) {
-        Class decoratorClass = decorator.getClass();
-        Class enclosingClass = decoratorClass.getEnclosingClass();
-        while (!BaseDialog.class.isAssignableFrom(enclosingClass)) {
-            decoratorClass = decoratorClass.getSuperclass();
-            enclosingClass = decoratorClass.getEnclosingClass();
-        }
-        return enclosingClass.getSimpleName();
-    }
-
-    protected D getOverallDecorator() {
-        D decorator = (D)overallDecorator.get(getClass().getSimpleName());
+    public static <DL extends BaseDialog, DC extends Decorator> DC getOverallDecorator(Class<DL> dialogClass) {
+        String decoratorName = dialogClass.getSimpleName();
+        DC decorator = (DC)overallDecorator.get(decoratorName);
         if (decorator == null) {
-            decorator = createDecorator();
-            if (decorator == null)
-                throw new NullPointerException();
-            setOverallDecorator(decorator);
+            decorator = createDecorator(dialogClass);
+            overallDecorator.put(decoratorName, decorator);
         }
         return decorator;
     }
 
-    private D createDecorator() {
+    private static <DL extends BaseDialog, DC extends Decorator> DC createDecorator(Class<DL> dialogClass) {
+        if (dialogClass == BaseDialog.class)
+            return (DC)new Decorator();
+        DC result = createDecoratorImp(dialogClass);
+        Decorator baseDecorator = overallDecorator.get(BaseDialog.class.getSimpleName());
+        result.setParameters(baseDecorator);
+        return result;
+    }
+
+    private static <DL extends BaseDialog, DC extends Decorator> DC createDecoratorImp(Class<DL> dialogClass) {
         try {
-            Class dialogClass = getClass();
-            Type superClassType = dialogClass.getGenericSuperclass();
+            Class c = dialogClass;
+            Type superClassType = c.getGenericSuperclass();
             while (!(superClassType instanceof ParameterizedType)) {
-                dialogClass = dialogClass.getSuperclass();
-                superClassType = dialogClass.getGenericSuperclass();
+                c = c.getSuperclass();
+                superClassType = c.getGenericSuperclass();
             }
-            return ((Class<D>)((ParameterizedType)superClassType).
+            return ((Class<DC>)((ParameterizedType)superClassType).
                     getActualTypeArguments()[0]).newInstance();
         } catch (Exception e) {
+            throw new NullPointerException();
         }
-        return null;
     }
 
-    public void setCustomDecorator(D customDecorator) {
-        getArguments().putSerializable(ARGUMENT_KEY_CUSTOM_DECORATOR, customDecorator);
+//    protected D getOverallDecorator() {
+//        String decoratorName = getClass().getSimpleName();
+//        D decorator = (D)overallDecorator.get(decoratorName);
+//        if (decorator == null) {
+//            decorator = createDecorator(getClass());
+//            if (decorator == null)
+//                throw new NullPointerException();
+//            //setOverallDecorator(decorator);
+//            overallDecorator.put(decoratorName, decorator);
+//        }
+//        return decorator;
+//    }
+
+//    private D createDecorator() {
+//        try {
+//            Class dialogClass = getClass();
+//            Type superClassType = dialogClass.getGenericSuperclass();
+//            while (!(superClassType instanceof ParameterizedType)) {
+//                dialogClass = dialogClass.getSuperclass();
+//                superClassType = dialogClass.getGenericSuperclass();
+//            }
+//            return ((Class<D>)((ParameterizedType)superClassType).
+//                    getActualTypeArguments()[0]).newInstance();
+//        } catch (Exception e) {
+//        }
+//        return null;
+//    }
+
+//    public void setCustomDecorator(D customDecorator) {
+//        getArguments().putSerializable(ARGUMENT_KEY_CUSTOM_DECORATOR, customDecorator);
+//    }
+
+    final public D getCustomDecorator() {
+        //return (D) getArguments().getSerializable(ARGUMENT_KEY_CUSTOM_DECORATOR);
+        if (mCustomDecorator == null) {
+            mCustomDecorator = createDecorator(getClass());
+        }
+        return mCustomDecorator;
     }
 
-    private D getCustomDecorator() {
-        return (D) getArguments().getSerializable(ARGUMENT_KEY_CUSTOM_DECORATOR);
+    final protected D getDecorator(@Nullable Bundle savedInstanceState) {
+        if (mCustomDecorator != null)
+            return mCustomDecorator;
+        if (savedInstanceState != null) {
+            Bundle parameters = savedInstanceState.getBundle(ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS);
+            if (parameters != null) {
+                mCustomDecorator = createDecoratorImp(getClass());
+                mCustomDecorator.setParameters(parameters);
+                return mCustomDecorator;
+            }
+        }
+        return (D)getOverallDecorator(getClass());
     }
 
-    protected D getDecorator() {
-        D decorator = getCustomDecorator();
-        return decorator != null ? decorator : getOverallDecorator();
-    }
+    public static class Decorator  {
 
-    public static class Decorator implements Serializable {
+        protected Bundle mParameters = new Bundle();
+
+        protected Decorator() {
+            reset();
+        }
+
+        public void reset() {
+            mParameters.clear();
+            setOkCancelLayout(R.layout.qbox_group_ok_cancel);
+            setOkLayout(R.layout.qbox_group_ok);
+            setOkId(R.id.btn_ok);
+            setCancelId(R.id.btn_cancel);
+            setBaseBackground(R.drawable.qbox_ic_dialog_background);
+            setBasePadding(R.dimen.qbox_padding_dialog_base);
+            setSeparationLineExists(true);
+            setSeparationLineBackground(R.color.qbox_background_dialog_separation_line);
+            setSeparationLineWidth(R.dimen.qbox_dialog_separation_line_width_fixed);
+            setViewVerticalInterval(R.dimen.qbox_dialog_view_interval_vertical);
+        }
+
+        void setParameters(Decorator baseDecorator) {
+            if (baseDecorator != null) {
+                setParameters(baseDecorator.mParameters);
+            }
+        }
+
+        void setParameters(Bundle parameters) {
+            mParameters.putAll(parameters);
+        }
+
+//        void getParameters(Bundle outState) {
+//            if (outState != null) {
+//                outState.putBundle(ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS, mParameters);
+//            }
+//        }
 
         @LayoutRes
-        public int getContentLayout() {
-            return 0;
+        final public int getContentLayout() {
+            return mParameters.getInt("dp_content_layout");
+        }
+
+        final public void setContentLayout(@LayoutRes int layoutRes) {
+            if (getClass().getEnclosingClass() != BaseDialog.class) {
+                mParameters.putInt("dp_content_layout", layoutRes);
+            }
         }
 
         //以下三个方法与标题设置有关
         //若要自定义title，需重载Decorator的getTitleLayout()和getTitleId()方法
         @LayoutRes
         public int getTitleLayout() {
-            return 0;
+            return mParameters.getInt("dp_title_layout");
+        }
+
+        public void setTitleLayout(@LayoutRes int layoutRes) {
+            mParameters.putInt("dp_title_layout", layoutRes);
         }
 
         @IdRes
         public int getTitleId() {
-            return 0;
+            return mParameters.getInt("dp_title_id");
+        }
+
+        public void setTitleId(@IdRes int titleId) {
+            mParameters.putInt("dp_title_id", titleId);
         }
 
         //返回0时，采用默认设置的字体大小，若要自定义字体大小，重载即可
         @DimenRes
         public int getTitleTextSize() {
-            return 0;
+            return mParameters.getInt("dp_title_size");
         }
 
-        //以下11个方法与确认/取消组键设置有关
+        public void setTitleTextSize(@DimenRes int textSizeRes) {
+            mParameters.putInt("dp_title_size", textSizeRes);
+        }
+
+        //以下22个方法与确认/取消组键设置有关
         @LayoutRes
         public int getOkCancelLayout() {
-            return R.layout.qbox_group_ok_cancel;
+            return mParameters.getInt("dp_ok_cancel_layout");
+        }
+
+        public void setOkCancelLayout(@LayoutRes int layoutRes) {
+            mParameters.putInt("dp_ok_cancel_layout", layoutRes);
         }
 
         @LayoutRes
         public int getOkLayout() {
-            return R.layout.qbox_group_ok;
+            return mParameters.getInt("dp_ok_layout");
+        }
+
+        public void setOkLayout(@LayoutRes int layoutRes) {
+            mParameters.putInt("dp_ok_layout", layoutRes);
         }
 
         @IdRes
         public int getOkId() {
-            return R.id.btn_ok;
+            return mParameters.getInt("dp_ok_id");
+        }
+
+        public void setOkId(@IdRes int okId) {
+            mParameters.putInt("dp_ok_id", okId);
         }
 
         @IdRes
         public int getCancelId() {
-            return R.id.btn_cancel;
+            return mParameters.getInt("dp_cancel_id");
+        }
+
+        public void setCancelId(@IdRes int cancelId) {
+            mParameters.putInt("dp_cancel_id", cancelId);
         }
 
         @StringRes
         public int getOkLabel() {
-            return 0;
+            return mParameters.getInt("dp_ok_label");
+        }
+
+        public void setOkLabel(@StringRes int okLabelRes) {
+            mParameters.putInt("dp_ok_label", okLabelRes);
         }
 
         @StringRes
         public int getCancelLabel() {
-            return 0;
+            return mParameters.getInt("dp_cancel_label");
+        }
+
+        public void setCancelLabel(@StringRes int cancelLabelRes) {
+            mParameters.putInt("dp_cancel_label", cancelLabelRes);
         }
 
         @DimenRes
         public int getExitButtonTextSize() {
-            return 0;
+            return mParameters.getInt("dp_exit_button_text_size");
+        }
+
+        public void setExitButtonTextSize(@DimenRes int textSizeRes) {
+            mParameters.putInt("dp_exit_button_text_size", textSizeRes);
         }
 
         @DrawableRes
         public int getExitButtonBackground() {
-            return 0;
+            return mParameters.getInt("dp_exit_button_background");
+        }
+
+        public void setExitButtonBackground(@DrawableRes int backgroundRes) {
+            mParameters.putInt("dp_exit_button_background", backgroundRes);
         }
 
         @ColorRes
         public int getExitButtonTextColor() {
-            return 0;
+            return mParameters.getInt("dp_exit_button_text_color");
+        }
+
+        public void setExitButtonTextColor(@ColorRes int colorRes) {
+            mParameters.putInt("dp_exit_button_text_color", colorRes);
         }
 
         @IdRes
@@ -193,53 +342,87 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
         //整体背景
         @DrawableRes
-        public int getBackground() {
-            return R.drawable.qbox_ic_dialog_background;
+        public int getBaseBackground() {
+            return mParameters.getInt("dp_base_background");
+        }
+
+        public void setBaseBackground(@DrawableRes int backgroundRes) {
+            mParameters.putInt("dp_base_background", backgroundRes);
         }
 
         @DimenRes
         public int getBasePadding() {
-            return R.dimen.qbox_padding_dialog_base;
+            return mParameters.getInt("dp_base_padding");
+        }
+
+        public void setBasePadding(@DimenRes int paddingRes) {
+            mParameters.putInt("dp_base_padding", paddingRes);
+        }
+
+        public void setBasePadding(@DimenRes int leftPaddingRes,
+                                   @DimenRes int topPaddingRes,
+                                   @DimenRes int rightPaddingRes,
+                                   @DimenRes int bottomPaddingRes) {
+            mParameters.putInt("dp_base_left_padding", leftPaddingRes);
+            mParameters.putInt("dp_base_top_padding", topPaddingRes);
+            mParameters.putInt("dp_base_right_padding", rightPaddingRes);
+            mParameters.putInt("dp_base_bottom_padding", bottomPaddingRes);
         }
 
         @DimenRes
         public int getBaseTopPadding() {
-            return 0;
+            return mParameters.getInt("dp_base_top_padding");
         }
 
         @DimenRes
         public int getBaseBottomPadding() {
-            return 0;
+            return mParameters.getInt("dp_base_bottom_padding");
         }
 
         @DimenRes
         public int getBaseLeftPadding() {
-            return 0;
+            return mParameters.getInt("dp_base_left_padding");
         }
 
         @DimenRes
         public int getBaseRightPadding() {
-            return 0;
+            return mParameters.getInt("dp_base_right_padding");
         }
 
         //是否有分隔线
         public boolean hasSeparationLine() {
-            return true;
+            return mParameters.getByte("dp_separation_line_exists") == 1;
+        }
+
+        public void setSeparationLineExists(boolean exists) {
+            mParameters.putByte("dp_separation_line_exists", (byte)(exists ? 1 : 0));
         }
 
         @DrawableRes
         public int getSeparationLineBackground() {
-            return R.color.qbox_background_dialog_separation_line;
+            return mParameters.getInt("dp_separation_line_background");
+        }
+
+        public void setSeparationLineBackground(@DrawableRes int backgroundRes) {
+            mParameters.putInt("dp_separation_line_background", backgroundRes);
         }
 
         @DimenRes
         public int getSeparationLineWidth() {
-            return R.dimen.qbox_dialog_separation_line_width_fixed;
+            return mParameters.getInt("dp_separation_line_width");
+        }
+
+        public void setSeparationLineWidth(@DimenRes int widthRes) {
+            mParameters.putInt("dp_separation_line_width", widthRes);
         }
 
         @DimenRes
         public int getViewVerticalInterval() {
-            return R.dimen.qbox_dialog_view_interval_vertical;
+            return mParameters.getInt("dp_view_vertical_interval");
+        }
+
+        public void setViewVerticalInterval(@DimenRes int intervalRes) {
+            mParameters.putInt("dp_view_vertical_interval", intervalRes);
         }
     }
 
@@ -259,7 +442,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        D decorator = getDecorator();
+        D decorator = getDecorator(savedInstanceState);
         LinearLayout liBase = inflateBaseView(inflater, decorator);
         //设置内容
         onCreateContentView(inflater, liBase, decorator, savedInstanceState);
@@ -273,7 +456,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     private LinearLayout inflateBaseView(LayoutInflater inflater,
                                          D decorator) {
         LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.qbox_dialog_base, null);
-        int background = getDecorator().getBackground();
+        int background = decorator.getBaseBackground();
         if (background != 0) {
             layout.setBackgroundResource(background);
         }
@@ -315,9 +498,9 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                                      @Nullable Bundle savedInstanceState) {
         int contentLayoutRes = decorator.getContentLayout();
         if (contentLayoutRes != 0) {
-            inflater.inflate(contentLayoutRes, baseView);
-            //contentView必定是第一个创建的view
-            onSetContentView(baseView.getChildAt(baseView.getChildCount() - 1), decorator, savedInstanceState);
+            View rootView = inflater.inflate(contentLayoutRes, baseView);
+            //若layout为merge，则rootView==baseView
+            onSetContentView(rootView != null ? rootView : baseView, decorator, savedInstanceState);
         }
     }
 
@@ -439,9 +622,18 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (mCustomDecorator != null && outState != null) {
+            outState.putBundle(ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS,
+                    mCustomDecorator.mParameters);
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void onClick(View v) {
         int id = v.getId();
-        D decorator = getDecorator();
+        D decorator = getDecorator(null);
         if (id == decorator.getOkId()) {
             if (onConfirm()) {
                 dismiss();
@@ -503,7 +695,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     }
 
     //绑定布局中的view
-    protected abstract void onSetContentView(View content, D decorator, @Nullable Bundle savedInstanceState);
+    protected abstract void onSetContentView(View contentView, D decorator, @Nullable Bundle savedInstanceState);
 
     protected boolean onConfirm() {
         OnDialogConfirmListener listener = getListener(OnDialogConfirmListener.class);
