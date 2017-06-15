@@ -1,4 +1,4 @@
-package com.cjq.tool.qbox.ui.view.custom_drawable_size;
+package com.cjq.tool.qbox.ui.view;
 
 import android.content.Context;
 import android.support.v7.widget.AppCompatCheckBox;

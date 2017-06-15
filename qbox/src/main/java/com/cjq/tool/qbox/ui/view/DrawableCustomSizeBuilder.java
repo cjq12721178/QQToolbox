@@ -1,5 +1,4 @@
-package com.cjq.tool.qbox.ui.view.custom_drawable_size;
-
+package com.cjq.tool.qbox.ui.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -8,6 +7,7 @@ import android.util.AttributeSet;
 import android.widget.TextView;
 
 import com.cjq.tool.qbox.R;
+
 
 /**
  * Created by CJQ on 2017/6/15.
