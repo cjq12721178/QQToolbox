@@ -34,9 +34,13 @@ public class ListDialog
         @Override
         public void reset() {
             super.reset();
-            setContentLayout(R.layout.qbox_dialog_content_list);
             setListId(R.id.rv_items);
             setItemVerticalInterval(R.dimen.qbox_list_item_interval_vertical);
+        }
+
+        @Override
+        protected int onSetContentLayout() {
+            return R.layout.qbox_dialog_content_list;
         }
 
         @IdRes

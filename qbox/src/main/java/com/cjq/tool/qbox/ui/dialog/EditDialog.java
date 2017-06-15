@@ -3,6 +3,7 @@ package com.cjq.tool.qbox.ui.dialog;
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
 import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.FragmentManager;
@@ -32,8 +33,17 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
         @Override
         public void reset() {
             super.reset();
-            setContentLayout(R.layout.qbox_dialog_content_edit);
             setEditId(R.id.il_text);
+        }
+
+        @Override
+        protected int onSetContentLayout() {
+            return R.layout.qbox_dialog_content_edit;
+        }
+
+        @Override
+        public void setContentLayout(@LayoutRes int layoutRes) {
+            super.setContentLayout(layoutRes);
         }
 
         @IdRes

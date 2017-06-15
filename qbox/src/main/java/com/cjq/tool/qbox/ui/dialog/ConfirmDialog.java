@@ -14,6 +14,10 @@ public class ConfirmDialog extends BaseDialog<ConfirmDialog.Decorator> {
 
     public static class Decorator extends BaseDialog.Decorator {
 
+        @Override
+        protected int onSetContentLayout() {
+            return 0;
+        }
     }
 
     @Override

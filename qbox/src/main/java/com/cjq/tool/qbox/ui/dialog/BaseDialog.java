@@ -48,29 +48,10 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     private static final String ARGUMENT_KEY_TITLE_RESOURCE = "in_title_resource";
     private static final String ARGUMENT_KEY_EXIT_TYPE = "in_exit_type";
     private static final String ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS = "in_custom_decorator_paras";
-    //private static final String ARGUMENT_KEY_CUSTOM_DECORATOR = "in_custom_decorator";
     private static final String FLAG_SEPARATION_LINE = "line";
 
     private static final Map<String, Decorator> overallDecorator = new HashMap<>();
     private D mCustomDecorator;
-
-//    public static void setOverallDecorator(Decorator decorator) {
-//        if (decorator != null) {
-//            //取相应dialog类名为key
-//            String decoratorName = getDecoratorName(decorator);
-//            overallDecorator.put(decoratorName, decorator);
-//        }
-//    }
-//
-//    private static String getDecoratorName(Decorator decorator) {
-//        Class decoratorClass = decorator.getClass();
-//        Class enclosingClass = decoratorClass.getEnclosingClass();
-//        while (!BaseDialog.class.isAssignableFrom(enclosingClass)) {
-//            decoratorClass = decoratorClass.getSuperclass();
-//            enclosingClass = decoratorClass.getEnclosingClass();
-//        }
-//        return enclosingClass.getSimpleName();
-//    }
 
     //Decorator无法在Dialog类外部通过实例化获得，
     //只能通过getOverallDecorator(Class<DL>)和getCustomDecorator()方法获得
@@ -93,10 +74,10 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
     private static <DL extends BaseDialog, DC extends Decorator> DC createDecorator(Class<DL> dialogClass) {
         if (dialogClass == BaseDialog.class)
-            return (DC)new Decorator();
+            return (DC)new BaseDecorator();
         DC result = createDecoratorImp(dialogClass);
         Decorator baseDecorator = overallDecorator.get(BaseDialog.class.getSimpleName());
-        result.setParameters(baseDecorator);
+        result.addParameters(baseDecorator);
         return result;
     }
 
@@ -115,40 +96,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         }
     }
 
-//    protected D getOverallDecorator() {
-//        String decoratorName = getClass().getSimpleName();
-//        D decorator = (D)overallDecorator.get(decoratorName);
-//        if (decorator == null) {
-//            decorator = createDecorator(getClass());
-//            if (decorator == null)
-//                throw new NullPointerException();
-//            //setOverallDecorator(decorator);
-//            overallDecorator.put(decoratorName, decorator);
-//        }
-//        return decorator;
-//    }
-
-//    private D createDecorator() {
-//        try {
-//            Class dialogClass = getClass();
-//            Type superClassType = dialogClass.getGenericSuperclass();
-//            while (!(superClassType instanceof ParameterizedType)) {
-//                dialogClass = dialogClass.getSuperclass();
-//                superClassType = dialogClass.getGenericSuperclass();
-//            }
-//            return ((Class<D>)((ParameterizedType)superClassType).
-//                    getActualTypeArguments()[0]).newInstance();
-//        } catch (Exception e) {
-//        }
-//        return null;
-//    }
-
-//    public void setCustomDecorator(D customDecorator) {
-//        getArguments().putSerializable(ARGUMENT_KEY_CUSTOM_DECORATOR, customDecorator);
-//    }
-
     final public D getCustomDecorator() {
-        //return (D) getArguments().getSerializable(ARGUMENT_KEY_CUSTOM_DECORATOR);
         if (mCustomDecorator == null) {
             mCustomDecorator = createDecorator(getClass());
         }
@@ -162,14 +110,14 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             Bundle parameters = savedInstanceState.getBundle(ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS);
             if (parameters != null) {
                 mCustomDecorator = createDecoratorImp(getClass());
-                mCustomDecorator.setParameters(parameters);
+                mCustomDecorator.addParameters(parameters);
                 return mCustomDecorator;
             }
         }
         return (D)getOverallDecorator(getClass());
     }
 
-    public static class Decorator  {
+    public static abstract class Decorator  {
 
         protected Bundle mParameters = new Bundle();
 
@@ -189,30 +137,28 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             setSeparationLineBackground(R.color.qbox_background_dialog_separation_line);
             setSeparationLineWidth(R.dimen.qbox_dialog_separation_line_width_fixed);
             setViewVerticalInterval(R.dimen.qbox_dialog_view_interval_vertical);
+            setContentLayout(onSetContentLayout());
         }
 
-        void setParameters(Decorator baseDecorator) {
+        @LayoutRes
+        protected abstract int onSetContentLayout();
+
+        void addParameters(Decorator baseDecorator) {
             if (baseDecorator != null) {
-                setParameters(baseDecorator.mParameters);
+                addParameters(baseDecorator.mParameters);
             }
         }
 
-        void setParameters(Bundle parameters) {
+        void addParameters(Bundle parameters) {
             mParameters.putAll(parameters);
         }
-
-//        void getParameters(Bundle outState) {
-//            if (outState != null) {
-//                outState.putBundle(ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS, mParameters);
-//            }
-//        }
 
         @LayoutRes
         final public int getContentLayout() {
             return mParameters.getInt("dp_content_layout");
         }
 
-        final public void setContentLayout(@LayoutRes int layoutRes) {
+        protected void setContentLayout(@LayoutRes int layoutRes) {
             if (getClass().getEnclosingClass() != BaseDialog.class) {
                 mParameters.putInt("dp_content_layout", layoutRes);
             }
@@ -426,6 +372,14 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         }
     }
 
+    private static class BaseDecorator extends Decorator {
+
+        @Override
+        protected int onSetContentLayout() {
+            return 0;
+        }
+    }
+
     public BaseDialog() {
         setArguments(new Bundle());
         setExitType(EXIT_TYPE_OK_CANCEL);
@@ -498,9 +452,20 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                                      @Nullable Bundle savedInstanceState) {
         int contentLayoutRes = decorator.getContentLayout();
         if (contentLayoutRes != 0) {
-            View rootView = inflater.inflate(contentLayoutRes, baseView);
-            //若layout为merge，则rootView==baseView
-            onSetContentView(rootView != null ? rootView : baseView, decorator, savedInstanceState);
+            inflater.inflate(contentLayoutRes, baseView);
+            onSetContentView(baseView, decorator, savedInstanceState);
+            int intervalRes = decorator.getViewVerticalInterval();
+            if (intervalRes != 0) {
+                int interval = getResources().getDimensionPixelSize(intervalRes);
+                for (int i = 2, n = baseView.getChildCount();i < n;++i) {
+                    View childView = baseView.getChildAt(i);
+                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) childView.getLayoutParams();
+                    params.setMargins(params.leftMargin, interval, params.rightMargin, params.bottomMargin);
+                    childView.setLayoutParams(params);
+                }
+            }
+//            View contentView = rootView != null ? rootView : baseView;
+//            onSetContentView(contentView, decorator, savedInstanceState);
         }
     }
 
