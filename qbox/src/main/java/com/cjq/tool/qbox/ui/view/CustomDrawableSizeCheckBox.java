@@ -15,7 +15,7 @@ public class CustomDrawableSizeCheckBox extends AppCompatCheckBox {
     }
 
     public CustomDrawableSizeCheckBox(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        this(context, attrs, android.support.v7.appcompat.R.attr.checkboxStyle);
     }
 
     public CustomDrawableSizeCheckBox(Context context, AttributeSet attrs, int defStyleAttr) {

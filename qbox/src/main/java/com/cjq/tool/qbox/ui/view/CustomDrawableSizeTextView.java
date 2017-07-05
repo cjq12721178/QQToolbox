@@ -15,7 +15,7 @@ public class CustomDrawableSizeTextView extends AppCompatTextView {
     }
 
     public CustomDrawableSizeTextView(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        this(context, attrs, android.R.attr.textViewStyle);
     }
 
     public CustomDrawableSizeTextView(Context context, AttributeSet attrs, int defStyleAttr) {

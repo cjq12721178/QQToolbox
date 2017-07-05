@@ -15,7 +15,7 @@ public class CustomDrawableSizeRadioButton extends AppCompatRadioButton {
     }
 
     public CustomDrawableSizeRadioButton(Context context, AttributeSet attrs) {
-        this(context, attrs, 0);
+        this(context, attrs, android.support.v7.appcompat.R.attr.radioButtonStyle);
     }
 
     public CustomDrawableSizeRadioButton(Context context, AttributeSet attrs, int defStyleAttr) {

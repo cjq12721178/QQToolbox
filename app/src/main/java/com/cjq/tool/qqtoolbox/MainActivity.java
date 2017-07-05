@@ -8,6 +8,7 @@ import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
+import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -95,6 +96,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 BaseDialog.Decorator decorator4 = BaseDialog.getBaseOverallDecorator();
                 decorator4.setTitleTextSize(R.dimen.super_text_size);
                 decorator4.setCancelLabel(R.string.custom_cancel);
+                break;
+            case R.id.btn_show_simple_toast:
+                SimpleCustomizeToast.show(this, "尼玛");
                 break;
         }
     }

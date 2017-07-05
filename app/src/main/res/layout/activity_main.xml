@@ -89,4 +89,22 @@
         android:text="set base decoration"
         app:layout_constraintTop_toBottomOf="@+id/btn_list_dialog"
         app:layout_constraintLeft_toLeftOf="@id/textView2"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_label_toast"
+        android:text="Simple Toast"
+        android:layout_marginLeft="16dp"
+        android:layout_marginTop="16dp"
+        app:layout_constraintTop_toBottomOf="@id/btn_set_base_decoration"
+        app:layout_constraintLeft_toLeftOf="parent"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_show_simple_toast"
+        android:text="show simple toast"
+        app:layout_constraintLeft_toLeftOf="@id/tv_label_toast"
+        app:layout_constraintTop_toBottomOf="@id/tv_label_toast"
+        android:onClick="onClick"/>
 </android.support.constraint.ConstraintLayout>

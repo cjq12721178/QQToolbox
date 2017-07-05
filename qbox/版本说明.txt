@@ -30,3 +30,8 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20170615-0.1.7(8):
 1. 调整部分包和类的位置
+
+20170704-0.2.1(9):
+1. 修正CustomDrawableSizeXXXView的构造函数
+2. 新增SimpleCustomizeToast
+3. 新增ClosableLog
