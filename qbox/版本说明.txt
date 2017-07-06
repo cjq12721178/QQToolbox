@@ -35,3 +35,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 1. 修正CustomDrawableSizeXXXView的构造函数
 2. 新增SimpleCustomizeToast
 3. 新增ClosableLog
+
+20170706-0.3.0(10):
+1. 新增SwitchableFragmentManager用于在某个layout中切换不同的fragment以达到实现多种显示方式的目的

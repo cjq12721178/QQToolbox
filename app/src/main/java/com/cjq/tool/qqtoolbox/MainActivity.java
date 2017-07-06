@@ -1,5 +1,6 @@
 package com.cjq.tool.qqtoolbox;
 
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -8,14 +9,27 @@ import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
+import com.cjq.tool.qbox.ui.manager.SwitchableFragmentManager;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
+import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
+import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
+import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    private SwitchableFragmentManager mSwitchableFragmentManager;
+    private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSwitchableFragmentManager = new SwitchableFragmentManager(
+                getSupportFragmentManager(),
+                R.id.fl_fragment_stub,
+                mFragmentTags,
+                new Class[] {VisualFragment1.class, VisualFragment2.class, VisualFragment3.class});
     }
 
     @Override
@@ -99,6 +113,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_show_simple_toast:
                 SimpleCustomizeToast.show(this, "尼玛");
+                break;
+            case R.id.btn_switch_fragment:
+                int index = v.getTag() == null ? 0 : (int)v.getTag();
+                mSwitchableFragmentManager.switchTo(mFragmentTags[index]);
+                index += 1;
+                if (index >= 3) {
+                    index = 0;
+                }
+                v.setTag(index);
                 break;
         }
     }
