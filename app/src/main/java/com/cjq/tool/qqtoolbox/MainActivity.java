@@ -116,9 +116,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_switch_fragment:
                 int index = v.getTag() == null ? 0 : (int)v.getTag();
-                mSwitchableFragmentManager.switchTo(mFragmentTags[index]);
+                mSwitchableFragmentManager.switchTo(index == 3 ? null : mFragmentTags[index]);
                 index += 1;
-                if (index >= 3) {
+                if (index >= 4) {
                     index = 0;
                 }
                 v.setTag(index);

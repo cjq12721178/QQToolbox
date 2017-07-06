@@ -57,33 +57,29 @@ public class SwitchableFragmentManager<F extends Fragment> {
     }
 
     public F switchTo(int fragmentIndex) {
-        if (fragmentIndex < 0 || fragmentIndex >= mFragmentTags.length) {
-            throw new IllegalArgumentException("out of fragment tags bounds");
-        }
-        return switchTo(mFragmentTags[fragmentIndex]);
+        return switchTo(fragmentIndex < 0 || fragmentIndex >= mFragmentTags.length
+                ? null
+                : mFragmentTags[fragmentIndex]);
     }
 
     public F switchTo(String tag) {
-        if (TextUtils.isEmpty(tag)) {
-            throw new IllegalArgumentException("fragment tag which to be switched can not be empty");
-        }
         F from = mCurrentFragment;
-        F to = getFragmentByTag(tag);
+        F to = TextUtils.isEmpty(tag)
+                ? null : getFragmentByTag(tag);
         if (from == to) {
             return mCurrentFragment;
-        }
-        if (to == null) {
-            return null;
         }
         FragmentTransaction transaction = mFragmentManager.beginTransaction();
         if (from != null) {
             transaction.hide(from);
         }
-        if (!to.isAdded()) {
-            transaction.add(mParentViewId, to, tag);
-        }
-        if (to.isHidden()) {
-            transaction.show(to);
+        if (to != null) {
+            if (!to.isAdded()) {
+                transaction.add(mParentViewId, to, tag);
+            }
+            if (to.isHidden()) {
+                transaction.show(to);
+            }
         }
         transaction.commit();
         mCurrentFragment = to;
@@ -105,6 +101,6 @@ public class SwitchableFragmentManager<F extends Fragment> {
                 }
             }
         }
-        throw new IllegalArgumentException("can not get fragment by tag");
+        return null;
     }
 }
