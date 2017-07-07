@@ -89,10 +89,8 @@ public class SwitchableFragmentManager<F extends Fragment & OnDataSetChangedList
         if (from != null) {
             transaction.hide(from);
         }
-        boolean needNotifyDataSetChanged = false;
         if (to != null) {
             if (!to.isAdded()) {
-                needNotifyDataSetChanged = true;
                 transaction.add(mParentViewId, to, tag);
             }
             if (to.isHidden()) {
@@ -101,9 +99,6 @@ public class SwitchableFragmentManager<F extends Fragment & OnDataSetChangedList
         }
         transaction.commit();
         mCurrentFragment = to;
-        if (needNotifyDataSetChanged) {
-            notifyDataSetChanged();
-        }
         return from;
     }
 

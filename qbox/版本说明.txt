@@ -45,3 +45,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20170707-0.3.2(12):
 1. 完善SwitchableFragmentManager构造函数的参数类型检查
 2. 新增接口OnDataSetChangedListener，数据变换时通过SwitchableFragmentManager调用notifyDataSetChanged()方法刷新当前fragment
+
+20170707-0.3.3(13):
+1. SwitchableFragmentManager在第一次添加某fragment时不再自动调用notifyDataSetChanged()方法，而是当数据发生变化时，由使用者自己调用

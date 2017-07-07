@@ -122,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         fragment.setStudent(new VisualFragment.Student("fisrt", (int)(50.0 * Math.random())));
                     }
                 }
+                mSwitchableFragmentManager.notifyDataSetChanged();
                 index += 1;
                 if (index >= 4) {
                     index = 0;
