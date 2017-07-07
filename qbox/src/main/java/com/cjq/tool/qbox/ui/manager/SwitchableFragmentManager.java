@@ -1,5 +1,7 @@
 package com.cjq.tool.qbox.ui.manager;
 
+import android.os.Handler;
+import android.os.Message;
 import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -11,7 +13,9 @@ import android.text.TextUtils;
  * Created by CJQ on 2017/7/6.
  */
 
-public class SwitchableFragmentManager<F extends Fragment> {
+public class SwitchableFragmentManager<F extends Fragment & OnDataSetChangedListener> {
+
+    private static final int MESSAGE_DATA_SET_CHANGED = 1;
 
     private F mCurrentFragment;
     private final FragmentManager mFragmentManager;
@@ -26,7 +30,7 @@ public class SwitchableFragmentManager<F extends Fragment> {
         if (fragmentManager == null) {
             throw new NullPointerException("fragment manager can not be null");
         }
-        if (isArrayOrComponentNull(fragmentTags) || isArrayOrComponentNull(fragmentClasses)) {
+        if (isTagsNullOrEmpty(fragmentTags) || isClassesNullOrIllegal(fragmentClasses)) {
             throw new NullPointerException("fragment tags and classes can not be null");
         }
         if (fragmentTags.length != fragmentClasses.length) {
@@ -38,14 +42,26 @@ public class SwitchableFragmentManager<F extends Fragment> {
         mFragmentClasses = fragmentClasses;
     }
 
-    private <T> boolean isArrayOrComponentNull(T[] array) {
-        if (array == null) {
+    private boolean isTagsNullOrEmpty(String[] tags) {
+        if (tags == null) {
             return true;
         }
-        for (int i = 0;i < array.length;++i) {
-            if (array[i] == null) {
+        for (int i = 0;i < tags.length;++i) {
+            if (TextUtils.isEmpty(tags[i])) {
                 return true;
-            } else if (array[i] instanceof String && array[i] == "") {
+            }
+        }
+        return false;
+    }
+
+    private boolean isClassesNullOrIllegal(Class<F>[] classes) {
+        if (classes == null) {
+            return true;
+        }
+        for (int i = 0;i < classes.length;++i) {
+            if (classes[i] == null ||
+                    !Fragment.class.isAssignableFrom(classes[i]) ||
+                    !OnDataSetChangedListener.class.isAssignableFrom(classes[i])) {
                 return true;
             }
         }
@@ -73,8 +89,10 @@ public class SwitchableFragmentManager<F extends Fragment> {
         if (from != null) {
             transaction.hide(from);
         }
+        boolean needNotifyDataSetChanged = false;
         if (to != null) {
             if (!to.isAdded()) {
+                needNotifyDataSetChanged = true;
                 transaction.add(mParentViewId, to, tag);
             }
             if (to.isHidden()) {
@@ -83,6 +101,9 @@ public class SwitchableFragmentManager<F extends Fragment> {
         }
         transaction.commit();
         mCurrentFragment = to;
+        if (needNotifyDataSetChanged) {
+            notifyDataSetChanged();
+        }
         return from;
     }
 
@@ -103,4 +124,19 @@ public class SwitchableFragmentManager<F extends Fragment> {
         }
         return null;
     }
+
+    public void notifyDataSetChanged() {
+        mHandler.sendEmptyMessage(MESSAGE_DATA_SET_CHANGED);
+    }
+
+    private final Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == MESSAGE_DATA_SET_CHANGED) {
+                if (mCurrentFragment != null) {
+                    mCurrentFragment.onDataSetChanged();
+                }
+            }
+        }
+    };
 }

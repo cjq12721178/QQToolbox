@@ -7,17 +7,23 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.cjq.tool.qbox.ui.manager.OnDataSetChangedListener;
 import com.cjq.tool.qqtoolbox.R;
 
 /**
  * Created by CJQ on 2017/7/6.
  */
 
-public class VisualFragment3 extends Fragment {
+public class VisualFragment3 extends VisualFragment {
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_visual3, null);
+    }
+
+    @Override
+    public void onDataSetChanged() {
+
     }
 }

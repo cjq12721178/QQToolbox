@@ -11,6 +11,8 @@ import com.cjq.tool.qbox.ui.dialog.EditDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
 import com.cjq.tool.qbox.ui.manager.SwitchableFragmentManager;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
+import com.cjq.tool.qbox.util.ClosableLog;
+import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
@@ -25,11 +27,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        mSwitchableFragmentManager = new SwitchableFragmentManager(
-                getSupportFragmentManager(),
-                R.id.fl_fragment_stub,
-                mFragmentTags,
-                new Class[] {VisualFragment1.class, VisualFragment2.class, VisualFragment3.class});
+        ClosableLog.setEnablePrint(true);
     }
 
     @Override
@@ -115,14 +113,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 SimpleCustomizeToast.show(this, "尼玛");
                 break;
             case R.id.btn_switch_fragment:
+                initSwitchableFragmentManager();
                 int index = v.getTag() == null ? 0 : (int)v.getTag();
                 mSwitchableFragmentManager.switchTo(index == 3 ? null : mFragmentTags[index]);
+                if (index == 0) {
+                    VisualFragment fragment = (VisualFragment)mSwitchableFragmentManager.getCurrentFragment();
+                    if (fragment != null) {
+                        fragment.setStudent(new VisualFragment.Student("fisrt", (int)(50.0 * Math.random())));
+                    }
+                }
                 index += 1;
                 if (index >= 4) {
                     index = 0;
                 }
                 v.setTag(index);
                 break;
+            case R.id.btn_notify_data_set_changed:
+                initSwitchableFragmentManager();
+                VisualFragment fragment = (VisualFragment)mSwitchableFragmentManager.getCurrentFragment();
+                mSwitchableFragmentManager.notifyDataSetChanged();
+                if (fragment != null) {
+                    fragment.setStudent(new VisualFragment.Student("second", (int)(50.0 * Math.random())));
+                }
+                break;
+        }
+    }
+
+    private void initSwitchableFragmentManager() {
+        if (mSwitchableFragmentManager == null) {
+            mSwitchableFragmentManager = new SwitchableFragmentManager(
+                    getSupportFragmentManager(),
+                    R.id.fl_fragment_stub,
+                    mFragmentTags,
+                    new Class[] {VisualFragment1.class, VisualFragment2.class, VisualFragment3.class});
         }
     }
 }

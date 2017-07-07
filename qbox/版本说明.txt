@@ -41,3 +41,7 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20170706-0.3.1(11):
 1. 修复SwitchableFragmentManager无法隐藏所有fragment的问题
+
+20170707-0.3.2(12):
+1. 完善SwitchableFragmentManager构造函数的参数类型检查
+2. 新增接口OnDataSetChangedListener，数据变换时通过SwitchableFragmentManager调用notifyDataSetChanged()方法刷新当前fragment
