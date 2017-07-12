@@ -51,3 +51,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20170712-0.4.0(14)
 1. 新增NumericConverter类，用于各种数值类型间的转换，目前主要是从byte转为uint8、uint16、uint32、int16、int32等
+
+20170712-0.4.1(15)
+1. 在NumericConverter类中添加float转为bytes的函数

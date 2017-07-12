@@ -1,9 +1,13 @@
 package com.cjq.tool.qbox.util;
 
+
 /**
  * Created by KAT on 2016/6/28.
  */
 public class NumericConverter {
+
+    private static final int FLOAT_BYTES = 4;
+
     public static short int8ToUInt8(byte b) {
         return (short) (b & 0xff);
     }
@@ -83,5 +87,31 @@ public class NumericConverter {
 
     public static float bytesToFloatByLSB(byte[] bytes, int pos) {
         return Float.intBitsToFloat(int8toInt32ByLSB(bytes, pos));
+    }
+
+    public static void floatToBytesByMSB(float f, byte[] bytes, int pos) {
+        int intBits = Float.floatToIntBits(f);
+        for (int i = 0, mask = 0xff000000;i < FLOAT_BYTES;++i, mask >>= 8) {
+            bytes[pos + i] = (byte) (intBits & mask);
+        }
+    }
+
+    public static byte[] floatToBytesByMSB(float f) {
+        byte[] bytes = new byte[FLOAT_BYTES];
+        floatToBytesByMSB(f, bytes, 0);
+        return bytes;
+    }
+
+    public static void floatToBytesByLSB(float f, byte[] bytes, int pos) {
+        int intBits = Float.floatToIntBits(f);
+        for (int i = 0, mask = 0xff;i < FLOAT_BYTES;++i, mask <<= 8) {
+            bytes[pos + i] = (byte) (intBits & mask);
+        }
+    }
+
+    public static byte[] floatToBytesByLSB(float f) {
+        byte[] bytes = new byte[FLOAT_BYTES];
+        floatToBytesByLSB(f, bytes, 0);
+        return bytes;
     }
 }
