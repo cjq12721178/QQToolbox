@@ -48,3 +48,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20170707-0.3.3(13):
 1. SwitchableFragmentManager在第一次添加某fragment时不再自动调用notifyDataSetChanged()方法，而是当数据发生变化时，由使用者自己调用
+
+20170712-0.4.0(14)
+1. 新增NumericConverter类，用于各种数值类型间的转换，目前主要是从byte转为uint8、uint16、uint32、int16、int32等
