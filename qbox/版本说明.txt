@@ -54,3 +54,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20170712-0.4.1(15)
 1. 在NumericConverter类中添加float转为bytes的函数
+
+20170714-0.5.0(16)
+1. 新增SizeSelfAdaptionTextView，使固定长度的TextView根据文字长度调整字体大小

@@ -4,6 +4,8 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.EditText;
+import android.widget.TextView;
 
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
@@ -11,6 +13,7 @@ import com.cjq.tool.qbox.ui.dialog.EditDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
 import com.cjq.tool.qbox.ui.manager.SwitchableFragmentManager;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
+import com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView;
 import com.cjq.tool.qbox.util.ClosableLog;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
@@ -21,6 +24,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private SwitchableFragmentManager mSwitchableFragmentManager;
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
+    private SizeSelfAdaptionTextView mSizeSelfAdaptionTextView;
+    private EditText mEtSetText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +33,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
 
         ClosableLog.setEnablePrint(true);
+        mSizeSelfAdaptionTextView = (SizeSelfAdaptionTextView) findViewById(R.id.tv_fix_size);
+        mEtSetText = (EditText) findViewById(R.id.et_set_text);
     }
 
     @Override
@@ -136,6 +143,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if (fragment != null) {
                     fragment.setStudent(new VisualFragment.Student("second", (int)(50.0 * Math.random())));
                 }
+                break;
+            case R.id.btn_set_text:
+                mSizeSelfAdaptionTextView.setText(mEtSetText.getText().toString());
                 break;
         }
     }
