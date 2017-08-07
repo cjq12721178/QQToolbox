@@ -1,1 +1,1 @@
-include ':app', ':qbox'
+include ':app', ':qbox', ':weisi'

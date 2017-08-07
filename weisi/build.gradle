@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 24
-    buildToolsVersion "25.0.0"
+    buildToolsVersion '25.0.0'
 
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 24
-        versionCode 16
-        versionName "0.5.0"
+        versionCode 1
+        versionName "0.1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
@@ -19,6 +19,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
     //打包后应用名称
 
     libraryVariants.all { variant ->
@@ -27,7 +28,7 @@ android {
             def fileName
             if (outputFile != null && outputFile.name.endsWith('.aar')) {
                 if (variant.buildType.name == 'release') {
-                    fileName = "com.cjq.tool.qbox-${defaultConfig.versionName}.aar"
+                    fileName = "com.cjq.lib.weisi-${defaultConfig.versionName}.aar"
                 } else if (variant.buildType.name == 'debug') {
                     fileName = "debug-${defaultConfig.versionName}.aar"
                 }
@@ -38,13 +39,13 @@ android {
 }
 
 dependencies {
-    compile fileTree(include: ['*.jar'], dir: 'libs')
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
     compile 'com.android.support:appcompat-v7:24.2.1'
     testCompile 'junit:junit:4.12'
-    compile 'com.android.support:recyclerview-v7:24.2.1'
+    compile project(path: ':qbox')
 }
 
 task copyAar(type: Copy) {
@@ -52,14 +53,14 @@ task copyAar(type: Copy) {
     into "${projectDir}"
     exclude 'debug*'
     include "*${android.defaultConfig.versionName}.aar"
-    println "qbox back-up completed"
+    println "weisi back-up completed"
 }
 
 afterEvaluate {
     tasks.matching {
         // 以process开头以ReleaseJavaRes或DebugJavaRes结尾的task
         it.name == "assembleRelease" &&
-        it.project.name == "qbox"
+                it.project.name == "weisi"
     }.each { task ->
         //task.dependsOn(testAssembleRelease)  // 任务依赖：执行task之前需要执行dependsOn指定的任务
         task.doLast {
