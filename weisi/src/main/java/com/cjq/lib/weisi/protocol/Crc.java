@@ -46,64 +46,99 @@ public class Crc {
     private Crc() {
     }
 
-    public static int calc16ByMSB(byte[] buf) {
-        return calc16ByMSB(buf, 0, buf.length);
+    //abnormal系列用于来自BLE的数据解析，因为目测BLE的CRC计算有问题。。
+    public static int calc16AbnormalByMsb(byte[] buf) {
+        return calc16AbnormalByMsb(buf, 0, buf.length);
     }
 
-    public static int calc16ByMSB(byte[] buf, int pos, int len) {
-        return calc16ByMSB(CRC16_DEFAULT_START_VALUE, buf, pos, len);
+    public static int calc16AbnormalByMsb(byte[] buf, int pos, int len) {
+        return calc16AbnormalByMsb(CRC16_DEFAULT_START_VALUE, buf, pos, len);
     }
 
-    public static int calc16ByMSB(int startCrc16, byte[] buf, int pos, int len) {
+    public static int calc16AbnormalByMsb(int startCrc16, byte[] buf, int pos, int len) {
         int crc16 = startCrc16;
         for(int i = pos, end = pos + len; i < end; i++) {
-            crc16 = calc16PerByte(crc16, buf[i]);
+            crc16 = calc16AbnormalPerByte(crc16, buf[i]);
         }
         return crc16 & 0xffff;
     }
 
-    public static int calc16ByLSB(byte[] buf) {
-        return calc16ByLSB(buf, 0, buf.length);
+    public static int calc16AbnormalByLSB(byte[] buf) {
+        return calc16AbnormalByLSB(buf, 0, buf.length);
     }
 
-    public static int calc16ByLSB(byte[] buf, int pos, int len) {
-        return calc16ByLSB(CRC16_DEFAULT_START_VALUE, buf, pos, len);
+    public static int calc16AbnormalByLSB(byte[] buf, int pos, int len) {
+        return calc16AbnormalByLSB(CRC16_DEFAULT_START_VALUE, buf, pos, len);
     }
 
-    public static int calc16ByLSB(int startCrc16, byte[] buf, int pos, int len) {
+    public static int calc16AbnormalByLSB(int startCrc16, byte[] buf, int pos, int len) {
         int crc16 = startCrc16;
         for(int i = pos + len - 1;i >= pos;--i) {
-            crc16 = calc16PerByte(crc16, buf[i]);
+            crc16 = calc16AbnormalPerByte(crc16, buf[i]);
         }
         return crc16 & 0xffff;
     }
 
-    private static int calc16PerByte(int crc, byte val) {
+    private static int calc16AbnormalPerByte(int crc, byte val) {
         return (REMAIN_TABLE_16[((crc >> 8) ^ ((int)val & 0xff)) & 0xff] ^ (crc << 8)) & 0xffff;
     }
 
-    public static boolean isCorrect16(byte[] buf, boolean isLSB) {
-        if (buf == null || buf.length < CRC16_LENGTH) {
-            return false;
-        }
-        int crcPos = buf.length - CRC16_LENGTH;
-        int crc16 = calc16ByMSB(buf, 0, crcPos);
-        return isLSB
-                ? (crc16 & 0xff) == buf[crcPos] && (crc16 >> 8) == buf[crcPos + 1]
-                : (crc16 & 0xff) == buf[crcPos + 1] && (crc16 >> 8) == buf[crcPos];
+    public static boolean isCorrect16Abnormal(byte[] buf, boolean isBufMsb, boolean isCrcMsb) {
+        return isCorrect16(buf, 0, buf.length, true, isBufMsb, isCrcMsb);
     }
 
-//    public static int calculateCCITT16(byte[] message) {
-//        return calculateCCITT16(message, 0, message.length);
-//    }
-//
-//    public static int calculateCCITT16(byte[] message, int position, int length) {
-//        int crc16 = CRC16_DEFAULT_START_VALUE;
-//        for (int i = position, n = length < message.length ? length : message.length;
-//             i < n;
-//             ++i) {
-//            crc16 = (crc16 >> 8) ^ REMAIN_TABLE_16[(crc16 ^ message[i]) & 0xff];
-//        }
-//        return crc16;
-//    }
+    public static boolean isCorrect16Abnormal(byte[] buf, int position, int length, boolean isBufMsb, boolean isCrcMsb) {
+        return isCorrect16(buf, position, length, true, isBufMsb, isCrcMsb);
+    }
+
+    public static int calc16ByMsb(byte[] buf) {
+        return calc16ByMsb(buf, 0, buf.length);
+    }
+
+    public static int calc16ByMsb(byte[] buf, int position, int length) {
+        int crc16 = CRC16_DEFAULT_START_VALUE;
+        for (int i = position,
+             n = (length + position) < buf.length
+                     ? length + position
+                     : buf.length;
+             i < n;
+             ++i) {
+            crc16 = (crc16 >> 8) ^ REMAIN_TABLE_16[(crc16 ^ buf[i]) & 0xff];
+        }
+        return crc16;
+    }
+
+    public static int calc16ByLsb(byte[] buf) {
+        return calc16ByLsb(buf, 0, buf.length);
+    }
+
+    public static int calc16ByLsb(byte[] buf, int position, int length) {
+        int crc16 = CRC16_DEFAULT_START_VALUE;
+        for (int i = position + length - 1;i >= position;--i) {
+            crc16 = (crc16 >> 8) ^ REMAIN_TABLE_16[(crc16 ^ buf[i]) & 0xff];
+        }
+        return crc16;
+    }
+
+    public static boolean isCorrect16(byte[] buf, boolean isBufMsb, boolean isCrcMsb) {
+        return isCorrect16(buf, 0, buf.length, false, isBufMsb, isCrcMsb);
+    }
+
+    public static boolean isCorrect16(byte[] buf, int position, int length, boolean isBufMsb, boolean isCrcMsb) {
+        return isCorrect16(buf, position, length, false, isBufMsb, isCrcMsb);
+    }
+
+    private static boolean isCorrect16(byte[] buf, int position, int length, boolean isAbnormal, boolean isBufMsb, boolean isCrcMsb) {
+        int crcPos = buf.length - CRC16_LENGTH;
+        int crc16 = isAbnormal
+                ? (isBufMsb
+                    ? calc16ByMsb(buf, position, length)
+                    : calc16ByLsb(buf, position, length))
+                : (isBufMsb
+                    ? calc16AbnormalByMsb(buf, position, length)
+                    : calc16AbnormalByLSB(buf, position, length));
+        return isCrcMsb
+                ? (crc16 & 0xff) == buf[crcPos + 1] && (crc16 >> 8) == buf[crcPos]
+                : (crc16 & 0xff) == buf[crcPos] && (crc16 >> 8) == buf[crcPos + 1];
+    }
 }

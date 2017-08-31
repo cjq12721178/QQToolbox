@@ -6,7 +6,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -23,50 +22,44 @@ import javax.xml.parsers.SAXParserFactory;
 
 public class ConfigurationManager {
 
-    private static Map<Byte, DataType> mBleDataTypes;
-    private static Map<Byte, DataType> mEthernetDataTypes;
-    private static List<Configuration> mBleConfiguration;
-    private static List<Configuration> mEthernetConfiguration;
+    private static final int BLE_ADDRESS_LENGTH = 6;
+    private static final Map<Byte, DataType> BLE_DATA_TYPES = new HashMap<>();
+    private static final Map<Byte, DataType> ETHERNET_DATA_TYPES = new HashMap<>();
+    private static final List<Configuration> BLE_CONFIGURATIONS = new ArrayList<>();
+    private static final List<Configuration> ETHERNET_CONFIGURATIONS = new ArrayList<>();
 
     public static boolean importBleConfiguration(Context context) {
-        try {
-            return importBleConfiguration(context.getAssets().open("BleSensorConfiguration.xml"));
-        } catch (Exception e) {
-        }
-        return false;
-    }
-
-    public static boolean importBleConfiguration(InputStream is) {
-        ConfigurationImporter importer = getConfigurationImporter(is);
-        if (importer == null) {
-            return false;
-        }
-        mBleDataTypes = importer.getDataTypeMap();
-        mBleConfiguration = importer.getConfigurations();
-        return true;
+        return importConfiguration(BLE_DATA_TYPES,
+                BLE_CONFIGURATIONS,
+                context,
+                "BleSensorConfiguration.xml");
     }
 
     public static boolean importEthernetConfiguration(Context context) {
-        try {
-            return importBleConfiguration(context.getAssets().open("EthernetSensorConfiguration.xml"));
-        } catch (Exception e) {
-        }
-        return false;
+        return importConfiguration(ETHERNET_DATA_TYPES,
+                ETHERNET_CONFIGURATIONS,
+                context,
+                "EthernetSensorConfiguration.xml");
     }
 
-    public static boolean importEthernetConfiguration(InputStream is) {
-        ConfigurationImporter importer = getConfigurationImporter(is);
+    private static boolean importConfiguration(Map<Byte, DataType> dataTypes,
+                                               List<Configuration> configurations,
+                                               Context context,
+                                               String configFileName) {
+        ConfigurationImporter importer = getConfigurationImporter(context, configFileName);
         if (importer == null) {
             return false;
         }
-        mEthernetDataTypes = importer.getDataTypeMap();
-        mEthernetConfiguration = importer.getConfigurations();
+        dataTypes.clear();
+        configurations.clear();
+        dataTypes.putAll(importer.getDataTypeMap());
+        configurations.addAll(importer.getConfigurations());
         return true;
     }
 
-    static Configuration findConfiguration(boolean isBle, int address) {
+    public static Configuration findConfiguration(int address) {
         CONFIGURATION_SEARCHER.mStartAddress = address;
-        List<Configuration> configurations = getConfigurations(isBle);
+        List<Configuration> configurations = getConfigurations(address);
         if (configurations == null)
             return null;
         int index = Collections.binarySearch(configurations,
@@ -75,8 +68,16 @@ public class ConfigurationManager {
         return index >= 0 ? configurations.get(index) : null;
     }
 
-    static DataType getDataType(boolean isBle, byte dataTypeValue) {
-        Map<Byte, DataType> dataTypeMap = isBle ? mBleDataTypes : mEthernetDataTypes;
+    public static boolean isBleSensor(int address) {
+        return (address & 0xff0000) != 0;
+    }
+
+    public static boolean isBleSensor(String address) {
+        return address.length() == BLE_ADDRESS_LENGTH;
+    }
+
+    public static DataType getDataType(int address, byte dataTypeValue) {
+        Map<Byte, DataType> dataTypeMap = getDataTypes(address);
         DataType dataType = dataTypeMap.get(dataTypeValue);
         if (dataType == null) {
             dataType = new DataType(dataTypeValue);
@@ -99,16 +100,20 @@ public class ConfigurationManager {
         }
     };
 
-    private static List<Configuration> getConfigurations(boolean isBle) {
-        return isBle ? mBleConfiguration : mEthernetConfiguration;
+    private static List<Configuration> getConfigurations(int address) {
+        return isBleSensor(address) ? BLE_CONFIGURATIONS : ETHERNET_CONFIGURATIONS;
     }
 
-    private static ConfigurationImporter getConfigurationImporter(InputStream is) {
+    private static Map<Byte, DataType> getDataTypes(int address) {
+        return isBleSensor(address) ? BLE_DATA_TYPES : ETHERNET_DATA_TYPES;
+    }
+
+    private static ConfigurationImporter getConfigurationImporter(Context context, String fileName) {
         try {
             SAXParserFactory factory = SAXParserFactory.newInstance();
             SAXParser parser = factory.newSAXParser();
             ConfigurationImporter importer = new ConfigurationImporter();
-            parser.parse(is, importer);
+            parser.parse(context.getAssets().open(fileName), importer);
             return importer;
         } catch (Exception e) {
             return null;
@@ -120,6 +125,7 @@ public class ConfigurationManager {
         private static final String DATA_TYPE = "DataType";
         private static final String PARAPHRASES = "paraphrases";
         private static final String CONFIGURATION = "configurations";
+        private static final String DATA_TYPE_CUSTOM_NAME = "DataTypeCustomName";
 
         private Map<Byte, DataType> mDataTypeMap;
         private DataType mDataType;
@@ -135,7 +141,11 @@ public class ConfigurationManager {
         private Configuration.MeasureParameter mMeasureParameter;
         private int mIndex;
         private byte mDataTypeValue;
-        private String mAppendLabel;
+        private String mDataTypeCustomName;
+        private int mCustomDataTypeNameType;
+        private int mValueType = -1;
+        private boolean mSigned;
+        private double mCoefficient;
 
         public Map<Byte, DataType> getDataTypeMap() {
             return mDataTypeMap;
@@ -159,6 +169,8 @@ public class ConfigurationManager {
                 mConfiguration = new Configuration();
             } else if (localName.equals(PARAPHRASES)) {
                 mParaphrases = new HashMap<>();
+            } else if (localName.equals(DATA_TYPE_CUSTOM_NAME)) {
+                mCustomDataTypeNameType = Integer.parseInt(attributes.getValue("type"));
             }
             mBuilder.setLength(0);
         }
@@ -183,6 +195,15 @@ public class ConfigurationManager {
                 case "unit":
                     mDataType.mUnit = mBuilder.toString();
                     break;
+                case "type":
+                    mValueType = Integer.parseInt(mBuilder.toString());
+                    break;
+                case "signed":
+                    mSigned = Boolean.parseBoolean(mBuilder.toString());
+                    break;
+                case "coefficient":
+                    mCoefficient = Double.parseDouble(mBuilder.toString());
+                    break;
                 case DATA_TYPE:
                     mDataTypeMap.put(mDataType.mValue, mDataType);
                     break;
@@ -198,8 +219,8 @@ public class ConfigurationManager {
                 case "DataTypeValue":
                     mDataTypeValue = (byte)Integer.parseInt(mBuilder.toString(), 16);
                     break;
-                case "AppendLabel":
-                    mAppendLabel = mBuilder.toString();
+                case DATA_TYPE_CUSTOM_NAME:
+                    mDataTypeCustomName = mBuilder.toString();
                     break;
                 case "measurement":
                     //获取数据类型
@@ -208,10 +229,22 @@ public class ConfigurationManager {
                         mDataType = new DataType(mDataTypeValue);
                         mDataTypeMap.put(mDataTypeValue, mDataType);
                     }
+                    //若为Ethernet，则为DataType额外生成ValueBuilder
+                    if (mValueType != -1) {
+                        mDataType.mBuilder = new UdpDataValueBuilder(mValueType, mSigned, mCoefficient);
+                        mValueType = -1;
+                        mCoefficient = 1;
+                    } else {
+                        mDataType.mBuilder = BleDataValueBuilder.getInstance();
+                    }
                     //生成测量参数
                     mMeasureParameter = new Configuration.MeasureParameter(mDataType,
-                            mAppendLabel != null ? mDataType.getName() + mAppendLabel : null);
-                    mAppendLabel = null;
+                            mDataTypeCustomName != null
+                                    ? (mCustomDataTypeNameType == 0
+                                        ? mDataType.getName() + mDataTypeCustomName
+                                        : mDataTypeCustomName)
+                                    : null);
+                    mDataTypeCustomName = null;
                     //若存在相同数据类型，则为阵列传感器，使用链式附加，否则按数据类型升序排列
                     mIndex = findMeasureParameter(mMeasureParameters, mMeasureParameter);
                     if (mIndex >= 0) {
@@ -251,6 +284,12 @@ public class ConfigurationManager {
                     break;
                 case "calendar":
                     mDataType.mInterpreter = CalendarInterpreter.from(mBuilder.toString());
+                    break;
+                case "interpreter":
+                    switch (mBuilder.toString()) {
+                        case "ground":mDataType.mInterpreter = GroundLeadInterpreter.getInstance();
+                            break;
+                    }
                     break;
                 case "configurations":
                     Collections.sort(mConfigurations, new Comparator<Configuration>() {

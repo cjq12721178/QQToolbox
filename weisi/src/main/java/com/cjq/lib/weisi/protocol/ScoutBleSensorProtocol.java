@@ -25,40 +25,42 @@ public class ScoutBleSensorProtocol implements Constant {
             + SENSOR_DATA_LENGTH;
 
     private final byte[] mDataTypeArray = new byte[255];
+    private final byte[] mTmpBroadcastAddress = new byte[BROADCAST_ADDRESS_LENGTH];
 
-    public void analyze(byte[] broadcastAddress, byte[] broadcastData, OnDataAnalyzedListener listener) {
+    public void analyze(String broadcastAddress, byte[] broadcastData, OnDataAnalyzedListener listener) {
         if (broadcastAddress == null
-                || broadcastAddress.length != BROADCAST_ADDRESS_LENGTH
                 || broadcastData == null
                 || broadcastData.length < MIN_FRAME_LENGTH
                 || listener == null) {
             return;
         }
+        if (!broadcastAddressStringToBytes(mTmpBroadcastAddress, broadcastAddress)) {
+            return;
+        }
         int dataZoneLength = NumericConverter.int8ToUInt16(broadcastData[0]) - CRC16_LENGTH;
         if (dataZoneLength < MIN_DATA_ZONE_LENGTH
-                || Crc.calc16ByMSB(Crc.calc16ByLSB(broadcastAddress), broadcastData, 0, DATA_ZONE_LENGTH_LENGTH + dataZoneLength) !=
+                || Crc.calc16AbnormalByMsb(Crc.calc16AbnormalByLSB(mTmpBroadcastAddress), broadcastData, 0, DATA_ZONE_LENGTH_LENGTH + dataZoneLength) !=
                 NumericConverter.int8ToUInt16(broadcastData[DATA_ZONE_LENGTH_LENGTH + dataZoneLength],
                         broadcastData[DATA_ZONE_LENGTH_LENGTH + dataZoneLength + 1])) {
             return;
         }
         //是否为阵列传感器
-        boolean isArraySensor = NumericConverter.int8ToUInt16(broadcastAddress[4]) != 0;
+        boolean isArraySensor = NumericConverter.int8ToUInt16(mTmpBroadcastAddress[4]) != 0;
         if (isArraySensor) {
             Arrays.fill(mDataTypeArray, (byte) 0);
         }
+        int sensorAddress = broadcastAddressToRawAddress(mTmpBroadcastAddress);
         for (int start = 0, end = dataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
              start < end; start += SENSOR_DATA_LENGTH) {
-            listener.onDataAnalyzed(broadcastData[start],
+            listener.onDataAnalyzed(sensorAddress,
+                    broadcastData[start],
                     isArraySensor
                             ? mDataTypeArray[NumericConverter.int8ToUInt16(broadcastData[start])]++
                             : 0,
                     System.currentTimeMillis(),
-                    NumericConverter.bytesToFloatByMSB(broadcastData, start + DATA_TYPE_VALUE_LENGTH));
+                    broadcastData,
+                    start + DATA_TYPE_VALUE_LENGTH);
         }
-    }
-
-    public interface OnDataAnalyzedListener {
-        void onDataAnalyzed(byte dataTypeValue, int dataTypeIndex, long timestamp, double rawValue);
     }
 
     public byte[] broadcastAddressStringToBytes(String src) {

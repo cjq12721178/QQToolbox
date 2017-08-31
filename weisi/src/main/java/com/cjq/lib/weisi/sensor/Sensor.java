@@ -3,6 +3,7 @@ package com.cjq.lib.weisi.sensor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -12,46 +13,82 @@ import java.util.List;
 public class Sensor implements OnRawAddressComparer {
 
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
-    private static final int BLE_ADDRESS_LENGTH = 6;
+
     private String mName;
     private final int mRawAddress;
+    private final String mFormatAddress;
     private final List<Measurement> mMeasurements;
     private final List<Measurement> mUnmodifiableMeasurements;
+    private SensorDecorator mDecorator;
 
-    public Sensor(int address) {
+    Sensor(int address) {
         this(address, null);
     }
 
-    public Sensor(int address, String name) {
+    Sensor(int address, SensorDecorator decorator) {
+        //设置地址
         mRawAddress = address & 0xffffff;
-        Configuration configuration = ConfigurationManager.findConfiguration(isBle(), mRawAddress);
+        mFormatAddress = ConfigurationManager.isBleSensor(address)
+                ? String.format("%06X", mRawAddress)
+                : String.format("%04X", mRawAddress);
+        //根据配置生成测量参数列表
+        Configuration configuration = ConfigurationManager.findConfiguration(mRawAddress);
         if (configuration != null) {
-            mName = name != null ? name : configuration.getSensorGeneralName();
-            int size = configuration.mMeasureParameters.length;
-            mMeasurements = new ArrayList<>(size);
-            for (int i = 0;i < size;++i) {
-                mMeasurements.add(new Measurement(configuration.mMeasureParameters[i].mInvolvedDataType,
-                        configuration.mMeasureParameters[i].mDataTypeAccurateName));
+            mName = configuration.getSensorGeneralName();
+            mMeasurements = new ArrayList<>(configuration.mMeasureParameters.length);
+            for (Configuration.MeasureParameter parameter :
+                    configuration.mMeasureParameters) {
+                mMeasurements.add(new Measurement(parameter));
             }
         } else {
-            mName = name != null ? name : "未知传感器";
+            mName = "未知传感器";
             mMeasurements = new ArrayList<>();
         }
         mUnmodifiableMeasurements = Collections.unmodifiableList(mMeasurements);
+        setDecorator(decorator);
     }
 
-    boolean isBle() {
-        return (mRawAddress & 0xff0000) != 0;
+    public void setDecorator(SensorDecorator decorator) {
+        if (decorator == mDecorator) {
+            return;
+        }
+        mDecorator = decorator;
+        if (decorator == null) {
+            for (Measurement measurement :
+                    mMeasurements) {
+                measurement.setDecorator(null);
+            }
+        } else {
+            Iterator<Measurement> measurementIterator = mMeasurements.iterator();
+            Measurement measurement = measurementIterator.next();
+            MeasurementDecorator[] measurementDecorators = decorator.getMeasurementDecorators();
+            for (int measurementDecoratorIndex = 0;
+                 measurementDecoratorIndex < measurementDecorators.length
+                    && measurement != null;) {
+                if (measurement.getDataType().mValue
+                        == measurementDecorators[measurementDecoratorIndex].getDataTypeValue()) {
+                    measurement.setDecorator(measurementDecorators[measurementDecoratorIndex]);
+                    measurement = measurement.getNextSameDataTypeMeasurement();
+                    if (measurement == null) {
+                        measurement = measurementIterator.next();
+                    }
+                    ++measurementDecoratorIndex;
+                } else {
+                    measurement = measurementIterator.next();
+                }
+            }
+        }
     }
 
     //一般情况下传感器所拥有的测量量由配置文件读取，
     //对于未配置的传感器，可以采用该方法动态添加测量量
     //注：传感器阵列测量量需要依次添加
     //返回新添加的测量量
-    public Measurement addMeasurement(byte dataTypeValue, String name) {
+    public Measurement addMeasurement(byte dataTypeValue, MeasurementDecorator decorator) {
         int position = getMeasurementPosition(dataTypeValue);
-        Measurement newMeasurement = new Measurement(ConfigurationManager.
-                getDataType(isBle(), dataTypeValue), name);
+        Measurement newMeasurement = new Measurement(
+                ConfigurationManager.getDataType(mRawAddress, dataTypeValue),
+                decorator);
         if (position >= 0) {
             mMeasurements.get(position)
                     .getLastSameDataTypeMeasurement()
@@ -62,8 +99,14 @@ public class Sensor implements OnRawAddressComparer {
         return newMeasurement;
     }
 
-    public String getName() {
+    //返回传感器通用名称
+    public String getGeneralName() {
         return mName;
+    }
+
+    //返回传感器名称（可以经过SensorDecorator修饰）
+    public String getName() {
+        return mDecorator != null ? mDecorator.getName() : mName;
     }
 
     @Override
@@ -71,12 +114,8 @@ public class Sensor implements OnRawAddressComparer {
         return mRawAddress;
     }
 
-    public String getAddress() {
-        if (isBle()) {
-            return String.format("%06X", mRawAddress);
-        } else {
-            return String.format("%04X", mRawAddress);
-        }
+    public String getFormatAddress() {
+        return mFormatAddress;
     }
 
     public Measurement getMeasurementByDataTypeValue(byte dataTypeValue) {
@@ -125,6 +164,17 @@ public class Sensor implements OnRawAddressComparer {
 
     public List<Measurement> getMeasurements() {
         return mUnmodifiableMeasurements;
+    }
+
+    public int getMeasurementSize() {
+        int size = 0;
+        for (Measurement measurement :
+                mMeasurements) {
+            do {
+                ++size;
+            } while ((measurement = measurement.getNextSameDataTypeMeasurement()) != null);
+        }
+        return size;
     }
 
     private static final Comparator<Measurement> MEASUREMENT_GET_COMPARATOR = new Comparator<Measurement>() {

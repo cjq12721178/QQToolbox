@@ -85,7 +85,7 @@ public class RatchetWheelStateMonitorProtocol implements Constant {
 
     private void setCrc(byte[] frame) {
         int crcPos = frame.length - CRC16_LENGTH;
-        int crc16 = Crc.calc16ByMSB(frame, 0, crcPos);
+        int crc16 = Crc.calc16AbnormalByMsb(frame, 0, crcPos);
         frame[crcPos] = (byte) (crc16 & 0xff);
         frame[crcPos + 1] = (byte) (crc16 & 0xff00);
     }
@@ -94,7 +94,7 @@ public class RatchetWheelStateMonitorProtocol implements Constant {
         if (listener == null) {
             return;
         }
-        if (!Crc.isCorrect16(frame, true)) {
+        if (!Crc.isCorrect16Abnormal(frame, true, false)) {
             return;
         }
         int dataZoneLength = frame[0] & 0x1F;
