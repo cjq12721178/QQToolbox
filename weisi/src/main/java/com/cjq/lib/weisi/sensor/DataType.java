@@ -34,7 +34,7 @@ public class DataType {
         return mUnit;
     }
 
-    public String getDecoratedValue(Value value) {
+    public String getDecoratedValue(Measurement.Value value) {
         return value != null ? getDecoratedValue(value.mRawValue) : "";
     }
 
@@ -42,7 +42,7 @@ public class DataType {
         return mInterpreter.interpret(rawValue);
     }
 
-    public String getDecoratedValueWithUnit(Value value) {
+    public String getDecoratedValueWithUnit(Measurement.Value value) {
         return value != null ? getDecoratedValueWithUnit(value.mRawValue) : "";
     }
 
@@ -52,7 +52,7 @@ public class DataType {
                 mInterpreter.interpret(rawValue);
     }
 
-    public ValueBuilder getBuilder() {
+    public ValueBuilder getValueBuilder() {
         return mBuilder;
     }
 }

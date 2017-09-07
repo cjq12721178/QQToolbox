@@ -1,5 +1,6 @@
 package com.cjq.lib.weisi.protocol;
 
+import com.cjq.lib.weisi.sensor.ValueBuildDelegator;
 import com.cjq.tool.qbox.util.NumericConverter;
 
 import java.util.Arrays;
@@ -14,18 +15,18 @@ public class ScoutBleSensorProtocol implements Constant {
     private static final int DATA_ZONE_LENGTH_LENGTH = 1;
     private static final int BATTERY_INFO_LENGTH = 1;
     private static final int RSSI_LENGTH = 1;
-    private static final int MIN_FRAME_LENGTH = DATA_ZONE_LENGTH_LENGTH
-            + BATTERY_INFO_LENGTH
-            + RSSI_LENGTH
-            + CRC16_LENGTH;
     private static final int SENSOR_DATA_LENGTH = DATA_TYPE_VALUE_LENGTH
             + RAW_VALUE_LENGTH;
     private static final int MIN_DATA_ZONE_LENGTH = BATTERY_INFO_LENGTH
             + RSSI_LENGTH
             + SENSOR_DATA_LENGTH;
+    private static final int MIN_FRAME_LENGTH = DATA_ZONE_LENGTH_LENGTH
+            + MIN_DATA_ZONE_LENGTH
+            + CRC16_LENGTH;
 
     private final byte[] mDataTypeArray = new byte[255];
     private final byte[] mTmpBroadcastAddress = new byte[BROADCAST_ADDRESS_LENGTH];
+    private final ValueBuildDelegator mValueBuildDelegator = new ValueBuildDelegator();
 
     public void analyze(String broadcastAddress, byte[] broadcastData, OnDataAnalyzedListener listener) {
         if (broadcastAddress == null
@@ -50,6 +51,12 @@ public class ScoutBleSensorProtocol implements Constant {
             Arrays.fill(mDataTypeArray, (byte) 0);
         }
         int sensorAddress = broadcastAddressToRawAddress(mTmpBroadcastAddress);
+        mValueBuildDelegator
+                .setData(broadcastData)
+                .setBatteryVoltageIndex(broadcastData.length
+                        - CRC16_LENGTH
+                        - RSSI_LENGTH
+                        - BATTERY_INFO_LENGTH);
         for (int start = 0, end = dataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
              start < end; start += SENSOR_DATA_LENGTH) {
             listener.onDataAnalyzed(sensorAddress,
@@ -57,9 +64,7 @@ public class ScoutBleSensorProtocol implements Constant {
                     isArraySensor
                             ? mDataTypeArray[NumericConverter.int8ToUInt16(broadcastData[start])]++
                             : 0,
-                    System.currentTimeMillis(),
-                    broadcastData,
-                    start + DATA_TYPE_VALUE_LENGTH);
+                    mValueBuildDelegator.setRawValueIndex(start + DATA_TYPE_VALUE_LENGTH));
         }
     }
 

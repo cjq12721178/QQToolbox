@@ -11,27 +11,31 @@ import java.util.Map;
 public class SensorManager {
 
     private static final Map<Integer, Sensor> SENSOR_MAP = new HashMap<>();
-    private static OnSensorAddedListener onSensorAddedListener;
+    private static OnSensorCreateListener onSensorCreateListener;
 
     private SensorManager() {
     }
 
-    public static synchronized Sensor getSensor(int address) {
-        Sensor sensor = SENSOR_MAP.get(address);
-        if (sensor == null) {
-            sensor = new Sensor(address);
-            addSensor(address, sensor);
-        }
-        return sensor;
+    public static Sensor getSensor(int address) {
+        return getSensor(address, null, false);
     }
 
-    public static synchronized Sensor buildSensor(int address, SensorDecorator decorator) {
+    public static Sensor createSensor(int address, SensorDecorator decorator) {
+        return getSensor(address, decorator, true);
+    }
+
+    private static synchronized Sensor getSensor(int address, SensorDecorator decorator, boolean autoCreate) {
         Sensor sensor = SENSOR_MAP.get(address);
-        if (sensor == null) {
-            sensor = new Sensor(address, decorator);
-            addSensor(address, sensor);
-        } else {
-            sensor.setDecorator(decorator);
+        if (autoCreate) {
+            if (sensor == null) {
+                sensor = new Sensor(address, decorator);
+                SENSOR_MAP.put(address, sensor);
+                if (onSensorCreateListener != null) {
+                    onSensorCreateListener.onSensorCreate(sensor);
+                }
+            } else {
+                sensor.setDecorator(decorator);
+            }
         }
         return sensor;
     }
@@ -43,18 +47,11 @@ public class SensorManager {
         sensorCarrier.addAll(SENSOR_MAP.values());
     }
 
-    private static void addSensor(int address, Sensor sensor) {
-        SENSOR_MAP.put(address, sensor);
-        if (onSensorAddedListener != null) {
-            onSensorAddedListener.onSensorAdded(sensor);
-        }
+    public static synchronized void setOnSensorCreateListener(OnSensorCreateListener listener) {
+        onSensorCreateListener = listener;
     }
 
-    public static void setOnSensorAddedListener(OnSensorAddedListener listener) {
-        onSensorAddedListener = listener;
-    }
-
-    public interface OnSensorAddedListener {
-        void onSensorAdded(Sensor sensor);
+    public interface OnSensorCreateListener {
+        void onSensorCreate(Sensor sensor);
     }
 }

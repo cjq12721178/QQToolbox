@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -17,6 +18,8 @@ public class Sensor implements OnRawAddressComparer {
     private String mName;
     private final int mRawAddress;
     private final String mFormatAddress;
+    private final Value mRealTimeValue = new Value(0, 0);
+    private final LinkedList<Value> mHistoryValues = new LinkedList<>();
     private final List<Measurement> mMeasurements;
     private final List<Measurement> mUnmodifiableMeasurements;
     private SensorDecorator mDecorator;
@@ -82,12 +85,14 @@ public class Sensor implements OnRawAddressComparer {
 
     //一般情况下传感器所拥有的测量量由配置文件读取，
     //对于未配置的传感器，可以采用该方法动态添加测量量
-    //注：传感器阵列测量量需要依次添加
+    //注：1. 传感器阵列测量量需要依次添加
+    //    2. 动态添加无法保证阵列传感器中相同测量量的排列顺序
     //返回新添加的测量量
-    public Measurement addMeasurement(byte dataTypeValue, MeasurementDecorator decorator) {
+    public Measurement addMeasurement(byte dataTypeValue,
+                                      MeasurementDecorator decorator) {
         int position = getMeasurementPosition(dataTypeValue);
         Measurement newMeasurement = new Measurement(
-                ConfigurationManager.getDataType(mRawAddress, dataTypeValue),
+                ConfigurationManager.getDataType(mRawAddress, dataTypeValue, true),
                 decorator);
         if (position >= 0) {
             mMeasurements.get(position)
@@ -145,10 +150,12 @@ public class Sensor implements OnRawAddressComparer {
     public int getMeasurementPosition(byte dataTypeValue) {
         int position;
         if (mMeasurements.size() > MEASUREMENT_SEARCH_THRESHOLD) {
-            MODIFIABLE_DATA_TYPE.setValue(dataTypeValue);
-            position = Collections.binarySearch(mMeasurements,
-                    MEASUREMENT_GET_COMPARER,
-                    MEASUREMENT_GET_COMPARATOR);
+            synchronized (MODIFIABLE_DATA_TYPE) {
+                MODIFIABLE_DATA_TYPE.setValue(dataTypeValue);
+                position = Collections.binarySearch(mMeasurements,
+                        MEASUREMENT_GET_COMPARER,
+                        MEASUREMENT_GET_COMPARATOR);
+            }
         } else {
             for (position = 0;position < MEASUREMENT_SEARCH_THRESHOLD;++position) {
                 if (mMeasurements.get(position).getDataType().getValue() == dataTypeValue) {
@@ -177,6 +184,77 @@ public class Sensor implements OnRawAddressComparer {
         return size;
     }
 
+    public void addMeasurementRealTimeValue(byte dataTypeValue,
+                                    int dataTypeValueIndex,
+                                    ValueBuildDelegator valueBuildDelegator) {
+        Measurement measurement = getMeasurementByDataTypeValue(dataTypeValue, dataTypeValueIndex);
+        if (measurement == null) {
+            measurement = addMeasurement(dataTypeValue, null);
+        }
+        valueBuildDelegator.setValueBuilder(measurement.getDataType().getValueBuilder());
+        long timestamp = valueBuildDelegator.getTimestamp();
+        addDynamicValue(timestamp, valueBuildDelegator.getBatteryVoltage());
+        measurement.addDynamicValue(timestamp, valueBuildDelegator.getRawValue());
+    }
+
+    public void addDynamicValue(long timestamp, float batteryVoltage) {
+        if (mRealTimeValue.mTimeStamp == timestamp) {
+            return;
+        }
+        setRealTimeValue(timestamp, batteryVoltage);
+        addHistoryValue(timestamp, batteryVoltage);
+    }
+
+    public void setRealTimeValue(long timestamp, float batteryVoltage) {
+        mRealTimeValue.mTimeStamp = timestamp;
+        mRealTimeValue.mBatteryVoltage = batteryVoltage;
+    }
+
+    private void addHistoryValue(long timestamp, float voltage) {
+        synchronized (mHistoryValues) {
+            int size = mHistoryValues.size();
+            if (size > 0) {
+                Value newValue;
+                if (size == Measurement.DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
+                    newValue = mHistoryValues.poll();
+                    newValue.mTimeStamp = timestamp;
+                    newValue.mBatteryVoltage = voltage;
+                } else {
+                    newValue = new Value(timestamp, voltage);
+                }
+                int index = findHistoryValueIndexByTimestamp(newValue);
+                mHistoryValues.add(index, newValue);
+            } else {
+                mHistoryValues.add(new Value(timestamp, voltage));
+            }
+        }
+    }
+
+    private int findHistoryValueIndexByTimestamp(Value target) {
+        //不在size==0的情况下使用
+        Value lastValue = mHistoryValues.peekLast();
+        if (target.mTimeStamp > lastValue.mTimeStamp) {
+            return mHistoryValues.size();
+        }
+        if (target.mTimeStamp == lastValue.mTimeStamp) {
+            mHistoryValues.pollLast();
+            return mHistoryValues.size();
+        }
+        Iterator<Value> values = mHistoryValues.descendingIterator();
+        values.next();
+        for (int i = mHistoryValues.size() - 1;values.hasNext();--i) {
+            lastValue = values.next();
+            if (target.mTimeStamp > lastValue.mTimeStamp) {
+                return i;
+            }
+        }
+        return 0;
+    }
+
+    public List<Value> getHistoryValues() {
+        return Collections.unmodifiableList(mHistoryValues);
+    }
+
     private static final Comparator<Measurement> MEASUREMENT_GET_COMPARATOR = new Comparator<Measurement>() {
         @Override
         public int compare(Measurement m1, Measurement m2) {
@@ -202,6 +280,25 @@ public class Sensor implements OnRawAddressComparer {
 
         public void setValue(byte value) {
             mModifiableValue = value;
+        }
+    }
+
+    public static class Value {
+
+        long mTimeStamp;
+        float mBatteryVoltage;
+
+        public Value(long timeStamp, float batteryVoltage) {
+            mTimeStamp = timeStamp;
+            mBatteryVoltage = batteryVoltage;
+        }
+
+        public long getTimeStamp() {
+            return mTimeStamp;
+        }
+
+        public float getBatteryVoltage() {
+            return mBatteryVoltage;
         }
     }
 }

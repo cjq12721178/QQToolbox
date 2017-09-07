@@ -13,18 +13,18 @@ import java.util.List;
 
 public class Measurement {
 
-    private static final int DEFAULT_MAX_HISTORY_VALUE_CAPACITY = 50;
+    static final int DEFAULT_MAX_HISTORY_VALUE_CAPACITY = 50;
     private static boolean enableSaveRealTimeValue = false;
 
     private final DataType mDataType;
     private String mName;
-    private Value mRealTimeValue = new Value(0, 0);
+    private final Value mRealTimeValue = new Value(0, 0);
     private LinkedList<Value> mHistoryValues = new LinkedList<>();
     private Measurement mNextMeasurement;
     private MeasurementDecorator mDecorator;
 
     //用于生成测量参数及其相同数据类型的阵列（根据配置静态生成）
-    public Measurement(@NonNull Configuration.MeasureParameter parameter) {
+    Measurement(@NonNull Configuration.MeasureParameter parameter) {
         if (parameter == null || parameter.mInvolvedDataType == null) {
             throw new NullPointerException("measure parameter can not be null");
         }
@@ -44,7 +44,7 @@ public class Measurement {
     }
 
     //用于生成单个测量参数（动态添加）
-    public Measurement(@NonNull DataType dataType, MeasurementDecorator decorator) {
+    Measurement(@NonNull DataType dataType, MeasurementDecorator decorator) {
         if (dataType == null) {
             throw new NullPointerException("dataType can not be null");
         }
@@ -95,19 +95,11 @@ public class Measurement {
         return this;
     }
 
-    public void setRealTimeValue(double rawValue) {
-        setRealTimeValue(System.currentTimeMillis(), rawValue);
-    }
-
     public void setRealTimeValue(long timestamp, double rawValue) {
         synchronized (mRealTimeValue) {
             mRealTimeValue.mTimeStamp = timestamp;
             mRealTimeValue.mRawValue = rawValue;
         }
-    }
-
-    public void setRealTimeValue(long timestamp, byte[] srcValue, int srcValueIndex) {
-        setRealTimeValue(timestamp, mDataType.mBuilder.build(srcValue, srcValueIndex));
     }
 
     public Value getRealTimeValue() {
@@ -126,27 +118,9 @@ public class Measurement {
                 : null;
     }
 
-    public void setEnableSaveRealTimeValue(boolean enabled) {
-        enableSaveRealTimeValue = enabled;
-    }
-
-    public void addDynamicValue(double rawValue) {
-        addDynamicValue(System.currentTimeMillis(), rawValue);
-    }
-
     public void addDynamicValue(long timestamp, double rawValue) {
         setRealTimeValue(timestamp, rawValue);
-        if (enableSaveRealTimeValue) {
-            addHistoryValue(timestamp, rawValue);
-        }
-    }
-
-    public void addDynamicValue(long timestamp, byte[] srcValue, int srcValueIndex) {
-        addDynamicValue(timestamp, mDataType.mBuilder.build(srcValue, srcValueIndex));
-    }
-
-    private void addHistoryValue(double rawValue) {
-        addHistoryValue(System.currentTimeMillis(), rawValue);
+        addHistoryValue(timestamp, rawValue);
     }
 
     private void addHistoryValue(long timestamp, double rawValue) {
@@ -196,5 +170,28 @@ public class Measurement {
 
     public void setDecorator(MeasurementDecorator decorator) {
         mDecorator = decorator;
+    }
+
+    /**
+     * Created by CJQ on 2017/6/16.
+     */
+
+    public static class Value {
+
+        long mTimeStamp;
+        double mRawValue;
+
+        public Value(long timeStamp, double rawValue) {
+            mTimeStamp = timeStamp;
+            mRawValue = rawValue;
+        }
+
+        public long getTimeStamp() {
+            return mTimeStamp;
+        }
+
+        public double getRawValue() {
+            return mRawValue;
+        }
     }
 }

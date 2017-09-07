@@ -1,9 +1,7 @@
 package com.cjq.lib.weisi.protocol;
 
+import com.cjq.lib.weisi.sensor.ValueBuildDelegator;
 import com.cjq.tool.qbox.util.NumericConverter;
-
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 /**
  * Created by CJQ on 2017/8/30.
@@ -33,14 +31,14 @@ public class ScoutUdpSensorProtocol implements Constant {
             + CRC16_LENGTH
             + END_CHARACTER.length;
 
-    private final GregorianCalendar mCalendar = new GregorianCalendar();
-    private int mAdjustedYear = mCalendar.get(Calendar.YEAR);
+    private final ValueBuildDelegator mValueBuildDelegator = new ValueBuildDelegator();
 
     public void analyze(byte[] udpData, OnDataAnalyzedListener listener) {
         //判断数据是否为空，以及数据长度是否大于最小数据长度
         if (udpData == null || listener == null || udpData.length < MIN_FRAME_LENGTH) {
             return;
         }
+
         //记录数据域长度
         int dataZoneLength = NumericConverter.int8ToUInt16(udpData[START_CHARACTER.length + BASE_STATION_ADDRESS_LENGTH]) - COMMAND_CODE_LENGTH;
         //计算实际数据长度
@@ -52,6 +50,7 @@ public class ScoutUdpSensorProtocol implements Constant {
                 || udpData[realDataLength - 1] != END_CHARACTER[1]) {
             return;
         }
+
         //计算CRC16并校验
         if (!Crc.isCorrect16(udpData,
                 START_CHARACTER.length,
@@ -60,24 +59,28 @@ public class ScoutUdpSensorProtocol implements Constant {
                 false)) {
             return;
         }
+
         //获取并校验命令码
         int commandCode = (byte)(udpData[START_CHARACTER.length
                 + BASE_STATION_ADDRESS_LENGTH
                 + DATA_ZONE_LENGTH_LENGTH] -
                     FIXED_DIFFERENCE_FROM_COMMAND_TO_RESPONSE);
+
         //目前只需要这一个命令
         if (commandCode != COMMAND_CODE_REQUEST_DATA) {
             return;
         }
-        long lastTime;
-        long currTime;
+
+        //解析数据帧
+        mValueBuildDelegator.setData(udpData);
         for (int start = START_CHARACTER.length
                 + BASE_STATION_ADDRESS_LENGTH
                 + DATA_ZONE_LENGTH_LENGTH
                 + COMMAND_CODE_LENGTH,
                 end = dataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH,
                 sensorValuePos,
-                calendarPos;
+                calendarPos,
+                voltagePos;
                 start < end;
                 start += SENSOR_DATA_LENGTH) {
             sensorValuePos = start +
@@ -88,26 +91,14 @@ public class ScoutUdpSensorProtocol implements Constant {
                     SENSOR_VALUE_LENGTH +
                     SENSOR_BATTERY_VOLTAGE_LENGTH +
                     SENSOR_CRC_LENGTH;
-            lastTime = mCalendar.getTimeInMillis();
-            mCalendar.set(mAdjustedYear,
-                    udpData[calendarPos] & 0x0f,
-                    udpData[++calendarPos],
-                    udpData[++calendarPos],
-                    udpData[++calendarPos],
-                    udpData[++calendarPos]);
-            currTime = mCalendar.getTimeInMillis();
-            //跨年修正，属于那种基本不会发生的情况
-            if (currTime < lastTime) {
-                mAdjustedYear = new GregorianCalendar().get(Calendar.YEAR);
-                mCalendar.set(Calendar.YEAR, mAdjustedYear);
-                currTime = mCalendar.getTimeInMillis();
-            }
+            voltagePos = sensorValuePos + SENSOR_VALUE_LENGTH;
             listener.onDataAnalyzed(NumericConverter.int8ToUInt16(udpData[start], udpData[start + 1]),
                     udpData[start + SENSOR_ADDRESS_LENGTH],
                     0,
-                    currTime,
-                    udpData,
-                    sensorValuePos);
+                    mValueBuildDelegator
+                            .setTimestampIndex(calendarPos)
+                            .setRawValueIndex(sensorValuePos)
+                            .setBatteryVoltageIndex(voltagePos));
         }
     }
 

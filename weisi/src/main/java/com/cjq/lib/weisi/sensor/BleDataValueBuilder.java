@@ -9,6 +9,7 @@ import com.cjq.tool.qbox.util.NumericConverter;
 public class BleDataValueBuilder implements ValueBuilder {
 
     private static final BleDataValueBuilder BLE_DATA_VALUE_BUILDER = new BleDataValueBuilder();
+    private static final float BATTERY_VOLTAGE_COEFFICIENT = 0.05f;
 
     private BleDataValueBuilder() {
     }
@@ -18,7 +19,18 @@ public class BleDataValueBuilder implements ValueBuilder {
     }
 
     @Override
-    public double build(byte[] src, int pos) {
-        return NumericConverter.bytesToFloatByMSB(src, pos);
+    public long buildTimestamp(byte[] src, int timestampIndex) {
+        return System.currentTimeMillis();
+    }
+
+    @Override
+    public double buildRawValue(byte[] src, int rawValueIndex) {
+        return NumericConverter.bytesToFloatByMSB(src, rawValueIndex);
+    }
+
+    @Override
+    public float buildBatteryVoltage(byte[] src, int batteryVoltageIndex, int sensorAddress) {
+        return NumericConverter.int8ToUInt16(src[batteryVoltageIndex])
+                * BATTERY_VOLTAGE_COEFFICIENT;
     }
 }

@@ -76,10 +76,10 @@ public class ConfigurationManager {
         return address.length() == BLE_ADDRESS_LENGTH;
     }
 
-    public static DataType getDataType(int address, byte dataTypeValue) {
+    public static DataType getDataType(int address, byte dataTypeValue, boolean autoCreate) {
         Map<Byte, DataType> dataTypeMap = getDataTypes(address);
         DataType dataType = dataTypeMap.get(dataTypeValue);
-        if (dataType == null) {
+        if (autoCreate && dataType == null) {
             dataType = new DataType(dataTypeValue);
             dataTypeMap.put(dataTypeValue, dataType);
         }
