@@ -14,6 +14,7 @@ import java.util.List;
 public class Sensor implements OnRawAddressComparer {
 
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
+    private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
 
     private String mName;
     private final int mRawAddress;
@@ -198,32 +199,35 @@ public class Sensor implements OnRawAddressComparer {
     }
 
     public void addDynamicValue(long timestamp, float batteryVoltage) {
-        if (mRealTimeValue.mTimeStamp == timestamp) {
-            return;
-        }
         setRealTimeValue(timestamp, batteryVoltage);
         addHistoryValue(timestamp, batteryVoltage);
     }
 
     public void setRealTimeValue(long timestamp, float batteryVoltage) {
-        mRealTimeValue.mTimeStamp = timestamp;
-        mRealTimeValue.mBatteryVoltage = batteryVoltage;
+        if (mRealTimeValue.mTimeStamp < timestamp) {
+            mRealTimeValue.mTimeStamp = timestamp;
+            mRealTimeValue.mBatteryVoltage = batteryVoltage;
+        }
     }
 
     private void addHistoryValue(long timestamp, float voltage) {
         synchronized (mHistoryValues) {
             int size = mHistoryValues.size();
             if (size > 0) {
-                Value newValue;
-                if (size == Measurement.DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
-                    newValue = mHistoryValues.poll();
-                    newValue.mTimeStamp = timestamp;
-                    newValue.mBatteryVoltage = voltage;
+                if (mRealTimeValue.mTimeStamp == timestamp) {
+                    mHistoryValues.peekLast().mBatteryVoltage = voltage;
                 } else {
-                    newValue = new Value(timestamp, voltage);
+                    Value newValue;
+                    if (size == Measurement.DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
+                        newValue = mHistoryValues.poll();
+                        newValue.mTimeStamp = timestamp;
+                        newValue.mBatteryVoltage = voltage;
+                    } else {
+                        newValue = new Value(timestamp, voltage);
+                    }
+                    int index = findHistoryValueIndexByTimestamp(newValue);
+                    mHistoryValues.add(index, newValue);
                 }
-                int index = findHistoryValueIndexByTimestamp(newValue);
-                mHistoryValues.add(index, newValue);
             } else {
                 mHistoryValues.add(new Value(timestamp, voltage));
             }
@@ -234,10 +238,6 @@ public class Sensor implements OnRawAddressComparer {
         //不在size==0的情况下使用
         Value lastValue = mHistoryValues.peekLast();
         if (target.mTimeStamp > lastValue.mTimeStamp) {
-            return mHistoryValues.size();
-        }
-        if (target.mTimeStamp == lastValue.mTimeStamp) {
-            mHistoryValues.pollLast();
             return mHistoryValues.size();
         }
         Iterator<Value> values = mHistoryValues.descendingIterator();
@@ -253,6 +253,21 @@ public class Sensor implements OnRawAddressComparer {
 
     public List<Value> getHistoryValues() {
         return Collections.unmodifiableList(mHistoryValues);
+    }
+
+    public State getState() {
+        if (mRealTimeValue.mTimeStamp == 0) {
+            return State.NEVER_CONNECTED;
+        }
+        return System.currentTimeMillis() - mRealTimeValue.mTimeStamp < MAX_COMMUNICATION_BREAK_TIME
+                ? State.ON_LINE
+                : State.OFF_LINE;
+    }
+
+    public enum State {
+        NEVER_CONNECTED,
+        ON_LINE,
+        OFF_LINE
     }
 
     private static final Comparator<Measurement> MEASUREMENT_GET_COMPARATOR = new Comparator<Measurement>() {
