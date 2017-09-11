@@ -12,6 +12,7 @@ public class SensorManager {
 
     private static final Map<Integer, Sensor> SENSOR_MAP = new HashMap<>();
     private static OnSensorCreateListener onSensorCreateListener;
+    private static OnSensorValueUpdateListener onSensorValueUpdateListener;
 
     private SensorManager() {
     }
@@ -53,5 +54,19 @@ public class SensorManager {
 
     public interface OnSensorCreateListener {
         void onSensorCreate(Sensor sensor);
+    }
+
+    static synchronized void notifySensorValueUpdate(Sensor sensor) {
+        if (onSensorValueUpdateListener != null) {
+            onSensorValueUpdateListener.onSensorValueUpdate(sensor);
+        }
+    }
+
+    public static synchronized void setOnSensorValueUpdateListener(OnSensorValueUpdateListener listener) {
+        onSensorValueUpdateListener = listener;
+    }
+
+    public interface OnSensorValueUpdateListener {
+        void onSensorValueUpdate(Sensor sensor);
     }
 }

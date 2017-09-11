@@ -24,6 +24,7 @@ public class Sensor implements OnRawAddressComparer {
     private final List<Measurement> mMeasurements;
     private final List<Measurement> mUnmodifiableMeasurements;
     private SensorDecorator mDecorator;
+    private long mFirstValueReceivedTimestamp;
 
     Sensor(int address) {
         this(address, null);
@@ -205,8 +206,12 @@ public class Sensor implements OnRawAddressComparer {
 
     public void setRealTimeValue(long timestamp, float batteryVoltage) {
         if (mRealTimeValue.mTimeStamp < timestamp) {
+            if (mRealTimeValue.mTimeStamp == 0) {
+                mFirstValueReceivedTimestamp = timestamp;
+            }
             mRealTimeValue.mTimeStamp = timestamp;
             mRealTimeValue.mBatteryVoltage = batteryVoltage;
+            SensorManager.notifySensorValueUpdate(this);
         }
     }
 
@@ -253,6 +258,10 @@ public class Sensor implements OnRawAddressComparer {
 
     public List<Value> getHistoryValues() {
         return Collections.unmodifiableList(mHistoryValues);
+    }
+
+    public long getFirstValueReceivedTimestamp() {
+        return mFirstValueReceivedTimestamp;
     }
 
     public State getState() {
