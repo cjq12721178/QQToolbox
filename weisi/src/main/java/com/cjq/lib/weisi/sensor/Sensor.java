@@ -215,6 +215,10 @@ public class Sensor implements OnRawAddressComparer {
         }
     }
 
+    public Value getRealTimeValue() {
+        return mRealTimeValue;
+    }
+
     private void addHistoryValue(long timestamp, float voltage) {
         synchronized (mHistoryValues) {
             int size = mHistoryValues.size();
