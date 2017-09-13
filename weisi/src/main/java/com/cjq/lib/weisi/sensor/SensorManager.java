@@ -41,11 +41,20 @@ public class SensorManager {
         return sensor;
     }
 
-    public static synchronized void getAllSensors(List<Sensor> sensorCarrier) {
+    public static synchronized void getAllSensors(List<Sensor> sensorCarrier, Filter filter) {
         if (sensorCarrier == null) {
             return;
         }
-        sensorCarrier.addAll(SENSOR_MAP.values());
+        if (filter == null) {
+            sensorCarrier.addAll(SENSOR_MAP.values());
+        } else {
+            for (Sensor sensor :
+                    SENSOR_MAP.values()) {
+                if (filter.isMatch(sensor)) {
+                    sensorCarrier.add(sensor);
+                }
+            }
+        }
     }
 
     public static synchronized void setOnSensorCreateListener(OnSensorCreateListener listener) {

@@ -25,6 +25,7 @@ public class Sensor implements OnRawAddressComparer {
     private final List<Measurement> mUnmodifiableMeasurements;
     private SensorDecorator mDecorator;
     private long mFirstValueReceivedTimestamp;
+    private long mNetInTimestamp;
 
     Sensor(int address) {
         this(address, null);
@@ -186,9 +187,9 @@ public class Sensor implements OnRawAddressComparer {
         return size;
     }
 
-    public void addMeasurementRealTimeValue(byte dataTypeValue,
-                                    int dataTypeValueIndex,
-                                    ValueBuildDelegator valueBuildDelegator) {
+    public void addMeasurementDynamicValue(byte dataTypeValue,
+                                           int dataTypeValueIndex,
+                                           ValueBuildDelegator valueBuildDelegator) {
         Measurement measurement = getMeasurementByDataTypeValue(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
             measurement = addMeasurement(dataTypeValue, null);
@@ -266,6 +267,14 @@ public class Sensor implements OnRawAddressComparer {
 
     public long getFirstValueReceivedTimestamp() {
         return mFirstValueReceivedTimestamp;
+    }
+
+    public long getNetInTimestamp() {
+        return mNetInTimestamp;
+    }
+
+    public void setNetInTimestamp(long netInTimestamp) {
+        mNetInTimestamp = netInTimestamp;
     }
 
     public State getState() {
