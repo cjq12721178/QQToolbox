@@ -212,7 +212,6 @@ public class Sensor implements OnRawAddressComparer {
             }
             mRealTimeValue.mTimeStamp = timestamp;
             mRealTimeValue.mBatteryVoltage = batteryVoltage;
-            SensorManager.notifySensorValueUpdate(this);
         }
     }
 

@@ -11,8 +11,6 @@ import java.util.Map;
 public class SensorManager {
 
     private static final Map<Integer, Sensor> SENSOR_MAP = new HashMap<>();
-    private static OnSensorCreateListener onSensorCreateListener;
-    private static OnSensorValueUpdateListener onSensorValueUpdateListener;
 
     private SensorManager() {
     }
@@ -31,9 +29,6 @@ public class SensorManager {
             if (sensor == null) {
                 sensor = new Sensor(address, decorator);
                 SENSOR_MAP.put(address, sensor);
-                if (onSensorCreateListener != null) {
-                    onSensorCreateListener.onSensorCreate(sensor);
-                }
             } else {
                 sensor.setDecorator(decorator);
             }
@@ -55,27 +50,5 @@ public class SensorManager {
                 }
             }
         }
-    }
-
-    public static synchronized void setOnSensorCreateListener(OnSensorCreateListener listener) {
-        onSensorCreateListener = listener;
-    }
-
-    public interface OnSensorCreateListener {
-        void onSensorCreate(Sensor sensor);
-    }
-
-    static synchronized void notifySensorValueUpdate(Sensor sensor) {
-        if (onSensorValueUpdateListener != null) {
-            onSensorValueUpdateListener.onSensorValueUpdate(sensor);
-        }
-    }
-
-    public static synchronized void setOnSensorValueUpdateListener(OnSensorValueUpdateListener listener) {
-        onSensorValueUpdateListener = listener;
-    }
-
-    public interface OnSensorValueUpdateListener {
-        void onSensorValueUpdate(Sensor sensor);
     }
 }

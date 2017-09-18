@@ -81,6 +81,9 @@ public class ConfigurationManager {
         DataType dataType = dataTypeMap.get(dataTypeValue);
         if (autoCreate && dataType == null) {
             dataType = new DataType(dataTypeValue);
+            dataType.mBuilder = isBleSensor(address)
+                    ? BleDataValueBuilder.getInstance()
+                    : new UdpDataValueBuilder(0, true, 3);
             dataTypeMap.put(dataTypeValue, dataType);
         }
         return dataType;
