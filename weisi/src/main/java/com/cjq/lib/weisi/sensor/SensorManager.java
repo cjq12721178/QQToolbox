@@ -15,8 +15,8 @@ public class SensorManager {
     private SensorManager() {
     }
 
-    public static Sensor getSensor(int address) {
-        return getSensor(address, null, false);
+    public static Sensor getSensor(int address, boolean autoCreate) {
+        return getSensor(address, null, autoCreate);
     }
 
     public static Sensor createSensor(int address, SensorDecorator decorator) {
