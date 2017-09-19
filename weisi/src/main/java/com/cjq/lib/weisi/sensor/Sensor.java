@@ -50,14 +50,13 @@ public class Sensor implements OnRawAddressComparer {
             mName = "未知传感器";
             mMeasurementKinds = new ArrayList<>();
         }
-        //mMeasurementCollections = Collections.unmodifiableList(mMeasurementKinds);
         generateMeasurementCollections();
         setDecorator(decorator);
     }
 
     private void generateMeasurementCollections() {
-        int size = getMeasurementSizeByKinds();
-        if (mMeasurementCollections == null || mMeasurementCollections.size() != size) {
+        int size = getMeasurementSizeForKinds();
+        if (size != mMeasurementKinds.size()) {
             mMeasurementCollections = new ArrayList<>(size);
             for (Measurement measurement :
                     mMeasurementKinds) {
@@ -105,9 +104,10 @@ public class Sensor implements OnRawAddressComparer {
     //注：1. 传感器阵列测量量需要依次添加
     //    2. 动态添加无法保证阵列传感器中相同测量量的排列顺序
     //返回新添加的测量量
-    public Measurement addMeasurement(byte dataTypeValue,
-                                      MeasurementDecorator decorator) {
-        int position = getMeasurementPosition(dataTypeValue);
+    private Measurement addMeasurement(int position,
+                                       byte dataTypeValue,
+                                       MeasurementDecorator decorator) {
+        //int position = getMeasurementPosition(dataTypeValue);
         Measurement newMeasurement = new Measurement(
                 ConfigurationManager.getDataType(mRawAddress, dataTypeValue, true),
                 decorator);
@@ -154,37 +154,42 @@ public class Sensor implements OnRawAddressComparer {
     }
 
     public Measurement getMeasurementByPosition(int position, int index) {
-        if (position >= 0 && position < mMeasurementKinds.size()) {
-            Measurement result = mMeasurementKinds.get(position);
-            for (int i = 0;
-                 i < index && (result = result.getNextSameDataTypeMeasurement()) != null;
-                 ++i);
-            return result;
-        } else {
+        if (position < 0 || position >= mMeasurementKinds.size()) {
             return null;
         }
+        return getMeasurementByPositionImpl(position, index);
+    }
+
+    private Measurement getMeasurementByPositionImpl(int position, int index) {
+        Measurement result = mMeasurementKinds.get(position);
+        for (int i = 0;
+             i < index && (result = result.getNextSameDataTypeMeasurement()) != null;
+             ++i);
+        return result;
     }
 
     public int getMeasurementPosition(byte dataTypeValue) {
-        int position;
-        if (mMeasurementKinds.size() > MEASUREMENT_SEARCH_THRESHOLD) {
+        int position, size = mMeasurementKinds.size();
+        if (size > MEASUREMENT_SEARCH_THRESHOLD) {
             synchronized (MODIFIABLE_DATA_TYPE) {
                 MODIFIABLE_DATA_TYPE.setValue(dataTypeValue);
                 position = Collections.binarySearch(mMeasurementKinds,
                         MEASUREMENT_GET_COMPARER,
                         MEASUREMENT_GET_COMPARATOR);
             }
+            return position;
         } else {
-            for (position = 0;position < MEASUREMENT_SEARCH_THRESHOLD;++position) {
-                if (mMeasurementKinds.get(position).getDataType().getValue() == dataTypeValue) {
-                    break;
+            byte currentValue;
+            for (position = 0;position < size;++position) {
+                currentValue = mMeasurementKinds.get(position).getDataType().getValue();
+                if (currentValue == dataTypeValue) {
+                    return position;
+                } else if (dataTypeValue < currentValue) {
+                    return -(position + 1);
                 }
             }
-            if (position == MEASUREMENT_SEARCH_THRESHOLD) {
-                position = -(position + 1);
-            }
+            return -(position + 1);
         }
-        return position;
     }
 
     public List<Measurement> getMeasurementKinds() {
@@ -192,10 +197,10 @@ public class Sensor implements OnRawAddressComparer {
     }
 
     public List<Measurement> getMeasurementCollections() {
-        return mMeasurementCollections;
+        return mMeasurementCollections != null ? mMeasurementCollections : mMeasurementKinds;
     }
 
-    private int getMeasurementSizeByKinds() {
+    private int getMeasurementSizeForKinds() {
         int size = 0;
         for (Measurement measurement :
                 mMeasurementKinds) {
@@ -209,10 +214,19 @@ public class Sensor implements OnRawAddressComparer {
     public void addMeasurementDynamicValue(byte dataTypeValue,
                                            int dataTypeValueIndex,
                                            ValueBuildDelegator valueBuildDelegator) {
-        Measurement measurement = getMeasurementByDataTypeValue(dataTypeValue, dataTypeValueIndex);
-        if (measurement == null) {
-            measurement = addMeasurement(dataTypeValue, null);
+        int position = getMeasurementPosition(dataTypeValue);
+        Measurement measurement;
+        if (position >= 0 && position < mMeasurementKinds.size()) {
+            measurement = getMeasurementByPositionImpl(position, dataTypeValueIndex);
+        } else if (position < 0) {
+            measurement = addMeasurement(position, dataTypeValue, null);
+        } else {
+            return;
         }
+//        Measurement measurement = getMeasurementByDataTypeValue(dataTypeValue, dataTypeValueIndex);
+//        if (measurement == null) {
+//            measurement = addMeasurement(dataTypeValue, null);
+//        }
         valueBuildDelegator.setValueBuilder(measurement.getDataType().getValueBuilder());
         long timestamp = valueBuildDelegator.getTimestamp();
         addDynamicValue(timestamp, valueBuildDelegator.getBatteryVoltage());

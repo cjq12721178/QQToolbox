@@ -58,14 +58,16 @@ public class ConfigurationManager {
     }
 
     public static Configuration findConfiguration(int address) {
-        CONFIGURATION_SEARCHER.mStartAddress = address;
         List<Configuration> configurations = getConfigurations(address);
         if (configurations == null)
             return null;
-        int index = Collections.binarySearch(configurations,
-                CONFIGURATION_SEARCHER,
-                CONFIGURATION_SEARCH_COMPARATOR);
-        return index >= 0 ? configurations.get(index) : null;
+        synchronized (CONFIGURATION_SEARCHER) {
+            CONFIGURATION_SEARCHER.mStartAddress = address;
+            int index = Collections.binarySearch(configurations,
+                    CONFIGURATION_SEARCHER,
+                    CONFIGURATION_SEARCH_COMPARATOR);
+            return index >= 0 ? configurations.get(index) : null;
+        }
     }
 
     public static boolean isBleSensor(int address) {
@@ -93,13 +95,13 @@ public class ConfigurationManager {
     private static final Comparator<Configuration> CONFIGURATION_SEARCH_COMPARATOR = new Comparator<Configuration>() {
         @Override
         public int compare(Configuration c1, Configuration c2) {
-            if (c1.mEndAddress < c2.mStartAddress) {
+            if (c2.mStartAddress < c1.mStartAddress) {
                 return -1;
-            } else if (c1.mStartAddress > c2.mStartAddress) {
-                return 1;
-            } else {
-                return 0;
             }
+            if (c2.mStartAddress > c1.mEndAddress) {
+                return 1;
+            }
+            return 0;
         }
     };
 
