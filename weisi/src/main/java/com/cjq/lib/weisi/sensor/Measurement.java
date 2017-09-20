@@ -95,7 +95,7 @@ public class Measurement {
         return this;
     }
 
-    public void setRealTimeValue(long timestamp, double rawValue) {
+    void setRealTimeValue(long timestamp, double rawValue) {
         synchronized (mRealTimeValue) {
             mRealTimeValue.mTimeStamp = timestamp;
             mRealTimeValue.mRawValue = rawValue;
@@ -118,7 +118,7 @@ public class Measurement {
                 : null;
     }
 
-    public void addDynamicValue(long timestamp, double rawValue) {
+    void addDynamicValue(long timestamp, double rawValue) {
         setRealTimeValue(timestamp, rawValue);
         addHistoryValue(timestamp, rawValue);
     }

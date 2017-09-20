@@ -233,12 +233,12 @@ public class Sensor implements OnRawAddressComparer {
         measurement.addDynamicValue(timestamp, valueBuildDelegator.getRawValue());
     }
 
-    public void addDynamicValue(long timestamp, float batteryVoltage) {
+    private void addDynamicValue(long timestamp, float batteryVoltage) {
         setRealTimeValue(timestamp, batteryVoltage);
         addHistoryValue(timestamp, batteryVoltage);
     }
 
-    public void setRealTimeValue(long timestamp, float batteryVoltage) {
+    private void setRealTimeValue(long timestamp, float batteryVoltage) {
         if (mRealTimeValue.mTimeStamp < timestamp) {
             if (mRealTimeValue.mTimeStamp == 0) {
                 mFirstValueReceivedTimestamp = timestamp;

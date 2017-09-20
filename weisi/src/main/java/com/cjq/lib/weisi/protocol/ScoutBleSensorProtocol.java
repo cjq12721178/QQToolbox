@@ -57,8 +57,10 @@ public class ScoutBleSensorProtocol implements Constant {
                         - CRC16_LENGTH
                         - RSSI_LENGTH
                         - BATTERY_INFO_LENGTH);
-        for (int start = 0, end = dataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
-             start < end; start += SENSOR_DATA_LENGTH) {
+        for (int start = DATA_ZONE_LENGTH_LENGTH,
+             end = dataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
+             start < end;
+             start += SENSOR_DATA_LENGTH) {
             listener.onDataAnalyzed(sensorAddress,
                     broadcastData[start],
                     isArraySensor
