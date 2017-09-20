@@ -57,3 +57,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20170714-0.5.0(16)
 1. 新增SizeSelfAdaptionTextView，使固定长度的TextView根据文字长度调整字体大小
+
+20170920-0.6.0(17):
+1. 新增AdapterDelegate和AdapterDelegateBaseManager用于处理RecyclerView中多viewType的情况

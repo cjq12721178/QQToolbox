@@ -2,6 +2,7 @@ package com.cjq.tool.qbox.ui.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
+import android.view.ViewGroup;
 
 /**
  * Created by KAT on 2017/3/31.
@@ -34,6 +35,16 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerViewBaseAdapter
 
     public void setOnItemLongClickListener(OnItemLongClickListener listener) {
         mOnItemLongClickListener = listener;
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        return super.getItemViewType(position);
+    }
+
+    @Override
+    public VH onCreateViewHolder(ViewGroup parent, int viewType) {
+        return null;
     }
 
     @Override
