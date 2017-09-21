@@ -9,13 +9,27 @@ import android.view.ViewGroup;
  * 支持点击、长按事件，以及通过view的selected属性进行突显
  */
 
-public abstract class RecyclerViewBaseAdapter<VH extends RecyclerViewBaseAdapter.ViewHolder>
-        extends RecyclerView.Adapter<VH> {
+public abstract class RecyclerViewBaseAdapter<T, E>
+        extends RecyclerView.Adapter
+        implements View.OnClickListener,
+        View.OnLongClickListener {
 
+    protected T mItems;
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;
     private int mSelectedIndex = -1;
     private boolean mUpdateSelectedState;
+
+    public RecyclerViewBaseAdapter() {
+    }
+
+    public RecyclerViewBaseAdapter(T items) {
+        setItems(items);
+    }
+
+    public void setItems(T items) {
+        mItems = items;
+    }
 
     public int getSelectedIndex() {
         return mSelectedIndex;
@@ -29,6 +43,7 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerViewBaseAdapter
         mUpdateSelectedState = updateSelectedState;
     }
 
+    //请在setAdapter之前调用，下同
     public void setOnItemClickListener(OnItemClickListener listener) {
         mOnItemClickListener = listener;
     }
@@ -37,64 +52,67 @@ public abstract class RecyclerViewBaseAdapter<VH extends RecyclerViewBaseAdapter
         mOnItemLongClickListener = listener;
     }
 
+    public abstract void addAdapterDelegate(AdapterDelegate<E> delegate);
+
+    protected abstract AdapterDelegate<E> getAdapterDelegate(int viewType);
+
+    public abstract E getItemByPosition(int position);
+
     @Override
-    public int getItemViewType(int position) {
-        return super.getItemViewType(position);
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        RecyclerView.ViewHolder holder = getAdapterDelegate(viewType).onCreateViewHolder(parent);
+        boolean needTag = false;
+        if (mOnItemClickListener != null) {
+            holder.itemView.setOnClickListener(this);
+            needTag = true;
+        }
+        if (mOnItemLongClickListener != null) {
+            holder.itemView.setOnClickListener(this);
+            needTag = true;
+        }
+        if (needTag) {
+            holder.itemView.setTag(holder);
+        }
+        return holder;
     }
 
     @Override
-    public VH onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
-    }
-
-    @Override
-    public void onBindViewHolder(VH holder, int position) {
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
         if (mUpdateSelectedState) {
             holder.itemView.setSelected(position == mSelectedIndex);
         }
+        getAdapterDelegate(holder.getItemViewType()).onBindViewHolder(holder, getItemByPosition(position), position);
     }
 
-    public static class ViewHolder
-            extends RecyclerView.ViewHolder
-            implements View.OnClickListener, View.OnLongClickListener {
-
-        private RecyclerViewBaseAdapter mAdapter;
-
-        public ViewHolder(View itemView, RecyclerViewBaseAdapter adapter) {
-            super(itemView);
-            mAdapter = adapter;
-            if (mAdapter.mOnItemClickListener != null) {
-                itemView.setOnClickListener(this);
-            }
-            if (mAdapter.mOnItemLongClickListener != null) {
-                itemView.setOnLongClickListener(this);
-            }
-        }
-
-        @Override
-        public void onClick(View v) {
-            int position = getLayoutPosition();
+    @Override
+    public void onClick(View v) {
+        if (v.getTag() instanceof RecyclerView.ViewHolder) {
+            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) v.getTag();
+            int position = holder.getLayoutPosition();
             if (position != RecyclerView.NO_POSITION) {
-                mAdapter.mSelectedIndex = position;
-                mAdapter.mOnItemClickListener.onItemClick(v, position);
-                if (mAdapter.mUpdateSelectedState) {
-                    mAdapter.notifyDataSetChanged();
+                mSelectedIndex = position;
+                mOnItemClickListener.onItemClick(v, position);
+                if (mUpdateSelectedState) {
+                    notifyDataSetChanged();
                 }
             }
         }
+    }
 
-        @Override
-        public boolean onLongClick(View v) {
-            int position = getLayoutPosition();
+    @Override
+    public boolean onLongClick(View v) {
+        if (v.getTag() instanceof RecyclerView.ViewHolder) {
+            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) v.getTag();
+            int position = holder.getLayoutPosition();
             if (position != RecyclerView.NO_POSITION) {
-                mAdapter.mSelectedIndex = position;
-                mAdapter.mOnItemLongClickListener.onItemLongClick(v, position);
-                if (mAdapter.mUpdateSelectedState) {
-                    mAdapter.notifyDataSetChanged();
+                mSelectedIndex = position;
+                mOnItemLongClickListener.onItemLongClick(v, position);
+                if (mUpdateSelectedState) {
+                    notifyDataSetChanged();
                 }
             }
-            return true;
         }
+        return true;
     }
 
     public interface OnItemClickListener {

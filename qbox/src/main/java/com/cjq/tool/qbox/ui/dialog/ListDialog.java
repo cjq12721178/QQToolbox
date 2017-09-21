@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.cjq.tool.qbox.R;
+import com.cjq.tool.qbox.ui.adapter.AdapterDelegate;
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
 import com.cjq.tool.qbox.ui.decoration.SpaceItemDecoration;
 
@@ -106,30 +107,32 @@ public class ListDialog
     @Override
     public void onItemClick(View item, int position) {
         OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
-        if (listener != null && mItemAdapter != null && mItemAdapter.mItems != null) {
-            listener.onItemSelected(this, mItemAdapter.mItems[position]);
+        if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
+            listener.onItemSelected(this, mItemAdapter.getItems()[position]);
         }
         dismiss();
     }
 
-    private static class ItemAdapter extends RecyclerViewBaseAdapter<ItemAdapter.ViewHolder> {
+    private static class ItemAdapter extends RecyclerViewBaseAdapter<String[], String> {
 
-        private String[] mItems;
+        private final ItemAdapterDelegate mDelegate = new ItemAdapterDelegate();
 
         public ItemAdapter(String[] items) {
-            mItems = items;
+            super(items);
         }
 
         @Override
-        public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-            return new ViewHolder(LayoutInflater.from(parent.getContext())
-                    .inflate(R.layout.qbox_list_dialog_item, parent, false), this);
+        public void addAdapterDelegate(AdapterDelegate<String> delegate) {
         }
 
         @Override
-        public void onBindViewHolder(ViewHolder holder, int position) {
-            super.onBindViewHolder(holder, position);
-            holder.mTvItem.setText(mItems[position]);
+        public AdapterDelegate<String> getAdapterDelegate(int viewType) {
+            return mDelegate;
+        }
+
+        @Override
+        public String getItemByPosition(int position) {
+            return mItems[position];
         }
 
         @Override
@@ -137,14 +140,41 @@ public class ListDialog
             return mItems != null ? mItems.length : 0;
         }
 
-        public static class ViewHolder extends RecyclerViewBaseAdapter.ViewHolder {
+        public String[] getItems() {
+            return mItems;
+        }
+    }
 
-            private TextView mTvItem;
+    private static class ItemAdapterDelegate implements AdapterDelegate<String> {
 
-            public ViewHolder(View itemView, ItemAdapter itemAdapter) {
-                super(itemView, itemAdapter);
-                mTvItem = (TextView)itemView.findViewById(R.id.tv_item);
-            }
+        @Override
+        public int getItemViewType() {
+            return 0;
+        }
+
+        @Override
+        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent) {
+            return new ViewHolder(LayoutInflater
+                    .from(parent.getContext())
+                    .inflate(R.layout.qbox_list_dialog_item,
+                            parent,
+                            false));
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, String item, int position) {
+            ViewHolder viewHolder = (ViewHolder) holder;
+            viewHolder.mTvItem.setText(item);
+        }
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+
+        private TextView mTvItem;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            mTvItem = (TextView)itemView.findViewById(R.id.tv_item);
         }
     }
 

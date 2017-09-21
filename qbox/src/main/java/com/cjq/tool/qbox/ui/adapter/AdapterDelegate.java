@@ -8,8 +8,8 @@ import android.view.ViewGroup;
  * Created by CJQ on 2017/9/20.
  */
 
-public interface AdapterDelegate<T> {
+public interface AdapterDelegate<E> {
     int getItemViewType();
     RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent);
-    void onBindViewHolder(RecyclerView.ViewHolder holder, T item);
+    void onBindViewHolder(RecyclerView.ViewHolder holder, E item, int position);
 }
