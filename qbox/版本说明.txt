@@ -60,3 +60,9 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20170920-0.6.0(17):
 1. 新增AdapterDelegate和AdapterDelegateBaseManager用于处理RecyclerView中多viewType的情况
+
+20170921-0.6.1(18):
+1. 将AdapterDelegateManager整合进RecyclerViewBaseAdapter
+
+20171010-0.7.0(19):
+1. 新增代码运行时间辅助测量类
