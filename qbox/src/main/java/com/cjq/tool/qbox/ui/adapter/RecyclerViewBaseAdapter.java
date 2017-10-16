@@ -12,13 +12,12 @@ import java.util.List;
  * 支持点击、长按事件，以及通过view的selected属性进行突显
  */
 
-public abstract class RecyclerViewBaseAdapter<T, E>
+public abstract class RecyclerViewBaseAdapter<E>
         extends RecyclerView.Adapter
         implements View.OnClickListener,
         View.OnLongClickListener {
 
     private static final int UPDATE_TYPE_SELECTED_INDEX_CHANGED = 1;
-    protected T mItems;
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;
     private int mSelectedIndex = -1;
@@ -27,18 +26,6 @@ public abstract class RecyclerViewBaseAdapter<T, E>
 
     public RecyclerViewBaseAdapter() {
         onAddAdapterDelegate();
-    }
-
-    public RecyclerViewBaseAdapter(T items) {
-        this();
-        setItems(items);
-    }
-
-    public void setItems(T items) {
-        if (items != mItems) {
-            mItems = items;
-            notifyDataSetChanged();
-        }
     }
 
     public int getSelectedIndex() {

@@ -260,12 +260,13 @@ public class TestRecyclerViewBaseAdapterActivity
         }
     }
 
-    private static class TestRecyclerViewBaseAdapter extends RecyclerViewBaseAdapter<List<City>, City> {
+    private static class TestRecyclerViewBaseAdapter extends RecyclerViewBaseAdapter<City> {
 
         private TestRecyclerViewBaseAdapterDelegate mDelegate;
+        private List<City> mCities;
 
         public TestRecyclerViewBaseAdapter(List<City> cities) {
-            super(cities);
+            mCities = cities;
         }
 
         @Override
@@ -280,12 +281,12 @@ public class TestRecyclerViewBaseAdapterActivity
 
         @Override
         public City getItemByPosition(int position) {
-            return mItems.get(position);
+            return mCities.get(position);
         }
 
         @Override
         public int getItemCount() {
-            return mItems.size();
+            return mCities.size();
         }
     }
 }

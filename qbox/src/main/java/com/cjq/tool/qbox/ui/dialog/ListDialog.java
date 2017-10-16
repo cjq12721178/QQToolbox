@@ -115,12 +115,13 @@ public class ListDialog
         dismiss();
     }
 
-    private static class ItemAdapter extends RecyclerViewBaseAdapter<String[], String> {
+    private static class ItemAdapter extends RecyclerViewBaseAdapter<String> {
 
         private final ItemAdapterDelegate mDelegate = new ItemAdapterDelegate();
+        private String[] mItems;
 
         public ItemAdapter(String[] items) {
-            super(items);
+            mItems = items;
         }
 
         @Override
