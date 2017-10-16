@@ -19,6 +19,8 @@ import com.cjq.tool.qbox.ui.adapter.AdapterDelegate;
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
 import com.cjq.tool.qbox.ui.decoration.SpaceItemDecoration;
 
+import java.util.List;
+
 /**
  * Created by KAT on 2017/4/11.
  */
@@ -122,7 +124,7 @@ public class ListDialog
         }
 
         @Override
-        public void addAdapterDelegate(AdapterDelegate<String> delegate) {
+        public void onAddAdapterDelegate() {
         }
 
         @Override
@@ -165,6 +167,11 @@ public class ListDialog
         public void onBindViewHolder(RecyclerView.ViewHolder holder, String item, int position) {
             ViewHolder viewHolder = (ViewHolder) holder;
             viewHolder.mTvItem.setText(item);
+        }
+
+        @Override
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, String item, int position, List payloads) {
+
         }
     }
 

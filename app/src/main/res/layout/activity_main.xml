@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.cjq.tool.qqtoolbox.MainActivity">
+    tools:context="com.cjq.tool.qqtoolbox.activity.MainActivity">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
@@ -180,6 +180,25 @@
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
             app:layout_constraintTop_toBottomOf="@id/tv_fix_size"
             app:layout_constraintRight_toLeftOf="@id/btn_set_text"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_test_general_recycler_view"
+            android:text="测试一般RecyclerView"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/et_set_text"/>
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_test_recycler_view_base_adapter"
+            android:text="测试RecyclerViewBaseAdapter"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_general_recycler_view"/>
+
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
 

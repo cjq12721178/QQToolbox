@@ -1,5 +1,6 @@
-package com.cjq.tool.qqtoolbox;
+package com.cjq.tool.qqtoolbox.activity;
 
+import android.content.Intent;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import com.cjq.tool.qbox.ui.manager.SwitchableFragmentManager;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView;
 import com.cjq.tool.qbox.util.ClosableLog;
+import com.cjq.tool.qqtoolbox.R;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
@@ -146,6 +148,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.btn_set_text:
                 mSizeSelfAdaptionTextView.setText(mEtSetText.getText().toString());
+                break;
+            case R.id.btn_test_general_recycler_view:
+                startActivity(new Intent(this, TestGeneralRecyclerViewActivity.class));
+                break;
+            case R.id.btn_test_recycler_view_base_adapter:
+                startActivity(new Intent(this, TestRecyclerViewBaseAdapterActivity.class));
                 break;
         }
     }
