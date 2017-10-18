@@ -70,3 +70,11 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20171016-0.7.1(20):
 1. 修复RecyclerViewBaseAdapter选中项无法自适应数据项增删改等变化
 2. 改变RecyclerViewBaseAdapter的点击和长按的实现方式
+
+20171016-0.7.2(21):
+1. 精简RecyclerViewBaseAdapter，增强扩展性
+
+20171017-0.7.3(22):
+1. 从RecyclerViewBaseAdapter中重新分离AdapterDelegateManager，简化RecyclerViewBaseAdapter的使用
+2. 新增AdapterDelegateListManager，实现对AdapterDelegate的线性管理
+3. 使RecyclerViewBaseAdapter实现AdapterDelegate接口，方便单viewType情况下的使用

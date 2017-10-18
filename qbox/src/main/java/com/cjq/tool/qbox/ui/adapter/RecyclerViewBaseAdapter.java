@@ -15,7 +15,7 @@ import java.util.List;
 public abstract class RecyclerViewBaseAdapter<E>
         extends RecyclerView.Adapter
         implements View.OnClickListener,
-        View.OnLongClickListener {
+        View.OnLongClickListener, AdapterDelegate<E> {
 
     private static final int UPDATE_TYPE_SELECTED_INDEX_CHANGED = 1;
     private OnItemClickListener mOnItemClickListener;
@@ -23,9 +23,18 @@ public abstract class RecyclerViewBaseAdapter<E>
     private int mSelectedIndex = -1;
     private boolean mUpdateSelectedState;
     private final RecyclerViewBaseDataObserver mDataObserver = new RecyclerViewBaseDataObserver();
+    private final AdapterDelegateManager mAdapterDelegateManager;
+
+    public RecyclerViewBaseAdapter(AdapterDelegateManager manager) {
+        if (manager == null) {
+            throw new NullPointerException("adapter delegate manager may not be null");
+        }
+        mAdapterDelegateManager = manager;
+    }
 
     public RecyclerViewBaseAdapter() {
-        onAddAdapterDelegate();
+        //this(null);
+        mAdapterDelegateManager = new SingleAdapterDelegateManager();
     }
 
     public int getSelectedIndex() {
@@ -55,15 +64,11 @@ public abstract class RecyclerViewBaseAdapter<E>
         mOnItemLongClickListener = listener;
     }
 
-    public abstract void onAddAdapterDelegate();
-
-    protected abstract AdapterDelegate<E> getAdapterDelegate(int viewType);
-
     public abstract E getItemByPosition(int position);
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        RecyclerView.ViewHolder holder = getAdapterDelegate(viewType).onCreateViewHolder(parent);
+        RecyclerView.ViewHolder holder = mAdapterDelegateManager.onCreateViewHolder(parent, viewType);
         if (mOnItemClickListener != null) {
             holder.itemView.setOnClickListener(this);
         }
@@ -78,10 +83,7 @@ public abstract class RecyclerViewBaseAdapter<E>
         if (mUpdateSelectedState) {
             holder.itemView.setSelected(position == mSelectedIndex);
         }
-        getAdapterDelegate(holder.getItemViewType())
-                .onBindViewHolder(holder,
-                        getItemByPosition(position),
-                        position);
+        mAdapterDelegateManager.onBindViewHolder(holder, getItemByPosition(position), position);
     }
 
     @Override
@@ -93,11 +95,7 @@ public abstract class RecyclerViewBaseAdapter<E>
                     (int)payloads.get(0) == UPDATE_TYPE_SELECTED_INDEX_CHANGED) {
                 holder.itemView.setSelected(position == mSelectedIndex);
             } else {
-                getAdapterDelegate(holder.getItemViewType())
-                        .onBindViewHolder(holder,
-                                getItemByPosition(position),
-                                position,
-                                payloads);
+                mAdapterDelegateManager.onBindViewHolder(holder, getItemByPosition(position), position, payloads);
             }
         }
     }
@@ -112,8 +110,7 @@ public abstract class RecyclerViewBaseAdapter<E>
         unregisterAdapterDataObserver(mDataObserver);
     }
 
-    @Override
-    public void onClick(View v) {
+    private boolean onItemSelected(View v) {
         try {
             Field holderField = RecyclerView.LayoutParams.class.getDeclaredField("mViewHolder");
             holderField.setAccessible(true);
@@ -122,35 +119,51 @@ public abstract class RecyclerViewBaseAdapter<E>
             int lastPosition = mSelectedIndex;
             if (currentPosition != RecyclerView.NO_POSITION) {
                 mSelectedIndex = currentPosition;
-                mOnItemClickListener.onItemClick(v, currentPosition);
                 if (mUpdateSelectedState) {
                     if (lastPosition != -1) {
                         notifyItemChanged(lastPosition, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
                     }
                     notifyItemChanged(currentPosition, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
                 }
+                return true;
             }
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
+        return false;
+    }
+
+    @Override
+    public void onClick(View v) {
+        if (onItemSelected(v)) {
+            mOnItemClickListener.onItemClick(v, mSelectedIndex);
+        }
     }
 
     @Override
     public boolean onLongClick(View v) {
-        if (v.getTag() instanceof RecyclerView.ViewHolder) {
-            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) v.getTag();
-            int position = holder.getLayoutPosition();
-            if (position != RecyclerView.NO_POSITION) {
-                mSelectedIndex = position;
-                mOnItemLongClickListener.onItemLongClick(v, position);
-                if (mUpdateSelectedState) {
-                    notifyItemChanged(position, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
-                }
-            }
+        if (onItemSelected(v)) {
+            mOnItemLongClickListener.onItemLongClick(v, mSelectedIndex);
         }
         return true;
+    }
+
+    //以下三个方法用于只有一个viewType时候重载使用
+    @Override
+    public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent) {
+        return null;
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, E item, int position) {
+
+    }
+
+    @Override
+    public void onBindViewHolder(RecyclerView.ViewHolder holder, E item, int position, List payloads) {
+
     }
 
     public interface OnItemClickListener {
@@ -193,6 +206,19 @@ public abstract class RecyclerViewBaseAdapter<E>
             } else if (positionStart + itemCount <= mSelectedIndex) {
                 mSelectedIndex -= itemCount;
             }
+        }
+    }
+
+    private class SingleAdapterDelegateManager extends AdapterDelegateManager<E> {
+
+        @Override
+        public void addAdapterDelegate(AdapterDelegate<E> delegate) {
+
+        }
+
+        @Override
+        protected AdapterDelegate<E> getAdapterDelegate(int viewType) {
+            return RecyclerViewBaseAdapter.this;
         }
     }
 }

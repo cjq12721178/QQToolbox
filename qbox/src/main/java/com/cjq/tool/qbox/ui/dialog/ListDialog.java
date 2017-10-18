@@ -117,20 +117,11 @@ public class ListDialog
 
     private static class ItemAdapter extends RecyclerViewBaseAdapter<String> {
 
-        private final ItemAdapterDelegate mDelegate = new ItemAdapterDelegate();
         private String[] mItems;
 
         public ItemAdapter(String[] items) {
+            //super();
             mItems = items;
-        }
-
-        @Override
-        public void onAddAdapterDelegate() {
-        }
-
-        @Override
-        public AdapterDelegate<String> getAdapterDelegate(int viewType) {
-            return mDelegate;
         }
 
         @Override
@@ -146,9 +137,6 @@ public class ListDialog
         public String[] getItems() {
             return mItems;
         }
-    }
-
-    private static class ItemAdapterDelegate implements AdapterDelegate<String> {
 
         @Override
         public int getItemViewType() {
@@ -168,11 +156,6 @@ public class ListDialog
         public void onBindViewHolder(RecyclerView.ViewHolder holder, String item, int position) {
             ViewHolder viewHolder = (ViewHolder) holder;
             viewHolder.mTvItem.setText(item);
-        }
-
-        @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, String item, int position, List payloads) {
-
         }
     }
 

@@ -19,9 +19,7 @@ import com.cjq.tool.qqtoolbox.R;
 import com.cjq.tool.qqtoolbox.util.DebugTag;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 public class TestRecyclerViewBaseAdapterActivity
         extends AppCompatActivity
@@ -203,7 +201,92 @@ public class TestRecyclerViewBaseAdapterActivity
         }
     }
 
-    private static class TestRecyclerViewBaseAdapterDelegate implements AdapterDelegate<City> {
+//    private static class TestRecyclerViewBaseAdapterDelegate implements AdapterDelegate<City> {
+//
+//        @Override
+//        public int getItemViewType() {
+//            return 0;
+//        }
+//
+//        @Override
+//        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent) {
+//            CodeRunTimeCatcher.start();
+//            ViewHolder holder = new ViewHolder(LayoutInflater
+//                    .from(parent.getContext())
+//                    .inflate(R.layout.list_item_test_recycler_view_base_adapter,
+//                            parent,
+//                            false));
+//            ClosableLog.d(DebugTag.TEST_RECYCLER_VIEW_BASE_ADAPTER,
+//                    "on create view, create times = "
+//                            + (++createTimes) +
+//                            ", time = "
+//                            + CodeRunTimeCatcher.end() / 100000);
+//            return holder;
+//        }
+//
+//        @Override
+//        public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, City item, int position) {
+//            CodeRunTimeCatcher.start();
+//            ViewHolder holder = (ViewHolder) viewHolder;
+//            holder.mTvCity.setText(item.getName());
+//            ClosableLog.d(DebugTag.TEST_GENERAL_RECYCLER_VIEW,
+//                    "on bind view, position = "
+//                            + position
+//                            + ", create times = "
+//                            + createTimes
+//                            + ", time = "
+//                            + CodeRunTimeCatcher.end() / 100000);
+//        }
+//
+//        @Override
+//        public void onBindViewHolder(RecyclerView.ViewHolder holder, City item, int position, List payloads) {
+//            ClosableLog.d(DebugTag.TEST_GENERAL_RECYCLER_VIEW,
+//                    "on bind view payloads, position = "
+//                            + position
+//                            + ", create times = "
+//                            + createTimes);
+//        }
+//
+//        public static class ViewHolder extends RecyclerView.ViewHolder {
+//
+//            private final TextView mTvCity;
+//
+//            public ViewHolder(View itemView) {
+//                super(itemView);
+//                mTvCity = (TextView) itemView.findViewById(R.id.tv_city);
+//            }
+//        }
+//    }
+
+    private static class TestRecyclerViewBaseAdapter extends RecyclerViewBaseAdapter<City> {
+
+        //private TestRecyclerViewBaseAdapterDelegate mDelegate;
+        private List<City> mCities;
+
+        public TestRecyclerViewBaseAdapter(List<City> cities) {
+            //super(adapterDelegateManager);
+            mCities = cities;
+        }
+
+//        @Override
+//        public void onAddAdapterDelegate() {
+//            mDelegate = new TestRecyclerViewBaseAdapterDelegate();
+//        }
+
+//        @Override
+//        protected AdapterDelegate<City> getAdapterDelegate(int viewType) {
+//            return mDelegate;
+//        }
+
+        @Override
+        public City getItemByPosition(int position) {
+            return mCities.get(position);
+        }
+
+        @Override
+        public int getItemCount() {
+            return mCities.size();
+        }
 
         @Override
         public int getItemViewType() {
@@ -257,36 +340,6 @@ public class TestRecyclerViewBaseAdapterActivity
                 super(itemView);
                 mTvCity = (TextView) itemView.findViewById(R.id.tv_city);
             }
-        }
-    }
-
-    private static class TestRecyclerViewBaseAdapter extends RecyclerViewBaseAdapter<City> {
-
-        private TestRecyclerViewBaseAdapterDelegate mDelegate;
-        private List<City> mCities;
-
-        public TestRecyclerViewBaseAdapter(List<City> cities) {
-            mCities = cities;
-        }
-
-        @Override
-        public void onAddAdapterDelegate() {
-            mDelegate = new TestRecyclerViewBaseAdapterDelegate();
-        }
-
-        @Override
-        protected AdapterDelegate<City> getAdapterDelegate(int viewType) {
-            return mDelegate;
-        }
-
-        @Override
-        public City getItemByPosition(int position) {
-            return mCities.get(position);
-        }
-
-        @Override
-        public int getItemCount() {
-            return mCities.size();
         }
     }
 }
