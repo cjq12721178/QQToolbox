@@ -150,7 +150,7 @@ public abstract class RecyclerViewBaseAdapter<E>
         return true;
     }
 
-    //以下三个方法用于只有一个viewType时候重载使用
+    //以下4个方法用于只有一个viewType时候重载使用
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent) {
         return null;
@@ -164,6 +164,11 @@ public abstract class RecyclerViewBaseAdapter<E>
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, E item, int position, List payloads) {
 
+    }
+
+    @Override
+    public int getItemViewType() {
+        return 0;
     }
 
     public interface OnItemClickListener {
