@@ -23,6 +23,7 @@ public class BleKit {
 
     private long mIntervalTime = -1;
     private long mDurationTime = 10000;
+    private boolean mScanning = false;
     private Handler mHandler = new Handler();
     private BluetoothAdapter.LeScanCallback mLeScanCallback;
     private BluetoothAdapter mBluetoothAdapter;
@@ -61,8 +62,8 @@ public class BleKit {
         stopScan();
         if (leScanCallback != null &&
                 mBluetoothAdapter != null &&
-                !mBluetoothAdapter.isDiscovering() &&
-                durationTime > 0) {
+                !mScanning &&
+                (durationTime > 0 || intervalTime == 0)) {
             mLeScanCallback = leScanCallback;
             mIntervalTime = intervalTime;
             mDurationTime = durationTime;
@@ -76,6 +77,7 @@ public class BleKit {
             if (mIntervalTime != 0) {
                 mHandler.postDelayed(mOnStopScan, mDurationTime);
             }
+            mScanning = true;
             mBluetoothAdapter.startLeScan(mLeScanCallback);
         }
     };
@@ -84,6 +86,7 @@ public class BleKit {
         @Override
         public void run() {
             mBluetoothAdapter.stopLeScan(mLeScanCallback);
+            mScanning = false;
             if (mIntervalTime > 0) {
                 mHandler.postDelayed(mOnStartScan, mIntervalTime);
             }
@@ -92,7 +95,7 @@ public class BleKit {
 
     public void stopScan() {
         if (mBluetoothAdapter != null && mLeScanCallback != null) {
-            if (mBluetoothAdapter.isDiscovering()) {
+            if (mScanning) {
                 if (mIntervalTime != 0) {
                     mHandler.removeCallbacks(mOnStopScan);
                 }
