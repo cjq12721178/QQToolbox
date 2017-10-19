@@ -8,6 +8,7 @@ import java.util.List;
 
 /**
  * Created by CJQ on 2017/10/18.
+ * 用户无需设置viewType，但应注意，viewType的范围：[0，size)，其中size为delegate的数目
  */
 
 public class ArrayAdapterDelegateManager<E> extends AdapterDelegateManager<E> {

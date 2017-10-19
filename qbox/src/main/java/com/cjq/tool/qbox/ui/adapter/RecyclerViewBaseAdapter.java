@@ -26,15 +26,13 @@ public abstract class RecyclerViewBaseAdapter<E>
     private final AdapterDelegateManager mAdapterDelegateManager;
 
     public RecyclerViewBaseAdapter(AdapterDelegateManager manager) {
-        if (manager == null) {
-            throw new NullPointerException("adapter delegate manager may not be null");
-        }
-        mAdapterDelegateManager = manager;
+        mAdapterDelegateManager = manager == null
+                ? new SingleAdapterDelegateManager()
+                : manager;
     }
 
     public RecyclerViewBaseAdapter() {
-        //this(null);
-        mAdapterDelegateManager = new SingleAdapterDelegateManager();
+        this(null);
     }
 
     public int getSelectedIndex() {
@@ -158,7 +156,6 @@ public abstract class RecyclerViewBaseAdapter<E>
 
     @Override
     public void onBindViewHolder(RecyclerView.ViewHolder holder, E item, int position) {
-
     }
 
     @Override

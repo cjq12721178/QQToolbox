@@ -7,7 +7,7 @@ import java.util.List;
  * Created by CJQ on 2017/10/17.
  */
 
-public class ListAdapterDelegateManager<E> extends AdapterDelegateManager<E> {
+public abstract class ListAdapterDelegateManager<E> extends AdapterDelegateManager<E> {
 
     private List<AdapterDelegate<E>> mAdapterDelegates = new ArrayList<>();
 
