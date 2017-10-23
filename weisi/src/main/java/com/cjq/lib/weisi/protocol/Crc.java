@@ -129,7 +129,7 @@ public class Crc {
     }
 
     private static boolean isCorrect16(byte[] buf, int position, int length, boolean isAbnormal, boolean isBufMsb, boolean isCrcMsb) {
-        int crcPos = buf.length - CRC16_LENGTH;
+        int crcPos = position + length - CRC16_LENGTH;
         int crc16 = isAbnormal
                 ? (isBufMsb
                     ? calc16ByMsb(buf, position, length)
