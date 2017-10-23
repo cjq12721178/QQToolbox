@@ -118,7 +118,7 @@ public class ScoutUdpSensorProtocol implements Constant {
             frame[++offset] = DEFAULT_BASE_STATION_ADDRESS_DOWN_BIT;
             frame[++offset] = (byte) (dataZoneLength + COMMAND_CODE_LENGTH);
             frame[++offset] = commandCode;
-            fillDataZone(frame, offset);
+            fillDataZone(frame, ++offset);
             offset += dataZoneLength;
             int crc16 = Crc.calc16ByMsb(frame, START_CHARACTER.length, offset - START_CHARACTER.length);
             frame[offset] = (byte)(crc16 & 0xff);
