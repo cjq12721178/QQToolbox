@@ -129,7 +129,7 @@ public class ConfigurationManager {
 
         private static final String DATA_TYPE = "DataType";
         private static final String PARAPHRASES = "paraphrases";
-        private static final String CONFIGURATION = "configurations";
+        private static final String CONFIGURATION = "configuration";
         private static final String DATA_TYPE_CUSTOM_NAME = "DataTypeCustomName";
 
         private Map<Byte, DataType> mDataTypeMap;
