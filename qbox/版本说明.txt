@@ -92,3 +92,10 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171019-0.7.7(26)：
 1. 修复BleKit无法停止搜索蓝牙设备的问题
+
+20171023-0.7.8(27):
+1. 版本覆盖，上一版的修复内容时针对另一个lib的。。。
+
+20171023-0.7.9(28):
+1. 修改RecyclerViewBaseAdapter方法onBindViewHolder参数payloads的值为100000，避免子类使用时冲突
+2. 修复payloads提取时默认为int型导致子类无法使用其他类型参数的问题

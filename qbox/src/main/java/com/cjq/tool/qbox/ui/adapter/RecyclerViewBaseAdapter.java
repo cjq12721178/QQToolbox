@@ -17,7 +17,7 @@ public abstract class RecyclerViewBaseAdapter<E>
         implements View.OnClickListener,
         View.OnLongClickListener, AdapterDelegate<E> {
 
-    private static final int UPDATE_TYPE_SELECTED_INDEX_CHANGED = 1;
+    private static final int UPDATE_TYPE_SELECTED_INDEX_CHANGED = 100000;
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;
     private int mSelectedIndex = -1;
@@ -89,8 +89,10 @@ public abstract class RecyclerViewBaseAdapter<E>
         if (payloads.isEmpty()) {
             onBindViewHolder(holder, position);
         } else {
+            Object payload = payloads.get(0);
             if (mUpdateSelectedState &&
-                    (int)payloads.get(0) == UPDATE_TYPE_SELECTED_INDEX_CHANGED) {
+                    payload instanceof Integer &&
+                    (int)payload == UPDATE_TYPE_SELECTED_INDEX_CHANGED) {
                 holder.itemView.setSelected(position == mSelectedIndex);
             } else {
                 mAdapterDelegateManager.onBindViewHolder(holder, getItemByPosition(position), position, payloads);
