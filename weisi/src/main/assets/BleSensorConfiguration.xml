@@ -644,8 +644,8 @@
 		</configuration>
 		<configuration>
 			<SensorName>倾斜传感器</SensorName>
-			<start>600000</start>
-			<end>60FFFF</end>
+			<start>8B0000</start>
+			<end>8BFFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>65</DataTypeValue>
