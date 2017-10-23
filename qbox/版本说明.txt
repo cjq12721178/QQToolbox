@@ -85,3 +85,10 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171018-0.7.5(24):
 1. 使RecyclerViewBaseAdapter默认实现AdapterDelegate接口的getItemViewType方法，以方便使用
+
+20171019-0.7.6(25):
+1. 修改RecyclerViewBaseAdapter构造函数
+2. 添加部分注释
+
+20171019-0.7.7(26)：
+1. 修复BleKit无法停止搜索蓝牙设备的问题
