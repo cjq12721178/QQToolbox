@@ -472,7 +472,7 @@
 		<configuration>
 			<SensorName>温度传感器</SensorName>
 			<start>100000</start>
-			<count>11FFFF</count>
+			<end>11FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
@@ -482,7 +482,7 @@
 		<configuration>
 			<SensorName>水浸传感器</SensorName>
 			<start>600000</start>
-			<count>60FFFF</count>
+			<end>60FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>50</DataTypeValue>
@@ -495,7 +495,7 @@
 		<configuration>
 			<SensorName>振动传感器</SensorName>
 			<start>620000</start>
-			<count>62FFFF</count>
+			<end>62FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>52</DataTypeValue>
@@ -508,7 +508,7 @@
 		<configuration>
 			<SensorName>门磁传感器</SensorName>
 			<start>640000</start>
-			<count>64FFFF</count>
+			<end>64FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>54</DataTypeValue>
@@ -521,7 +521,7 @@
 		<configuration>
 			<SensorName>感烟探测器</SensorName>
 			<start>650000</start>
-			<count>65FFFF</count>
+			<end>65FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>55</DataTypeValue>
@@ -531,7 +531,7 @@
 		<configuration>
 			<SensorName>温湿度传感器</SensorName>
 			<start>800000</start>
-			<count>81FFFF</count>
+			<end>81FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
@@ -544,7 +544,7 @@
 		<configuration>
 			<SensorName>形变温度传感器</SensorName>
 			<start>840000</start>
-			<count>84FFFF</count>
+			<end>84FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
@@ -557,7 +557,7 @@
 		<configuration>
 			<SensorName>振动位移传感器</SensorName>
 			<start>860000</start>
-			<count>86FFFF</count>
+			<end>86FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>66</DataTypeValue>
@@ -585,7 +585,7 @@
 		<configuration>
 			<SensorName>棘轮状态监测传感器</SensorName>
 			<start>870000</start>
-			<count>87FFFF</count>
+			<end>87FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
@@ -612,7 +612,7 @@
 		<configuration>
 			<SensorName>直线位移传感器</SensorName>
 			<start>880000</start>
-			<count>88FFFF</count>
+			<end>88FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
@@ -625,7 +625,7 @@
 		<configuration>
 			<SensorName>距离/长度传感器</SensorName>
 			<start>890000</start>
-			<count>89FFFF</count>
+			<end>89FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>6B</DataTypeValue>
@@ -635,7 +635,7 @@
 		<configuration>
 			<SensorName>导线拉力传感器</SensorName>
 			<start>8A0000</start>
-			<count>8AFFFF</count>
+			<end>8AFFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>60</DataTypeValue>
@@ -645,7 +645,7 @@
 		<configuration>
 			<SensorName>倾斜传感器</SensorName>
 			<start>600000</start>
-			<count>60FFFF</count>
+			<end>60FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>65</DataTypeValue>
@@ -664,7 +664,7 @@
 		<configuration>
 			<SensorName>计数器</SensorName>
 			<start>8C0000</start>
-			<count>8CFFFF</count>
+			<end>8CFFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>5F</DataTypeValue>
@@ -677,7 +677,7 @@
 		<configuration>
 			<SensorName>水位传感器</SensorName>
 			<start>A20000</start>
-			<count>A2FFFF</count>
+			<end>A2FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>42</DataTypeValue>
@@ -687,7 +687,7 @@
 		<configuration>
 			<SensorName>雨量传感器</SensorName>
 			<start>A50000</start>
-			<count>A5FFFF</count>
+			<end>A5FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>45</DataTypeValue>
@@ -697,7 +697,7 @@
 		<configuration>
 			<SensorName>风速风向传感器</SensorName>
 			<start>A60000</start>
-			<count>A6FFFF</count>
+			<end>A6FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>46</DataTypeValue>
@@ -710,7 +710,7 @@
 		<configuration>
 			<SensorName>气压传感器</SensorName>
 			<start>A80000</start>
-			<count>A8FFFF</count>
+			<end>A8FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>48</DataTypeValue>
@@ -720,7 +720,7 @@
 		<configuration>
 			<SensorName>光照度传感器</SensorName>
 			<start>AA0000</start>
-			<count>AAFFFF</count>
+			<end>AAFFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>04A</DataTypeValue>
@@ -730,7 +730,7 @@
 		<configuration>
 			<SensorName>噪声传感器</SensorName>
 			<start>AC0000</start>
-			<count>ACFFFF</count>
+			<end>ACFFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>4C</DataTypeValue>
@@ -740,7 +740,7 @@
 		<configuration>
 			<SensorName>蓄电池监测模块</SensorName>
 			<start>B00000</start>
-			<count>B0FFFF</count>
+			<end>B0FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>1B</DataTypeValue>
@@ -753,7 +753,7 @@
 		<configuration>
 			<SensorName>冷凝除湿装置</SensorName>
 			<start>B20000</start>
-			<count>B2FFFF</count>
+			<end>B2FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
@@ -772,7 +772,7 @@
 		<configuration>
 			<SensorName>智能用电测控终端</SensorName>
 			<start>C00000</start>
-			<count>C3FFFF</count>
+			<end>C3FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>20</DataTypeValue>
@@ -971,7 +971,7 @@
 		<configuration>
 			<SensorName>小电流传感器</SensorName>
 			<start>C40000</start>
-			<count>C5FFFF</count>
+			<end>C5FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>1A</DataTypeValue>
@@ -981,7 +981,7 @@
 		<configuration>
 			<SensorName>大电流传感器</SensorName>
 			<start>C60000</start>
-			<count>C7FFFF</count>
+			<end>C7FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>1B</DataTypeValue>
@@ -991,7 +991,7 @@
 		<configuration>
 			<SensorName>智能安全帽</SensorName>
 			<start>C90000</start>
-			<count>C9FFFF</count>
+			<end>C9FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>1D</DataTypeValue>
@@ -1007,7 +1007,7 @@
 		<configuration>
 			<SensorName>智能避雷器</SensorName>
 			<start>CA0000</start>
-			<count>CDFFFF</count>
+			<end>CDFFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
