@@ -95,10 +95,10 @@ public class ConfigurationManager {
     private static final Comparator<Configuration> CONFIGURATION_SEARCH_COMPARATOR = new Comparator<Configuration>() {
         @Override
         public int compare(Configuration c1, Configuration c2) {
-            if (c2.mStartAddress < c1.mStartAddress) {
+            if (c1.mEndAddress < c2.mStartAddress) {
                 return -1;
             }
-            if (c2.mStartAddress > c1.mEndAddress) {
+            if (c1.mStartAddress > c2.mStartAddress) {
                 return 1;
             }
             return 0;
