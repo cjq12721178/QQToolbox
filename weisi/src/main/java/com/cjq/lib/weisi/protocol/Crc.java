@@ -7,6 +7,8 @@ package com.cjq.lib.weisi.protocol;
 public class Crc {
 
     public static final int CRC16_LENGTH = 2;
+    private static final int CRC8_START_BYTE = 0xFF;
+    private static final int CRC8_GENERATOR_POLYNOMIAL = 0x8C;
     private static final int CRC16_DEFAULT_START_VALUE = 0xFFFF;
     private static final int[] REMAIN_TABLE_16 = new int[] {
             0x0000, 0x1021, 0x2042, 0x3063, 0x4084, 0x50a5, 0x60c6, 0x70e7,
@@ -44,6 +46,26 @@ public class Crc {
     };
 
     private Crc() {
+    }
+
+    public static byte calc8(byte[] buffer) {
+        return calc8(buffer, 0, buffer.length);
+    }
+
+    public static byte calc8(byte[] buffer, int offset, int len) {
+        int crc8 = CRC8_START_BYTE;
+        for (int j = offset; j < offset + len; j++) {
+            crc8 ^= buffer[j] & CRC8_START_BYTE;
+            for (int i = 0; i < 8; i++) {
+                if ((crc8 & 1) != 0) {
+                    crc8 >>= 1;
+                    crc8 ^= CRC8_GENERATOR_POLYNOMIAL;
+                } else {
+                    crc8 >>= 1;
+                }
+            }
+        }
+        return (byte)crc8;
     }
 
     //abnormal系列用于来自BLE的数据解析，因为目测BLE的CRC计算有问题。。

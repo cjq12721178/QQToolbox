@@ -17,7 +17,8 @@ public class ScoutUdpSensorProtocol implements Constant {
     private static final int COMMAND_CODE_LENGTH = 1;
     private static final byte FIXED_DIFFERENCE_FROM_COMMAND_TO_RESPONSE = (byte)0x80;
     private static final int SENSOR_DATA_LENGTH = 16;
-    private static final int SENSOR_DATA_RESERVE_LENGTH = 4;
+    private static final int SENSOR_DATA_RESERVE1_LENGTH = 3;
+    private static final int SENSOR_DATA_RESERVE2_LENGTH = 1;
     private static final int SENSOR_VALUE_LENGTH = 2;
     private static final int SENSOR_BATTERY_VOLTAGE_LENGTH = 1;
     private static final int SENSOR_ADDRESS_LENGTH = 2;
@@ -86,15 +87,17 @@ public class ScoutUdpSensorProtocol implements Constant {
                 voltagePos;
                 start < end;
                 start += SENSOR_DATA_LENGTH) {
+            if (Crc.calc8(udpData, start, SENSOR_DATA_LENGTH - 1) != udpData[start + SENSOR_DATA_LENGTH - 1]) {
+                continue;
+            }
             sensorValuePos = start +
                     SENSOR_ADDRESS_LENGTH +
                     DATA_TYPE_VALUE_LENGTH +
-                    SENSOR_DATA_RESERVE_LENGTH;
-            calendarPos = sensorValuePos +
-                    SENSOR_VALUE_LENGTH +
-                    SENSOR_BATTERY_VOLTAGE_LENGTH +
-                    SENSOR_CRC_LENGTH;
+                    SENSOR_DATA_RESERVE1_LENGTH;
             voltagePos = sensorValuePos + SENSOR_VALUE_LENGTH;
+            calendarPos = voltagePos +
+                    SENSOR_BATTERY_VOLTAGE_LENGTH +
+                    SENSOR_DATA_RESERVE2_LENGTH;
             listener.onDataAnalyzed(NumericConverter.int8ToUInt16(udpData[start], udpData[start + 1]),
                     udpData[start + SENSOR_ADDRESS_LENGTH],
                     0,
