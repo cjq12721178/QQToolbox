@@ -210,6 +210,14 @@ public class ConfigurationManager {
                     mCoefficient = Double.parseDouble(mBuilder.toString());
                     break;
                 case DATA_TYPE:
+                    //根据mValueType为DataType配备不同的ValueBuilder
+                    if (mValueType != -1) {
+                        mDataType.mBuilder = new UdpDataValueBuilder(mValueType, mSigned, mCoefficient);
+                        mValueType = -1;
+                        mCoefficient = 1;
+                    } else {
+                        mDataType.mBuilder = BleDataValueBuilder.getInstance();
+                    }
                     mDataTypeMap.put(mDataType.mValue, mDataType);
                     break;
                 case "SensorName":
@@ -234,14 +242,14 @@ public class ConfigurationManager {
                         mDataType = new DataType(mDataTypeValue);
                         mDataTypeMap.put(mDataTypeValue, mDataType);
                     }
-                    //若为Ethernet，则为DataType额外生成ValueBuilder
-                    if (mValueType != -1) {
-                        mDataType.mBuilder = new UdpDataValueBuilder(mValueType, mSigned, mCoefficient);
-                        mValueType = -1;
-                        mCoefficient = 1;
-                    } else {
-                        mDataType.mBuilder = BleDataValueBuilder.getInstance();
-                    }
+//                    //若为Ethernet，则为DataType额外生成ValueBuilder
+//                    if (mValueType != -1) {
+//                        mDataType.mBuilder = new UdpDataValueBuilder(mValueType, mSigned, mCoefficient);
+//                        mValueType = -1;
+//                        mCoefficient = 1;
+//                    } else {
+//                        mDataType.mBuilder = BleDataValueBuilder.getInstance();
+//                    }
                     //生成测量参数
                     mMeasureParameter = new Configuration.MeasureParameter(mDataType,
                             mDataTypeCustomName != null
