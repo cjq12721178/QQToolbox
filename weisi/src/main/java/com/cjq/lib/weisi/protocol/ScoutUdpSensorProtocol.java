@@ -54,7 +54,10 @@ public class ScoutUdpSensorProtocol implements Constant {
         //计算CRC16并校验
         if (!Crc.isCorrect16(udpData,
                 START_CHARACTER.length,
-                MIN_FRAME_LENGTH - START_CHARACTER.length - END_CHARACTER.length,
+                BASE_STATION_ADDRESS_LENGTH
+                        + DATA_ZONE_LENGTH_LENGTH
+                        + COMMAND_CODE_LENGTH
+                        + dataZoneLength,
                 true,
                 false)) {
             return;
