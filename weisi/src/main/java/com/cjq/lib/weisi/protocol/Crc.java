@@ -133,11 +133,11 @@ public class Crc {
         int crcPos = position + length;
         int crc16 = isAbnormal
                 ? (isBufMsb
-                    ? calc16ByMsb(buf, position, length)
-                    : calc16ByLsb(buf, position, length))
-                : (isBufMsb
                     ? calc16AbnormalByMsb(buf, position, length)
-                    : calc16AbnormalByLSB(buf, position, length));
+                    : calc16AbnormalByLSB(buf, position, length))
+                : (isBufMsb
+                    ? calc16ByMsb(buf, position, length)
+                    : calc16ByLsb(buf, position, length));
         return isCrcMsb
                 ? (crc16 & 0xff) == buf[crcPos + 1] && (crc16 >> 8) == buf[crcPos]
                 : (crc16 & 0xff) == buf[crcPos] && (crc16 >> 8) == buf[crcPos + 1];
