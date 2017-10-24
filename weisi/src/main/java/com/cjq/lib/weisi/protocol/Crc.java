@@ -120,8 +120,9 @@ public class Crc {
         return crc16;
     }
 
+    //待计算CRC数据段后两位为原数据携带CRC
     public static boolean isCorrect16(byte[] buf, boolean isBufMsb, boolean isCrcMsb) {
-        return isCorrect16(buf, 0, buf.length, false, isBufMsb, isCrcMsb);
+        return isCorrect16(buf, 0, buf.length - CRC16_LENGTH, false, isBufMsb, isCrcMsb);
     }
 
     public static boolean isCorrect16(byte[] buf, int position, int length, boolean isBufMsb, boolean isCrcMsb) {
@@ -129,7 +130,7 @@ public class Crc {
     }
 
     private static boolean isCorrect16(byte[] buf, int position, int length, boolean isAbnormal, boolean isBufMsb, boolean isCrcMsb) {
-        int crcPos = position + length - CRC16_LENGTH;
+        int crcPos = position + length;
         int crc16 = isAbnormal
                 ? (isBufMsb
                     ? calc16ByMsb(buf, position, length)
