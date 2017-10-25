@@ -99,3 +99,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20171023-0.7.9(28):
 1. 修改RecyclerViewBaseAdapter方法onBindViewHolder参数payloads的值为100000，避免子类使用时冲突
 2. 修复payloads提取时默认为int型导致子类无法使用其他类型参数的问题
+
+20171025-0.8.0(29):
+1. 新增SortDialog，用于显示简易排序界面

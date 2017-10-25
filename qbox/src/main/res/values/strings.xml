@@ -4,4 +4,7 @@
     <string name="qbox_no">否</string>
     <string name="qbox_ok">确定</string>
     <string name="qbox_cancel">取消</string>
+    <string name="qbox_sort">排序</string>
+    <string name="qbox_ascend">升序</string>
+    <string name="qbox_descend">降序</string>
 </resources>

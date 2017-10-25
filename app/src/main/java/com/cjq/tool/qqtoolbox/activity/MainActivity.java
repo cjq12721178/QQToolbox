@@ -1,6 +1,7 @@
 package com.cjq.tool.qqtoolbox.activity;
 
 import android.content.Intent;
+import android.support.annotation.IdRes;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
+import com.cjq.tool.qbox.ui.dialog.SortDialog;
 import com.cjq.tool.qbox.ui.manager.SwitchableFragmentManager;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView;
@@ -22,7 +24,10 @@ import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+public class MainActivity
+        extends AppCompatActivity
+        implements View.OnClickListener,
+        SortDialog.OnSortTypeChangedListener {
 
     private SwitchableFragmentManager mSwitchableFragmentManager;
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
@@ -155,6 +160,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             case R.id.btn_test_recycler_view_base_adapter:
                 startActivity(new Intent(this, TestRecyclerViewBaseAdapterActivity.class));
                 break;
+            case R.id.btn_sort_dialog:
+                SortDialog dialog3 = new SortDialog();
+                dialog3.addSortType(R.id.address, "地址")
+                        .addSortType(R.id.time, "时间")
+                        .addSortType(R.id.name, "名称")
+                        .addSortType(R.id.unit, "单位")
+                        .show(getSupportFragmentManager(), "sort dialog");
+                break;
         }
     }
 
@@ -166,5 +179,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mFragmentTags,
                     new Class[] {VisualFragment1.class, VisualFragment2.class, VisualFragment3.class});
         }
+    }
+
+    @Override
+    public void onSortTypeChanged(@IdRes int checkedId, boolean isAscending) {
+        ClosableLog.d(SortDialog.TAG, "R.id.address = " + R.id.address
+                + "R.id.time = " + R.id.time
+                + "R.id.name = " + R.id.name
+                + "R.id.unit = " + R.id.unit);
+        ClosableLog.d(SortDialog.TAG, "checkedId = " + checkedId + ", isAscend = " + isAscending);
     }
 }
