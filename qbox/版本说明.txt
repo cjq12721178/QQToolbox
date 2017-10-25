@@ -102,3 +102,9 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171025-0.8.0(29):
 1. 新增SortDialog，用于显示简易排序界面
+
+20171025-0.8.1(30):
+1. 修复SortDialog无法默认选中排序的问题
+
+20171025-0.8.2(31):
+1. 修复SortDialog中默认排序没有显示的问题

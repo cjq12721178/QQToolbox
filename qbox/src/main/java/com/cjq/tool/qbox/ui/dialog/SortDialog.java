@@ -89,6 +89,7 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
             if (selectedId == -1) {
                 selectedId = sortType.getId();
                 setSelectedId(arguments, selectedId);
+                button.setChecked(true);
             } else if (selectedId == sortType.getId()) {
                 button.setChecked(true);
             }
