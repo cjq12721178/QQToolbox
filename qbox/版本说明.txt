@@ -108,3 +108,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171025-0.8.2(31):
 1. 修复SortDialog中默认排序没有显示的问题
+
+20171025-0.8.3(32):
+1. 更改SortDialog中RadioButton的样式（将圆圈从左移到了右）

@@ -1,6 +1,8 @@
 package com.cjq.tool.qbox.ui.dialog;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -82,6 +84,7 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
         Bundle arguments = getArguments();
         ArrayList<SortType> sortTypes = arguments.getParcelableArrayList(ARGUMENT_KEY_SORT_TYPES);
         int selectedId = getSelectedId(arguments);
+        Bitmap emptyRadioButtonImage = null;
         for (SortType sortType :
                 sortTypes) {
             RadioButton button = new RadioButton(getContext());
@@ -94,8 +97,8 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
                 button.setChecked(true);
             }
             button.setText(sortType.getLabel());
-            button.setButtonDrawable(null);
-            button.setCompoundDrawables(null,
+            button.setButtonDrawable(new BitmapDrawable(getResources(), emptyRadioButtonImage));
+            button.setCompoundDrawablesWithIntrinsicBounds(null,
                     null,
                     ContextCompat.getDrawable(getContext(),
                             android.R.drawable.btn_radio),
