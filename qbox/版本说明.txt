@@ -114,3 +114,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171031-0.9.0(33):
 1. 新增ExceptionLog类，用于处理Exception，可以选择Log输出，Toast显示，以及文件记录
+
+20171031-0.9.1(34):
+1. 修改ExceptionLog类，当LOG_TYPE为DEBUG时，只在debug模式下打印Exception信息
