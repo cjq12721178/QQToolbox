@@ -111,3 +111,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171025-0.8.3(32):
 1. 更改SortDialog中RadioButton的样式（将圆圈从左移到了右）
+
+20171031-0.9.0(33):
+1. 新增ExceptionLog类，用于处理Exception，可以选择Log输出，Toast显示，以及文件记录

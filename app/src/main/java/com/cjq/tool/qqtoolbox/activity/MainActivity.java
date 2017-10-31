@@ -2,12 +2,10 @@ package com.cjq.tool.qqtoolbox.activity;
 
 import android.content.Intent;
 import android.support.annotation.IdRes;
-import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.TextView;
 
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
@@ -33,6 +31,7 @@ public class MainActivity
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
     private SizeSelfAdaptionTextView mSizeSelfAdaptionTextView;
     private EditText mEtSetText;
+    private SortDialog mSortDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +41,7 @@ public class MainActivity
         ClosableLog.setEnablePrint(true);
         mSizeSelfAdaptionTextView = (SizeSelfAdaptionTextView) findViewById(R.id.tv_fix_size);
         mEtSetText = (EditText) findViewById(R.id.et_set_text);
+        //findViewById(R.id.tv_text_view_on_click).setOnClickListener(this);
     }
 
     @Override
@@ -161,13 +161,35 @@ public class MainActivity
                 startActivity(new Intent(this, TestRecyclerViewBaseAdapterActivity.class));
                 break;
             case R.id.btn_sort_dialog:
-                SortDialog dialog3 = new SortDialog();
-                dialog3.addSortType(R.id.address, "地址")
-                        .addSortType(R.id.time, "时间")
-                        .addSortType(R.id.name, "名称")
-                        .addSortType(R.id.unit, "单位")
-                        .show(getSupportFragmentManager(), "sort dialog");
+                if (mSortDialog == null) {
+                    mSortDialog = new SortDialog();
+                    mSortDialog.addSortType(R.id.address, "地址")
+                            .addSortType(R.id.time, "时间")
+                            .addSortType(R.id.name, "名称")
+                            .addSortType(R.id.unit, "单位")
+                            .setDefaultSelectedId(R.id.time);
+                }
+                mSortDialog.show(getSupportFragmentManager(), "sort dialog");
                 break;
+            case R.id.tv_text_view_on_click:
+                SimpleCustomizeToast.show(this, "when you see me, it means CustomDrawableSizeTextView can be clicked");
+                break;
+        }
+    }
+
+    public void onNormalTextViewClick(View v) {
+        SimpleCustomizeToast.show(this, "when you see me, it means normal TextView can be clicked");
+    }
+
+    public void onCustomTextViewClick(View v) {
+        SimpleCustomizeToast.show(this, "when you see me, it means CustomDrawableSizeTextView can be clicked");
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null) {
+            mSortDialog = (SortDialog) getSupportFragmentManager().findFragmentByTag("sort dialog");
         }
     }
 
