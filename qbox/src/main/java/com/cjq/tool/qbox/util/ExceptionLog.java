@@ -45,7 +45,7 @@ public class ExceptionLog {
         logFileDirectory = logDirectory;
     }
 
-    public static void process(int logType, Exception e) {
+    public static void process(int logType, Throwable e) {
         if (e == null) {
             return;
         }
