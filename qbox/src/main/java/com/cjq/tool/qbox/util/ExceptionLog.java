@@ -3,10 +3,10 @@ package com.cjq.tool.qbox.util;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.cjq.tool.qbox.BuildConfig;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 
 import java.io.File;
@@ -36,7 +36,7 @@ public class ExceptionLog {
     private ExceptionLog() {
     }
 
-    public static void initialize(Context c, String logDirectory) {
+    public static void initialize(@NonNull Context c, @NonNull String logDirectory) {
         if (c == null) {
             throw new NullPointerException("context may not be null");
         }
@@ -62,9 +62,7 @@ public class ExceptionLog {
         }
 
         if ((logType & LOG_TYPE_RECORD) != 0) {
-            StringWriter stringWriter = new StringWriter();
-            e.printStackTrace(new PrintWriter(stringWriter));
-            saveInLocalFile(stringWriter.toString());
+            saveInLocalFile(generateLog(e));
         }
     }
 
@@ -103,15 +101,18 @@ public class ExceptionLog {
         }
     }
 
-//    private static String decorateMessage(String msg) {
-//        //目前暂时简单的表示为“时间戳-错误信息”
-//        StringBuffer buffer = new StringBuffer();
-//        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-//        buffer.setLength(0);
-//        buffer.append(dateFormat.format(new Date()))
-//                .append(" —— ")
-//                .append(msg)
-//                .append('\n');
-//        return buffer.toString();
-//    }
+    @NonNull
+    private static String generateLog(Throwable e) {
+        //目前暂时简单的表示为“时间戳-错误信息”
+        StringBuffer buffer = new StringBuffer();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        StringWriter stringWriter = new StringWriter();
+        e.printStackTrace(new PrintWriter(stringWriter));
+        buffer.setLength(0);
+        buffer.append(dateFormat.format(new Date()))
+                .append(" ：\n")
+                .append(stringWriter.getBuffer())
+                .append('\n');
+        return buffer.toString();
+    }
 }

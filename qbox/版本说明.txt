@@ -121,6 +121,9 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20171031-0.9.2(35):
 1. 放宽ExceptionLog类process方法参数范围，从Exception到Throwable
 
-20171031-0.9.3(36)
+20171031-0.9.3(36):
 1. 修复ExceptionLog类在debug模式下无法输出异常信息的问题
 2. 添加写外部存储权限
+
+20171101-0.9.4(37):
+1. 为ExceptionLog类在record模式下增加日期
