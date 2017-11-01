@@ -1,6 +1,7 @@
 package com.cjq.tool.qbox.util;
 
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
 import android.os.Environment;
 import android.text.TextUtils;
 import android.util.Log;
@@ -30,6 +31,7 @@ public class ExceptionLog {
 
     private static Context context;
     private static String logFileDirectory;
+    private static boolean debuggable;
 
     private ExceptionLog() {
     }
@@ -43,6 +45,7 @@ public class ExceptionLog {
         }
         context = c;
         logFileDirectory = logDirectory;
+        debuggable = (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 
     public static void process(int logType, Throwable e) {
@@ -66,7 +69,7 @@ public class ExceptionLog {
     }
 
     private static boolean isDebuggable() {
-        return BuildConfig.DEBUG;
+        return debuggable;
     }
 
     private static void saveInLocalFile(String information) {
