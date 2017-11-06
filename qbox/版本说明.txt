@@ -131,4 +131,3 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20171101-0.10.0(38):
 1. 为SortDialog的SortType提供自定义字体大小的设置
 2. 新增FilterDialog(未完成)
-3. 修改传感器存储策略，在固定容量循环存储模式外新增不限容线性存储模式
