@@ -4,34 +4,27 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
  * Created by CJQ on 2017/6/16.
  */
 
-public class Sensor implements OnRawAddressComparer {
+public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddressComparer {
 
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
     private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
 
-    private String mName;
     private final int mRawAddress;
     private final String mFormatAddress;
-    private final Value mRealTimeValue = new Value(0, 0);
-    private final LinkedList<Value> mHistoryValues = new LinkedList<>();
     private final List<Measurement> mMeasurementKinds;
     private List<Measurement> mMeasurementCollections;
     private SensorDecorator mDecorator;
     private long mFirstValueReceivedTimestamp;
     private long mNetInTimestamp;
 
-    Sensor(int address) {
-        this(address, null);
-    }
-
-    Sensor(int address, SensorDecorator decorator) {
+    Sensor(int address, SensorDecorator decorator, int maxValueSize) {
+        super(maxValueSize);
         //设置地址
         mRawAddress = address & 0xffffff;
         mFormatAddress = ConfigurationManager.isBleSensor(address)
@@ -44,7 +37,7 @@ public class Sensor implements OnRawAddressComparer {
             mMeasurementKinds = new ArrayList<>(configuration.mMeasureParameters.length);
             for (Configuration.MeasureParameter parameter :
                     configuration.mMeasureParameters) {
-                mMeasurementKinds.add(new Measurement(parameter));
+                mMeasurementKinds.add(new Measurement(parameter, maxValueSize));
             }
         } else {
             mName = "未知传感器";
@@ -110,7 +103,8 @@ public class Sensor implements OnRawAddressComparer {
         //int position = getMeasurementPosition(dataTypeValue);
         Measurement newMeasurement = new Measurement(
                 ConfigurationManager.getDataType(mRawAddress, dataTypeValue, true),
-                decorator);
+                decorator,
+                MAX_SIZE);
         if (position >= 0) {
             mMeasurementKinds.get(position)
                     .getLastSameDataTypeMeasurement()
@@ -122,10 +116,15 @@ public class Sensor implements OnRawAddressComparer {
         return newMeasurement;
     }
 
-    //返回传感器通用名称
-    public String getGeneralName() {
-        return mName;
+    @Override
+    protected Value onCreateValue(long timestamp) {
+        return new Value(timestamp, 0);
     }
+
+    //返回传感器通用名称
+//    public String getGeneralName() {
+//        return mName;
+//    }
 
     //返回传感器名称（可以经过SensorDecorator修饰）
     public String getName() {
@@ -171,8 +170,8 @@ public class Sensor implements OnRawAddressComparer {
     public int getMeasurementPosition(byte dataTypeValue) {
         int position, size = mMeasurementKinds.size();
         if (size > MEASUREMENT_SEARCH_THRESHOLD) {
-            synchronized (MODIFIABLE_DATA_TYPE) {
-                MODIFIABLE_DATA_TYPE.setValue(dataTypeValue);
+            synchronized (MEASUREMENT_GET_COMPARER) {
+                MEASUREMENT_GET_COMPARER.setDataTypeValue(dataTypeValue);
                 position = Collections.binarySearch(mMeasurementKinds,
                         MEASUREMENT_GET_COMPARER,
                         MEASUREMENT_GET_COMPARATOR);
@@ -253,49 +252,53 @@ public class Sensor implements OnRawAddressComparer {
     }
 
     private void addHistoryValue(long timestamp, float voltage) {
-        synchronized (mHistoryValues) {
-            int size = mHistoryValues.size();
-            if (size > 0) {
-                if (mRealTimeValue.mTimeStamp == timestamp) {
-                    mHistoryValues.peekLast().mBatteryVoltage = voltage;
-                } else {
-                    Value newValue;
-                    if (size == Measurement.DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
-                        newValue = mHistoryValues.poll();
-                        newValue.mTimeStamp = timestamp;
-                        newValue.mBatteryVoltage = voltage;
-                    } else {
-                        newValue = new Value(timestamp, voltage);
-                    }
-                    int index = findHistoryValueIndexByTimestamp(newValue);
-                    mHistoryValues.add(index, newValue);
-                }
-            } else {
-                mHistoryValues.add(new Value(timestamp, voltage));
-            }
+        Value value = addHistoryValue(timestamp);
+        if (value != null) {
+            value.mBatteryVoltage = voltage;
         }
+//        synchronized (mHistoryValues) {
+//            int size = mHistoryValues.size();
+//            if (size > 0) {
+//                if (mRealTimeValue.mTimeStamp == timestamp) {
+//                    mHistoryValues.peekLast().mBatteryVoltage = voltage;
+//                } else {
+//                    Value newValue;
+//                    if (size == Measurement.DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
+//                        newValue = mHistoryValues.poll();
+//                        newValue.mTimeStamp = timestamp;
+//                        newValue.mBatteryVoltage = voltage;
+//                    } else {
+//                        newValue = new Value(timestamp, voltage);
+//                    }
+//                    int index = findHistoryValueIndexByTimestamp(newValue);
+//                    mHistoryValues.add(index, newValue);
+//                }
+//            } else {
+//                mHistoryValues.add(new Value(timestamp, voltage));
+//            }
+//        }
     }
 
-    private int findHistoryValueIndexByTimestamp(Value target) {
-        //不在size==0的情况下使用
-        Value lastValue = mHistoryValues.peekLast();
-        if (target.mTimeStamp > lastValue.mTimeStamp) {
-            return mHistoryValues.size();
-        }
-        Iterator<Value> values = mHistoryValues.descendingIterator();
-        values.next();
-        for (int i = mHistoryValues.size() - 1;values.hasNext();--i) {
-            lastValue = values.next();
-            if (target.mTimeStamp > lastValue.mTimeStamp) {
-                return i;
-            }
-        }
-        return 0;
-    }
+//    private int findHistoryValueIndexByTimestamp(Value target) {
+//        //不在size==0的情况下使用
+//        Value lastValue = mHistoryValues.peekLast();
+//        if (target.mTimeStamp > lastValue.mTimeStamp) {
+//            return mHistoryValues.size();
+//        }
+//        Iterator<Value> values = mHistoryValues.descendingIterator();
+//        values.next();
+//        for (int i = mHistoryValues.size() - 1;values.hasNext();--i) {
+//            lastValue = values.next();
+//            if (target.mTimeStamp > lastValue.mTimeStamp) {
+//                return i;
+//            }
+//        }
+//        return 0;
+//    }
 
-    public List<Value> getHistoryValues() {
-        return Collections.unmodifiableList(mHistoryValues);
-    }
+//    public List<Value> getHistoryValues() {
+//        return Collections.unmodifiableList(mHistoryValues);
+//    }
 
     public long getFirstValueReceivedTimestamp() {
         return mFirstValueReceivedTimestamp;
@@ -324,47 +327,44 @@ public class Sensor implements OnRawAddressComparer {
         OFF_LINE
     }
 
-    private static final Comparator<Measurement> MEASUREMENT_GET_COMPARATOR = new Comparator<Measurement>() {
+    private static final Comparator<DataTypeValueGetter> MEASUREMENT_GET_COMPARATOR = new Comparator<DataTypeValueGetter>() {
+
         @Override
-        public int compare(Measurement m1, Measurement m2) {
-            return m1.getDataType().getValue() - m2.getDataType().getValue();
+        public int compare(DataTypeValueGetter o1, DataTypeValueGetter o2) {
+            return o1.getDataTypeValue() - o2.getDataTypeValue();
         }
     };
 
-    private static final ModifiableDataType MODIFIABLE_DATA_TYPE = new ModifiableDataType((byte)0);
-    private static final Measurement MEASUREMENT_GET_COMPARER = new Measurement(MODIFIABLE_DATA_TYPE);
+    //private static final ModifiableDataType MODIFIABLE_DATA_TYPE = new ModifiableDataType((byte)0);
+    private static final ModifiableDataType MEASUREMENT_GET_COMPARER = new ModifiableDataType();
 
-    private static class ModifiableDataType extends DataType {
+    private static class ModifiableDataType implements DataTypeValueGetter {
 
         private byte mModifiableValue;
 
-        public ModifiableDataType(byte value) {
-            super(value);
+        public void setDataTypeValue(byte value) {
+            mModifiableValue = value;
         }
 
         @Override
-        public byte getValue() {
+        public byte getDataTypeValue() {
             return mModifiableValue;
-        }
-
-        public void setValue(byte value) {
-            mModifiableValue = value;
         }
     }
 
-    public static class Value {
+    public static class Value extends ValueContainer.Value {
 
-        long mTimeStamp;
+        //long mTimeStamp;
         float mBatteryVoltage;
 
         public Value(long timeStamp, float batteryVoltage) {
-            mTimeStamp = timeStamp;
+            super(timeStamp);
             mBatteryVoltage = batteryVoltage;
         }
 
-        public long getTimeStamp() {
-            return mTimeStamp;
-        }
+//        public long getTimeStamp() {
+//            return mTimeStamp;
+//        }
 
         public float getBatteryVoltage() {
             return mBatteryVoltage;

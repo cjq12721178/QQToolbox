@@ -10,6 +10,7 @@ import java.util.Map;
 
 public class SensorManager {
 
+    private static final int DEFAULT_DYNAMIC_SENSOR_MAX_VALUE_SIZE = 50;
     private static final Map<Integer, Sensor> SENSOR_MAP = new HashMap<>();
 
     private SensorManager() {
@@ -27,7 +28,7 @@ public class SensorManager {
         Sensor sensor = SENSOR_MAP.get(address);
         if (autoCreate) {
             if (sensor == null) {
-                sensor = new Sensor(address, decorator);
+                sensor = new Sensor(address, decorator, DEFAULT_DYNAMIC_SENSOR_MAX_VALUE_SIZE);
                 SENSOR_MAP.put(address, sensor);
             } else {
                 sensor.setDecorator(decorator);

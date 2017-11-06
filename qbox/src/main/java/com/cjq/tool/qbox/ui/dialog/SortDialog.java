@@ -6,6 +6,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.support.annotation.DimenRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -14,6 +15,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -85,6 +87,8 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
         ArrayList<SortType> sortTypes = arguments.getParcelableArrayList(ARGUMENT_KEY_SORT_TYPES);
         int selectedId = getSelectedId(arguments);
         Bitmap emptyRadioButtonImage = null;
+        int textSizeRes = decorator.getSortTypeTextSize();
+        float textSize = textSizeRes != 0 ? getResources().getDimensionPixelSize(textSizeRes) : 0;
         for (SortType sortType :
                 sortTypes) {
             RadioButton button = new RadioButton(getContext());
@@ -97,6 +101,9 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
                 button.setChecked(true);
             }
             button.setText(sortType.getLabel());
+            if (textSize != 0) {
+                button.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
+            }
             button.setButtonDrawable(new BitmapDrawable(getResources(), emptyRadioButtonImage));
             button.setCompoundDrawablesWithIntrinsicBounds(null,
                     null,
@@ -161,6 +168,15 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
             super.reset();
             setOkLabel(R.string.qbox_ascend);
             setCancelLabel(R.string.qbox_descend);
+            setSortTypeTextSize(R.dimen.qbox_size_text_dialog_view);
+        }
+
+        public void setSortTypeTextSize(@DimenRes int textSizeRes) {
+            mParameters.putInt("sdp_text_size", textSizeRes);
+        }
+
+        public int getSortTypeTextSize() {
+            return mParameters.getInt("sdp_text_size");
         }
     }
 

@@ -2,6 +2,7 @@ package com.cjq.lib.weisi.sensor;
 
 import android.support.annotation.NonNull;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -11,20 +12,19 @@ import java.util.List;
  * Created by CJQ on 2017/6/19.
  */
 
-public class Measurement {
+public class Measurement
+        extends ValueContainer<Measurement.Value>
+        implements DataTypeValueGetter {
 
-    static final int DEFAULT_MAX_HISTORY_VALUE_CAPACITY = 50;
     private static boolean enableSaveRealTimeValue = false;
 
     private final DataType mDataType;
-    private String mName;
-    private final Value mRealTimeValue = new Value(0, 0);
-    private LinkedList<Value> mHistoryValues = new LinkedList<>();
     private Measurement mNextMeasurement;
     private MeasurementDecorator mDecorator;
 
     //用于生成测量参数及其相同数据类型的阵列（根据配置静态生成）
-    Measurement(@NonNull Configuration.MeasureParameter parameter) {
+    Measurement(@NonNull Configuration.MeasureParameter parameter, int maxValueSize) {
+        super(maxValueSize);
         if (parameter == null || parameter.mInvolvedDataType == null) {
             throw new NullPointerException("measure parameter can not be null");
         }
@@ -37,14 +37,15 @@ public class Measurement {
         Configuration.MeasureParameter nextParameter = parameter;
         Measurement nextMeasurement = this;
         while (nextParameter.mNext != null) {
-            nextMeasurement.mNextMeasurement = new Measurement(nextParameter.mNext);
+            nextMeasurement.mNextMeasurement = new Measurement(nextParameter.mNext, maxValueSize);
             nextParameter = nextParameter.mNext;
             nextMeasurement = nextMeasurement.mNextMeasurement;
         }
     }
 
     //用于生成单个测量参数（动态添加）
-    Measurement(@NonNull DataType dataType, MeasurementDecorator decorator) {
+    Measurement(@NonNull DataType dataType, MeasurementDecorator decorator, int maxValueSize) {
+        super(maxValueSize);
         if (dataType == null) {
             throw new NullPointerException("dataType can not be null");
         }
@@ -53,16 +54,13 @@ public class Measurement {
         mName = dataType.getDefaultName();
     }
 
-    public Measurement(DataType dataType) {
-        this(dataType, null);
-    }
-
     public String getName() {
         return mDecorator != null ? mDecorator.getName() : mName;
     }
 
-    public String getGeneralName() {
-        return mName;
+    @Override
+    protected Value onCreateValue(long timestamp) {
+        return new Value(timestamp, 0);
     }
 
     public DataType getDataType() {
@@ -102,10 +100,6 @@ public class Measurement {
         }
     }
 
-    public Value getRealTimeValue() {
-        return mRealTimeValue;
-    }
-
     public String getDecoratedRealTimeValue() {
         return mRealTimeValue.mTimeStamp != 0
                 ? mDataType.getDecoratedValue(mRealTimeValue.mRawValue)
@@ -124,70 +118,70 @@ public class Measurement {
     }
 
     private void addHistoryValue(long timestamp, double rawValue) {
-        synchronized (mHistoryValues) {
-            int size = mHistoryValues.size();
-            if (size > 0) {
-                Value newValue;
-                if (size == DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
-                    newValue = mHistoryValues.poll();
-                    newValue.mTimeStamp = timestamp;
-                    newValue.mRawValue = rawValue;
-                } else {
-                    newValue = new Value(timestamp, rawValue);
-                }
-                int index = findHistoryValueIndexByTimestamp(newValue);
-                mHistoryValues.add(index, newValue);
-            } else {
-                mHistoryValues.add(new Value(timestamp, rawValue));
-            }
+        Value value = addHistoryValue(timestamp);
+        if (value != null) {
+            value.mRawValue = rawValue;
         }
+//        synchronized (mHistoryValues) {
+//            int size = mHistoryValues.size();
+//            if (size > 0) {
+//                Value newValue;
+//                if (size == DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
+//                    newValue = mHistoryValues.poll();
+//                    newValue.mTimeStamp = timestamp;
+//                    newValue.mRawValue = rawValue;
+//                } else {
+//                    newValue = new Value(timestamp, rawValue);
+//                }
+//                int index = findHistoryValueIndexByTimestamp(newValue);
+//                mHistoryValues.add(index, newValue);
+//            } else {
+//                mHistoryValues.add(new Value(timestamp, rawValue));
+//            }
+//        }
     }
 
-    private int findHistoryValueIndexByTimestamp(Value target) {
-        //不在size==0的情况下使用
-        Value lastValue = mHistoryValues.peekLast();
-        if (target.mTimeStamp > lastValue.mTimeStamp) {
-            return mHistoryValues.size();
-        }
-        if (target.mTimeStamp == lastValue.mTimeStamp) {
-            mHistoryValues.pollLast();
-            return mHistoryValues.size();
-        }
-        Iterator<Value> values = mHistoryValues.descendingIterator();
-        values.next();
-        for (int i = mHistoryValues.size() - 1;values.hasNext();--i) {
-            lastValue = values.next();
-            if (target.mTimeStamp > lastValue.mTimeStamp) {
-                return i;
-            }
-        }
-        return 0;
-    }
-
-    public List<Value> getHistoryValues() {
-        return Collections.unmodifiableList(mHistoryValues);
-    }
+//    private int findHistoryValueIndexByTimestamp(Value target) {
+//        //不在size==0的情况下使用
+//        Value lastValue = mHistoryValues.peekLast();
+//        if (target.mTimeStamp > lastValue.mTimeStamp) {
+//            return mHistoryValues.size();
+//        }
+//        if (target.mTimeStamp == lastValue.mTimeStamp) {
+//            mHistoryValues.pollLast();
+//            return mHistoryValues.size();
+//        }
+//        Iterator<Value> values = mHistoryValues.descendingIterator();
+//        values.next();
+//        for (int i = mHistoryValues.size() - 1;values.hasNext();--i) {
+//            lastValue = values.next();
+//            if (target.mTimeStamp > lastValue.mTimeStamp) {
+//                return i;
+//            }
+//        }
+//        return 0;
+//    }
 
     public void setDecorator(MeasurementDecorator decorator) {
         mDecorator = decorator;
+    }
+
+    @Override
+    public byte getDataTypeValue() {
+        return mDataType.mValue;
     }
 
     /**
      * Created by CJQ on 2017/6/16.
      */
 
-    public static class Value {
+    public static class Value extends ValueContainer.Value {
 
-        long mTimeStamp;
         double mRawValue;
 
         public Value(long timeStamp, double rawValue) {
-            mTimeStamp = timeStamp;
+            super(timeStamp);
             mRawValue = rawValue;
-        }
-
-        public long getTimeStamp() {
-            return mTimeStamp;
         }
 
         public double getRawValue() {
