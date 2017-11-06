@@ -5,7 +5,7 @@ package com.cjq.lib.weisi.sensor;
  */
 
 public interface ValueBuilder {
-    long buildTimestamp(byte[] src, int timestampIndex);
+    long buildTimestamp(byte[] src, long timestampIndex);
     double buildRawValue(byte[] src, int rawValueIndex);
     //为了兼容UDP协议在电压计算中的坑爹设置，附加了sensorAddress参数
     float buildBatteryVoltage(byte[] src, int batteryVoltageIndex, int sensorAddress);

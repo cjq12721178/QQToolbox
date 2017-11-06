@@ -19,8 +19,8 @@ public class BleDataValueBuilder implements ValueBuilder {
     }
 
     @Override
-    public long buildTimestamp(byte[] src, int timestampIndex) {
-        return System.currentTimeMillis();
+    public long buildTimestamp(byte[] src, long timestampIndex) {
+        return timestampIndex;
     }
 
     @Override

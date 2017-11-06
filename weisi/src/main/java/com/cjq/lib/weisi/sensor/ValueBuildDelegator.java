@@ -8,7 +8,7 @@ public class ValueBuildDelegator {
 
     private ValueBuilder mValueBuilder;
     private byte[] mData;
-    private int mTimestampIndex;
+    private long mTimestampIndex;
     private int mRawValueIndex;
     private int mBatteryVoltageIndex;
     private int mSensorAddress;
@@ -22,7 +22,7 @@ public class ValueBuildDelegator {
         return this;
     }
 
-    public ValueBuildDelegator setTimestampIndex(int timestampIndex) {
+    public ValueBuildDelegator setTimestampIndex(long timestampIndex) {
         mTimestampIndex = timestampIndex;
         return this;
     }

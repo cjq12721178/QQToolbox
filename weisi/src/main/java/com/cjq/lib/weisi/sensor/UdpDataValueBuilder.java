@@ -31,9 +31,9 @@ public class UdpDataValueBuilder implements ValueBuilder {
     }
 
     @Override
-    public long buildTimestamp(byte[] src, int timestampIndex) {
+    public long buildTimestamp(byte[] src, long timestampIndex) {
         long lastTime, currTime;
-        int calendarPos = timestampIndex;
+        int calendarPos = (int) timestampIndex;
         lastTime = TIMESTAMP_BUILDER.getTimeInMillis();
         TIMESTAMP_BUILDER.set(ADJUSTED_YEAR,
                 src[calendarPos] & 0x0f,

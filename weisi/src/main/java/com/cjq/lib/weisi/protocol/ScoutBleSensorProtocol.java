@@ -56,7 +56,8 @@ public class ScoutBleSensorProtocol implements Constant {
                 .setBatteryVoltageIndex(broadcastData.length
                         - CRC16_LENGTH
                         - RSSI_LENGTH
-                        - BATTERY_INFO_LENGTH);
+                        - BATTERY_INFO_LENGTH)
+                .setTimestampIndex(System.currentTimeMillis());
         for (int start = DATA_ZONE_LENGTH_LENGTH,
              end = dataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
              start < end;
