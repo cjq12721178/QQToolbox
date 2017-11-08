@@ -117,7 +117,7 @@ public class Measurement
         addHistoryValue(timestamp, rawValue);
     }
 
-    private void addHistoryValue(long timestamp, double rawValue) {
+    void addHistoryValue(long timestamp, double rawValue) {
         Value value = addHistoryValue(timestamp);
         if (value != null) {
             value.mRawValue = rawValue;

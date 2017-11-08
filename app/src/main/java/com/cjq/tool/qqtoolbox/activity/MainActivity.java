@@ -17,6 +17,9 @@ import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView;
 import com.cjq.tool.qbox.util.ClosableLog;
 import com.cjq.tool.qqtoolbox.R;
+import com.cjq.tool.qqtoolbox.fragment.NoTitleConstraintLayoutDialog;
+import com.cjq.tool.qqtoolbox.fragment.NoTitleLinearLayoutDialog;
+import com.cjq.tool.qqtoolbox.fragment.NoTitleRelativeLayoutDialog;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
@@ -173,6 +176,21 @@ public class MainActivity
                 break;
             case R.id.tv_text_view_on_click:
                 SimpleCustomizeToast.show(this, "when you see me, it means CustomDrawableSizeTextView can be clicked");
+                break;
+            case R.id.btn_test_dialog_fragment_constraint_layout_match_parent:
+                NoTitleConstraintLayoutDialog dialog3 = new NoTitleConstraintLayoutDialog();
+                dialog3.show(getSupportFragmentManager(), "no title constraint dialog");
+                break;
+            case R.id.btn_test_dialog_fragment_linear_layout_match_parent:
+                NoTitleLinearLayoutDialog dialog4 = new NoTitleLinearLayoutDialog();
+                dialog4.show(getSupportFragmentManager(), "no title linear dialog");
+                break;
+            case R.id.btn_test_dialog_fragment_relative_layout_match_parent:
+                NoTitleRelativeLayoutDialog dialog5 = new NoTitleRelativeLayoutDialog();
+                dialog5.show(getSupportFragmentManager(), "no title relative dialog");
+                break;
+            case R.id.btn_print_activity_and_fragment_lifecycle:
+                startActivity(new Intent(this, PrintLifecycleActivity.class));
                 break;
         }
     }

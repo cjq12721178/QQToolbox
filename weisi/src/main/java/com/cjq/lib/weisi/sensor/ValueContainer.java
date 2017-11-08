@@ -36,9 +36,26 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return mRealTimeValue;
     }
 
+    public V getLatestValue() {
+        int size = mHistoryValues.size();
+        if (size == 0) {
+            return null;
+        }
+        if (isStatic()) {
+            return mHistoryValues.get(size - 1);
+        }
+        return mHead > 0
+                ? mHistoryValues.get(mHead - 1)
+                : mHistoryValues.get(MAX_SIZE - 1);
+    }
+
+    public boolean isStatic() {
+        return MAX_SIZE <= 0;
+    }
+
     //注意：该方法不检查index范围
     public V getHistoryValue(int index) {
-        if (MAX_SIZE <= 0) {
+        if (isStatic()) {
             return mHistoryValues.get(index);
         }
         int pos = mHead + index - MAX_SIZE;
@@ -54,7 +71,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     public synchronized V addHistoryValue(long timestamp) {
         V v;
         int size = mHistoryValues.size();
-        if (MAX_SIZE <= 0 || size == 0) {
+        if (isStatic() || size == 0) {
             v = onCreateValue(timestamp);
             mHistoryValues.add(v);
         } else {

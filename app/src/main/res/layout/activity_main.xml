@@ -20,31 +20,32 @@
             android:layout_marginTop="16dp"
             android:text="Confirm Dialog"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="16dp"/>
         <Button
             android:id="@+id/btn_confirm_default_overall_decorator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="use default overall decorator"
-            app:layout_constraintLeft_toLeftOf="@id/textView"
-            app:layout_constraintTop_toBottomOf="@id/textView"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/textView"/>
         <Button
             android:id="@+id/btn_confirm_new_overall_decorator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="use new overall decorator"
-            app:layout_constraintLeft_toLeftOf="@id/textView"
-            app:layout_constraintTop_toBottomOf="@id/btn_confirm_default_overall_decorator"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/btn_confirm_default_overall_decorator"/>
         <Button
             android:id="@+id/btn_confirm_custom_decorator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="use custom decorator"
-            app:layout_constraintLeft_toLeftOf="@id/textView"
-            app:layout_constraintTop_toBottomOf="@id/btn_confirm_new_overall_decorator"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView"
+            app:layout_constraintTop_toBottomOf="@+id/btn_confirm_new_overall_decorator"/>
         <TextView
             android:id="@+id/textView2"
             android:layout_width="wrap_content"
@@ -53,31 +54,32 @@
             android:layout_marginTop="16dp"
             android:text="Edit Dialog"
             app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_confirm_custom_decorator"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_confirm_custom_decorator"
+            android:layout_marginStart="16dp"/>
         <Button
             android:id="@+id/btn_edit_use_default_overall_decorator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="use default overall decorator"
-            app:layout_constraintLeft_toLeftOf="@id/textView2"
-            app:layout_constraintTop_toBottomOf="@id/textView2"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView2"
+            app:layout_constraintTop_toBottomOf="@+id/textView2"/>
         <Button
             android:id="@+id/btn_edit_use_new_overall_decorator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="use new overall decorator"
-            app:layout_constraintLeft_toLeftOf="@id/textView2"
-            app:layout_constraintTop_toBottomOf="@id/btn_edit_use_default_overall_decorator"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView2"
+            app:layout_constraintTop_toBottomOf="@+id/btn_edit_use_default_overall_decorator"/>
         <Button
             android:id="@+id/btn_edit_use_custom_decorator"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="onClick"
             android:text="use custom decorator"
-            app:layout_constraintLeft_toLeftOf="@id/textView2"
-            app:layout_constraintTop_toBottomOf="@id/btn_edit_use_new_overall_decorator"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView2"
+            app:layout_constraintTop_toBottomOf="@+id/btn_edit_use_new_overall_decorator"/>
         <Button
             android:id="@+id/btn_list_dialog"
             android:layout_width="wrap_content"
@@ -85,7 +87,7 @@
             android:onClick="onClick"
             android:text="List Dialog"
             app:layout_constraintTop_toBottomOf="@+id/btn_edit_use_custom_decorator"
-            app:layout_constraintLeft_toLeftOf="@id/textView2"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView2"/>
         <Button
             android:id="@+id/btn_set_base_decoration"
             android:layout_width="wrap_content"
@@ -93,7 +95,7 @@
             android:onClick="onClick"
             android:text="set base decoration"
             app:layout_constraintTop_toBottomOf="@+id/btn_list_dialog"
-            app:layout_constraintLeft_toLeftOf="@id/textView2"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView2"/>
         <Button
             android:id="@+id/btn_sort_dialog"
             android:layout_width="wrap_content"
@@ -101,7 +103,7 @@
             android:onClick="onClick"
             android:text="Sort Dialog"
             app:layout_constraintTop_toBottomOf="@+id/btn_set_base_decoration"
-            app:layout_constraintLeft_toLeftOf="@id/textView2"/>
+            app:layout_constraintLeft_toLeftOf="@+id/textView2"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -110,15 +112,16 @@
             android:text="Simple Toast"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_sort_dialog"
-            app:layout_constraintLeft_toLeftOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_sort_dialog"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btn_show_simple_toast"
             android:text="show simple toast"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_toast"
-            app:layout_constraintTop_toBottomOf="@id/tv_label_toast"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_toast"
+            app:layout_constraintTop_toBottomOf="@+id/tv_label_toast"
             android:onClick="onClick"/>
 
         <TextView
@@ -128,31 +131,32 @@
             android:text="Switchable fragment manager"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_show_simple_toast"
-            app:layout_constraintLeft_toLeftOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_show_simple_toast"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btn_switch_fragment"
             android:text="switch fragment"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_switchable_fragment"
-            app:layout_constraintTop_toBottomOf="@id/tv_label_switchable_fragment"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_switchable_fragment"
+            app:layout_constraintTop_toBottomOf="@+id/tv_label_switchable_fragment"
             android:onClick="onClick"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btn_notify_data_set_changed"
             android:text="notify data set changed"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_switchable_fragment"
-            app:layout_constraintTop_toBottomOf="@id/btn_switch_fragment"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_switchable_fragment"
+            app:layout_constraintTop_toBottomOf="@+id/btn_switch_fragment"
             android:onClick="onClick"/>
         <FrameLayout
             android:layout_width="0dp"
             android:layout_height="100dp"
             android:id="@+id/fl_fragment_stub"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_switchable_fragment"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_switchable_fragment"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/btn_notify_data_set_changed"/>
+            app:layout_constraintTop_toBottomOf="@+id/btn_notify_data_set_changed"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -161,8 +165,9 @@
             android:text="Custom View"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/fl_fragment_stub"
-            app:layout_constraintLeft_toLeftOf="parent"/>
+            app:layout_constraintTop_toBottomOf="@+id/fl_fragment_stub"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp"/>
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -170,8 +175,9 @@
             android:text="Size self-adaption text view"
             android:textSize="12sp"
             android:layout_marginLeft="10dp"
-            app:layout_constraintTop_toBottomOf="@id/tv_label_custom_view"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_custom_view"/>
+            app:layout_constraintTop_toBottomOf="@+id/tv_label_custom_view"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_custom_view"
+            android:layout_marginStart="10dp"/>
         <com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView
             android:layout_width="100dp"
             android:layout_height="wrap_content"
@@ -179,44 +185,44 @@
             android:textSize="12sp"
             android:lines="1"
             android:text="在下面输入文字，点击旁边的按钮替换，查看效果"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
-            app:layout_constraintTop_toBottomOf="@id/tv_label_size_self_adaption"/>
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@+id/tv_label_size_self_adaption"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/btn_set_text"
             android:text="更换文字"
             android:onClick="onClick"
-            app:layout_constraintTop_toBottomOf="@id/tv_fix_size"
+            app:layout_constraintTop_toBottomOf="@+id/tv_fix_size"
             app:layout_constraintRight_toRightOf="parent"/>
         <EditText
             android:layout_width="0dp"
             android:layout_height="50dp"
             android:id="@+id/et_set_text"
             android:hint="在此输入文字，点击旁边的按钮替换，查看效果"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
-            app:layout_constraintTop_toBottomOf="@id/tv_fix_size"
-            app:layout_constraintRight_toLeftOf="@id/btn_set_text"/>
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@+id/tv_fix_size"
+            app:layout_constraintRight_toLeftOf="@+id/btn_set_text"/>
         <com.cjq.tool.qqtoolbox.view.TestNormalTextView
-            android:layout_width="match_parent"
+            android:layout_width="368dp"
             android:layout_height="wrap_content"
             android:id="@+id/tv_text_view_on_click"
             android:text="click me to test whether normal TextView is able to click"
             android:padding="10dp"
             android:onClick="onNormalTextViewClick"
             android:clickable="true"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
-            app:layout_constraintTop_toBottomOf="@id/et_set_text"/>
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@+id/et_set_text"/>
         <com.cjq.tool.qbox.ui.view.CustomDrawableSizeTextView
-            android:layout_width="match_parent"
+            android:layout_width="368dp"
             android:layout_height="wrap_content"
             android:id="@+id/tv_custom_text_view_on_click"
             android:text="click me to test whether CustomDrawableSizeTextView is able to click"
             android:onClick="onCustomTextViewClick"
             android:clickable="true"
             android:padding="10dp"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
-            app:layout_constraintTop_toBottomOf="@id/tv_text_view_on_click"/>
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@+id/tv_text_view_on_click"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -224,8 +230,8 @@
             android:id="@+id/btn_test_general_recycler_view"
             android:text="测试一般RecyclerView"
             android:onClick="onClick"
-            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
-            app:layout_constraintTop_toBottomOf="@id/tv_custom_text_view_on_click"/>
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@+id/tv_custom_text_view_on_click"/>
 
         <Button
             android:layout_width="wrap_content"
@@ -233,8 +239,62 @@
             android:id="@+id/btn_test_recycler_view_base_adapter"
             android:text="测试RecyclerViewBaseAdapter"
             android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@+id/btn_test_general_recycler_view"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_label_common_view"
+            android:text="Common View"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_recycler_view_base_adapter"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_test_dialog_fragment_constraint_layout_match_parent"
+            android:text="测试ConstrainLayout作为DialogFragment的layout，在STYLE_NO_TITLE的情况下，match_parent是否有效"
+            android:onClick="onClick"
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
-            app:layout_constraintTop_toBottomOf="@id/btn_test_general_recycler_view"/>
+            app:layout_constraintTop_toBottomOf="@id/tv_label_common_view"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_test_dialog_fragment_linear_layout_match_parent"
+            android:text="测试LinearLayout作为DialogFragment的layout，在STYLE_NO_TITLE的情况下，match_parent是否有效"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_dialog_fragment_constraint_layout_match_parent"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_test_dialog_fragment_relative_layout_match_parent"
+            android:text="测试RelativeLayout作为DialogFragment的layout，在STYLE_NO_TITLE的情况下，match_parent是否有效"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_dialog_fragment_linear_layout_match_parent"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_lifecycle"
+            android:text="Lifecycle"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_dialog_fragment_relative_layout_match_parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_print_activity_and_fragment_lifecycle"
+            android:text="print lifecycle for activity and fragment"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/tv_lifecycle"/>
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

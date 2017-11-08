@@ -15,6 +15,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
     private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
 
+    private boolean mUnknown;
     private final int mRawAddress;
     private final String mFormatAddress;
     private final List<Measurement> mMeasurementKinds;
@@ -33,6 +34,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         //根据配置生成测量参数列表
         Configuration configuration = ConfigurationManager.findConfiguration(mRawAddress);
         if (configuration != null) {
+            mUnknown = false;
             mName = configuration.getSensorGeneralName();
             mMeasurementKinds = new ArrayList<>(configuration.mMeasureParameters.length);
             for (Configuration.MeasureParameter parameter :
@@ -40,6 +42,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
                 mMeasurementKinds.add(new Measurement(parameter, maxValueSize));
             }
         } else {
+            mUnknown = true;
             mName = "未知传感器";
             mMeasurementKinds = new ArrayList<>();
         }
@@ -58,6 +61,10 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
                 } while ((measurement = measurement.getNextSameDataTypeMeasurement()) != null);
             }
         }
+    }
+
+    public boolean isUnknown() {
+        return mUnknown;
     }
 
     public void setDecorator(SensorDecorator decorator) {
@@ -100,7 +107,6 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     private Measurement addMeasurement(int position,
                                        byte dataTypeValue,
                                        MeasurementDecorator decorator) {
-        //int position = getMeasurementPosition(dataTypeValue);
         Measurement newMeasurement = new Measurement(
                 ConfigurationManager.getDataType(mRawAddress, dataTypeValue, true),
                 decorator,
@@ -120,11 +126,6 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     protected Value onCreateValue(long timestamp) {
         return new Value(timestamp, 0);
     }
-
-    //返回传感器通用名称
-//    public String getGeneralName() {
-//        return mName;
-//    }
 
     //返回传感器名称（可以经过SensorDecorator修饰）
     public String getName() {
@@ -210,9 +211,12 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         return size;
     }
 
-    public void addMeasurementDynamicValue(byte dataTypeValue,
+    public void addDynamicValue(byte dataTypeValue,
                                            int dataTypeValueIndex,
                                            ValueBuildDelegator valueBuildDelegator) {
+        if (isStatic()) {
+            return;
+        }
         int position = getMeasurementPosition(dataTypeValue);
         Measurement measurement;
         if (position >= 0 && position < mMeasurementKinds.size()) {
@@ -222,14 +226,22 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         } else {
             return;
         }
-//        Measurement measurement = getMeasurementByDataTypeValue(dataTypeValue, dataTypeValueIndex);
-//        if (measurement == null) {
-//            measurement = addMeasurement(dataTypeValue, null);
-//        }
         valueBuildDelegator.setValueBuilder(measurement.getDataType().getValueBuilder());
         long timestamp = valueBuildDelegator.getTimestamp();
-        addDynamicValue(timestamp, valueBuildDelegator.getBatteryVoltage());
-        measurement.addDynamicValue(timestamp, valueBuildDelegator.getRawValue());
+        float batteryVoltage = valueBuildDelegator.getBatteryVoltage();
+        double rawValue = valueBuildDelegator.getRawValue();
+        addDynamicValue(timestamp, batteryVoltage);
+        measurement.addDynamicValue(timestamp, rawValue);
+        if (SensorManager.onSensorRawValueCaptureListener != null) {
+            SensorManager
+                    .onSensorRawValueCaptureListener
+                    .onSensorRawValueCapture(mRawAddress,
+                            dataTypeValue,
+                            dataTypeValueIndex,
+                            timestamp,
+                            batteryVoltage,
+                            rawValue);
+        }
     }
 
     private void addDynamicValue(long timestamp, float batteryVoltage) {
@@ -256,49 +268,23 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         if (value != null) {
             value.mBatteryVoltage = voltage;
         }
-//        synchronized (mHistoryValues) {
-//            int size = mHistoryValues.size();
-//            if (size > 0) {
-//                if (mRealTimeValue.mTimeStamp == timestamp) {
-//                    mHistoryValues.peekLast().mBatteryVoltage = voltage;
-//                } else {
-//                    Value newValue;
-//                    if (size == Measurement.DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
-//                        newValue = mHistoryValues.poll();
-//                        newValue.mTimeStamp = timestamp;
-//                        newValue.mBatteryVoltage = voltage;
-//                    } else {
-//                        newValue = new Value(timestamp, voltage);
-//                    }
-//                    int index = findHistoryValueIndexByTimestamp(newValue);
-//                    mHistoryValues.add(index, newValue);
-//                }
-//            } else {
-//                mHistoryValues.add(new Value(timestamp, voltage));
-//            }
-//        }
     }
 
-//    private int findHistoryValueIndexByTimestamp(Value target) {
-//        //不在size==0的情况下使用
-//        Value lastValue = mHistoryValues.peekLast();
-//        if (target.mTimeStamp > lastValue.mTimeStamp) {
-//            return mHistoryValues.size();
-//        }
-//        Iterator<Value> values = mHistoryValues.descendingIterator();
-//        values.next();
-//        for (int i = mHistoryValues.size() - 1;values.hasNext();--i) {
-//            lastValue = values.next();
-//            if (target.mTimeStamp > lastValue.mTimeStamp) {
-//                return i;
-//            }
-//        }
-//        return 0;
-//    }
-
-//    public List<Value> getHistoryValues() {
-//        return Collections.unmodifiableList(mHistoryValues);
-//    }
+    public void addStaticValue(byte dataTypeValue,
+                               int dataTypeValueIndex,
+                               long timestamp,
+                               float batteryVoltage,
+                               double rawValue) {
+        if (mUnknown || !isStatic()) {
+            return;
+        }
+        Measurement measurement = getMeasurementByDataTypeValue(dataTypeValue, dataTypeValueIndex);
+        if (measurement == null) {
+            return;
+        }
+        addHistoryValue(timestamp, batteryVoltage);
+        measurement.addHistoryValue(timestamp, rawValue);
+    }
 
     public long getFirstValueReceivedTimestamp() {
         return mFirstValueReceivedTimestamp;
@@ -335,7 +321,6 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         }
     };
 
-    //private static final ModifiableDataType MODIFIABLE_DATA_TYPE = new ModifiableDataType((byte)0);
     private static final ModifiableDataType MEASUREMENT_GET_COMPARER = new ModifiableDataType();
 
     private static class ModifiableDataType implements DataTypeValueGetter {
@@ -354,17 +339,12 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 
     public static class Value extends ValueContainer.Value {
 
-        //long mTimeStamp;
         float mBatteryVoltage;
 
         public Value(long timeStamp, float batteryVoltage) {
             super(timeStamp);
             mBatteryVoltage = batteryVoltage;
         }
-
-//        public long getTimeStamp() {
-//            return mTimeStamp;
-//        }
 
         public float getBatteryVoltage() {
             return mBatteryVoltage;
