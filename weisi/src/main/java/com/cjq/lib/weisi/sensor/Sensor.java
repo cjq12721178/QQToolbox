@@ -192,6 +192,19 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         }
     }
 
+    private Measurement getMeasurementByDataTypeValueWithAutoCreate(byte dataTypeValue, int index) {
+        int position = getMeasurementPosition(dataTypeValue);
+        Measurement measurement;
+        if (position >= 0 && position < mMeasurementKinds.size()) {
+            measurement = getMeasurementByPositionImpl(position, index);
+        } else if (position < 0) {
+            measurement = addMeasurement(position, dataTypeValue, null);
+        } else {
+            measurement = null;
+        }
+        return measurement;
+    }
+
     public List<Measurement> getMeasurementKinds() {
         return Collections.unmodifiableList(mMeasurementKinds);
     }
@@ -217,13 +230,8 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         if (isStatic()) {
             return;
         }
-        int position = getMeasurementPosition(dataTypeValue);
-        Measurement measurement;
-        if (position >= 0 && position < mMeasurementKinds.size()) {
-            measurement = getMeasurementByPositionImpl(position, dataTypeValueIndex);
-        } else if (position < 0) {
-            measurement = addMeasurement(position, dataTypeValue, null);
-        } else {
+        Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
+        if (measurement == null) {
             return;
         }
         valueBuildDelegator.setValueBuilder(measurement.getDataType().getValueBuilder());
@@ -278,7 +286,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         if (mUnknown || !isStatic()) {
             return;
         }
-        Measurement measurement = getMeasurementByDataTypeValue(dataTypeValue, dataTypeValueIndex);
+        Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
             return;
         }
