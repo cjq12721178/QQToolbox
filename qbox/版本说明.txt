@@ -131,3 +131,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20171101-0.10.0(38):
 1. 为SortDialog的SortType提供自定义字体大小的设置
 2. 新增FilterDialog(未完成)
+
+20171109-0.10.1(39):
+1. 为ExceptionLog新增几个方法，以便使用

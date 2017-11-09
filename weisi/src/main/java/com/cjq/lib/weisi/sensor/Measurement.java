@@ -122,45 +122,7 @@ public class Measurement
         if (value != null) {
             value.mRawValue = rawValue;
         }
-//        synchronized (mHistoryValues) {
-//            int size = mHistoryValues.size();
-//            if (size > 0) {
-//                Value newValue;
-//                if (size == DEFAULT_MAX_HISTORY_VALUE_CAPACITY) {
-//                    newValue = mHistoryValues.poll();
-//                    newValue.mTimeStamp = timestamp;
-//                    newValue.mRawValue = rawValue;
-//                } else {
-//                    newValue = new Value(timestamp, rawValue);
-//                }
-//                int index = findHistoryValueIndexByTimestamp(newValue);
-//                mHistoryValues.add(index, newValue);
-//            } else {
-//                mHistoryValues.add(new Value(timestamp, rawValue));
-//            }
-//        }
     }
-
-//    private int findHistoryValueIndexByTimestamp(Value target) {
-//        //不在size==0的情况下使用
-//        Value lastValue = mHistoryValues.peekLast();
-//        if (target.mTimeStamp > lastValue.mTimeStamp) {
-//            return mHistoryValues.size();
-//        }
-//        if (target.mTimeStamp == lastValue.mTimeStamp) {
-//            mHistoryValues.pollLast();
-//            return mHistoryValues.size();
-//        }
-//        Iterator<Value> values = mHistoryValues.descendingIterator();
-//        values.next();
-//        for (int i = mHistoryValues.size() - 1;values.hasNext();--i) {
-//            lastValue = values.next();
-//            if (target.mTimeStamp > lastValue.mTimeStamp) {
-//                return i;
-//            }
-//        }
-//        return 0;
-//    }
 
     public void setDecorator(MeasurementDecorator decorator) {
         mDecorator = decorator;

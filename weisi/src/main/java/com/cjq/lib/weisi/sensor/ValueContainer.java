@@ -68,7 +68,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return mHistoryValues.size();
     }
 
-    public synchronized V addHistoryValue(long timestamp) {
+    protected synchronized V addHistoryValue(long timestamp) {
         V v;
         int size = mHistoryValues.size();
         if (isStatic() || size == 0) {

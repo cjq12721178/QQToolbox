@@ -48,6 +48,25 @@ public class ExceptionLog {
         debuggable = (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 
+    public static void debug(Throwable e) {
+        process(LOG_TYPE_DEBUG, e);
+    }
+
+    public static void display(Throwable e) {
+        process(LOG_TYPE_DISPLAY, e);
+    }
+
+    public static void record(Throwable e) {
+        process(LOG_TYPE_RECORD, e);
+    }
+
+    public static void process(Throwable e) {
+        process(LOG_TYPE_DEBUG
+                | LOG_TYPE_DISPLAY
+                | LOG_TYPE_RECORD,
+                e);
+    }
+
     public static void process(int logType, Throwable e) {
         if (e == null) {
             return;
