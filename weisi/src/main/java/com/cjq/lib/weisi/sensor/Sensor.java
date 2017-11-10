@@ -14,6 +14,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
     private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
+    private static OnDynamicValueCaptureListener onDynamicValueCaptureListener;
 
     private boolean mUnknown;
     private final int mRawAddress;
@@ -24,8 +25,8 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     private long mFirstValueReceivedTimestamp;
     private long mNetInTimestamp;
 
-    Sensor(int address, SensorDecorator decorator, int maxValueSize) {
-        super(maxValueSize);
+    Sensor(int address, SensorDecorator decorator, int maxDynamicValueSize) {
+        super(maxDynamicValueSize);
         //设置地址
         mRawAddress = address & 0xffffff;
         mFormatAddress = ConfigurationManager.isBleSensor(address)
@@ -39,7 +40,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
             mMeasurementKinds = new ArrayList<>(configuration.mMeasureParameters.length);
             for (Configuration.MeasureParameter parameter :
                     configuration.mMeasureParameters) {
-                mMeasurementKinds.add(new Measurement(parameter, maxValueSize));
+                mMeasurementKinds.add(new Measurement(parameter, maxDynamicValueSize));
             }
         } else {
             mUnknown = true;
@@ -110,7 +111,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         Measurement newMeasurement = new Measurement(
                 ConfigurationManager.getDataType(mRawAddress, dataTypeValue, true),
                 decorator,
-                MAX_SIZE);
+                MAX_DYNAMIC_VALUE_SIZE);
         if (position >= 0) {
             mMeasurementKinds.get(position)
                     .getLastSameDataTypeMeasurement()
@@ -225,11 +226,8 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     public void addDynamicValue(byte dataTypeValue,
-                                           int dataTypeValueIndex,
-                                           ValueBuildDelegator valueBuildDelegator) {
-        if (isStatic()) {
-            return;
-        }
+                                int dataTypeValueIndex,
+                                ValueBuildDelegator valueBuildDelegator) {
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
             return;
@@ -238,12 +236,12 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         long timestamp = valueBuildDelegator.getTimestamp();
         float batteryVoltage = valueBuildDelegator.getBatteryVoltage();
         double rawValue = valueBuildDelegator.getRawValue();
-        addDynamicValue(timestamp, batteryVoltage);
+        setRealTimeValue(timestamp, batteryVoltage);
+        setValueContent(addDynamicValue(timestamp), batteryVoltage);
         measurement.addDynamicValue(timestamp, rawValue);
-        if (SensorManager.onSensorRawValueCaptureListener != null) {
-            SensorManager
-                    .onSensorRawValueCaptureListener
-                    .onSensorRawValueCapture(mRawAddress,
+        if (onDynamicValueCaptureListener != null) {
+            onDynamicValueCaptureListener
+                    .onDynamicValueCapture(mRawAddress,
                             dataTypeValue,
                             dataTypeValueIndex,
                             timestamp,
@@ -252,9 +250,10 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         }
     }
 
-    private void addDynamicValue(long timestamp, float batteryVoltage) {
-        setRealTimeValue(timestamp, batteryVoltage);
-        addHistoryValue(timestamp, batteryVoltage);
+    private void setValueContent(Value value, float batteryVoltage) {
+        if (value != null) {
+            value.mBatteryVoltage = batteryVoltage;
+        }
     }
 
     private void setRealTimeValue(long timestamp, float batteryVoltage) {
@@ -267,25 +266,15 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         }
     }
 
-    public Value getRealTimeValue() {
-        return mRealTimeValue;
-    }
-
     private void addHistoryValue(long timestamp, float voltage) {
-        Value value = addHistoryValue(timestamp);
-        if (value != null) {
-            value.mBatteryVoltage = voltage;
-        }
+        setValueContent(addHistoryValue(timestamp), voltage);
     }
 
-    public void addStaticValue(byte dataTypeValue,
-                               int dataTypeValueIndex,
-                               long timestamp,
-                               float batteryVoltage,
-                               double rawValue) {
-        if (mUnknown || !isStatic()) {
-            return;
-        }
+    public void addHistoryValue(byte dataTypeValue,
+                                int dataTypeValueIndex,
+                                long timestamp,
+                                float batteryVoltage,
+                                double rawValue) {
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
             return;
@@ -357,5 +346,18 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         public float getBatteryVoltage() {
             return mBatteryVoltage;
         }
+    }
+
+    public static void setOnDynamicValueCaptureListener(OnDynamicValueCaptureListener listener) {
+        onDynamicValueCaptureListener = listener;
+    }
+
+    public interface OnDynamicValueCaptureListener {
+        void onDynamicValueCapture(int address,
+                                   byte dataTypeValue,
+                                   int dataTypeValueIndex,
+                                   long timestamp,
+                                   float batteryVoltage,
+                                   double rawValue);
     }
 }

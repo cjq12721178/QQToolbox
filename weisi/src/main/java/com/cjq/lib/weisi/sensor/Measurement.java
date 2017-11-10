@@ -2,12 +2,6 @@ package com.cjq.lib.weisi.sensor;
 
 import android.support.annotation.NonNull;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
-
 /**
  * Created by CJQ on 2017/6/19.
  */
@@ -23,8 +17,9 @@ public class Measurement
     private MeasurementDecorator mDecorator;
 
     //用于生成测量参数及其相同数据类型的阵列（根据配置静态生成）
-    Measurement(@NonNull Configuration.MeasureParameter parameter, int maxValueSize) {
-        super(maxValueSize);
+    Measurement(@NonNull Configuration.MeasureParameter parameter,
+                int maxDynamicValueSize) {
+        super(maxDynamicValueSize);
         if (parameter == null || parameter.mInvolvedDataType == null) {
             throw new NullPointerException("measure parameter can not be null");
         }
@@ -37,14 +32,16 @@ public class Measurement
         Configuration.MeasureParameter nextParameter = parameter;
         Measurement nextMeasurement = this;
         while (nextParameter.mNext != null) {
-            nextMeasurement.mNextMeasurement = new Measurement(nextParameter.mNext, maxValueSize);
+            nextMeasurement.mNextMeasurement = new Measurement(nextParameter.mNext, maxDynamicValueSize);
             nextParameter = nextParameter.mNext;
             nextMeasurement = nextMeasurement.mNextMeasurement;
         }
     }
 
     //用于生成单个测量参数（动态添加）
-    Measurement(@NonNull DataType dataType, MeasurementDecorator decorator, int maxValueSize) {
+    Measurement(@NonNull DataType dataType,
+                MeasurementDecorator decorator,
+                int maxValueSize) {
         super(maxValueSize);
         if (dataType == null) {
             throw new NullPointerException("dataType can not be null");
@@ -114,11 +111,14 @@ public class Measurement
 
     void addDynamicValue(long timestamp, double rawValue) {
         setRealTimeValue(timestamp, rawValue);
-        addHistoryValue(timestamp, rawValue);
+        setValueContent(addDynamicValue(timestamp), rawValue);
     }
 
     void addHistoryValue(long timestamp, double rawValue) {
-        Value value = addHistoryValue(timestamp);
+        setValueContent(addHistoryValue(timestamp), rawValue);
+    }
+
+    private void setValueContent(Value value, double rawValue) {
         if (value != null) {
             value.mRawValue = rawValue;
         }

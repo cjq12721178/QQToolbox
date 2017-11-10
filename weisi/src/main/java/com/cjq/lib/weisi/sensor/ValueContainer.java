@@ -9,21 +9,24 @@ import java.util.List;
 
 public abstract class ValueContainer<V extends ValueContainer.Value> {
 
-    protected final int MAX_SIZE;
+    protected final int MAX_DYNAMIC_VALUE_SIZE;
     protected final V mRealTimeValue;
+    //用于缓存实时数据
+    private final List<V> mDynamicValues;
     private final List<V> mHistoryValues;
-    private int mHead;
+    private int mDynamicValueHead;
     protected String mName;
 
-    public ValueContainer(int maxSize) {
-        MAX_SIZE = maxSize;
-        if (maxSize > 0) {
-            mHistoryValues = new ArrayList<>(maxSize);
-        } else {
-            mHistoryValues = new ArrayList<>();
-        }
+    public ValueContainer(int maxDynamicValueSize) {
+        MAX_DYNAMIC_VALUE_SIZE = maxDynamicValueSize;
         mRealTimeValue = onCreateValue(0);
-        mHead = 0;
+        if (maxDynamicValueSize > 0) {
+            mDynamicValues = new ArrayList<>(maxDynamicValueSize);
+        } else {
+            mDynamicValues = null;
+        }
+        mHistoryValues = new ArrayList<>();
+        mDynamicValueHead = 0;
     }
 
     protected abstract V onCreateValue(long timestamp);
@@ -36,88 +39,126 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return mRealTimeValue;
     }
 
-    public V getLatestValue() {
-        int size = mHistoryValues.size();
-        if (size == 0) {
-            return null;
-        }
-        if (isStatic()) {
-            return mHistoryValues.get(size - 1);
-        }
-        return mHead > 0
-                ? mHistoryValues.get(mHead - 1)
-                : mHistoryValues.get(MAX_SIZE - 1);
-    }
+//    public V getLatestValue() {
+//        int size = mHistoryValues.size();
+//        if (size == 0) {
+//            return null;
+//        }
+//        if (canCacheDynamicValue()) {
+//            return mHistoryValues.get(size - 1);
+//        }
+//        return mDynamicValueHead > 0
+//                ? mHistoryValues.get(mDynamicValueHead - 1)
+//                : mHistoryValues.get(MAX_DYNAMIC_VALUE_SIZE - 1);
+//    }
 
-    public boolean isStatic() {
-        return MAX_SIZE <= 0;
+    public boolean canCacheDynamicValue() {
+        return MAX_DYNAMIC_VALUE_SIZE > 0;
     }
 
     //注意：该方法不检查index范围
     public V getHistoryValue(int index) {
-        if (isStatic()) {
-            return mHistoryValues.get(index);
-        }
-        int pos = mHead + index - MAX_SIZE;
-        return pos > 0
-                ? mHistoryValues.get(pos)
-                : mHistoryValues.get(mHead + index);
+//        if (canCacheDynamicValue()) {
+//            return mHistoryValues.get(index);
+//        }
+//        int pos = mDynamicValueHead + index - MAX_DYNAMIC_VALUE_SIZE;
+//        return pos > 0
+//                ? mHistoryValues.get(pos)
+//                : mHistoryValues.get(mDynamicValueHead + index);
+        return mHistoryValues.get(index);
     }
 
     public int getHistoryValueSize() {
         return mHistoryValues.size();
     }
 
+    public V getDynamicValue(int index) {
+        if (!canCacheDynamicValue()) {
+            return null;
+        }
+        int pos = mDynamicValueHead + index - MAX_DYNAMIC_VALUE_SIZE;
+        return pos > 0
+                ? mDynamicValues.get(pos)
+                : mDynamicValues.get(mDynamicValueHead + index);
+    }
+
+    public int getDynamicValueSize() {
+        if (!canCacheDynamicValue()) {
+            return 0;
+        }
+        return mDynamicValues.size();
+    }
+
     protected synchronized V addHistoryValue(long timestamp) {
         V v;
-        int size = mHistoryValues.size();
-        if (isStatic() || size < MAX_SIZE) {
+        for (int i = mHistoryValues.size() - 1;i >= 0;--i) {
+            v = mHistoryValues.get(i);
+            if (timestamp > v.mTimeStamp) {
+                v = onCreateValue(timestamp);
+                mHistoryValues.add(i + 1, v);
+                return v;
+            } else if (timestamp == v.mTimeStamp) {
+                return v;
+            }
+        }
+        v = onCreateValue(timestamp);
+        mHistoryValues.add(0, v);
+        return v;
+    }
+
+    protected synchronized V addDynamicValue(long timestamp) {
+        if (!canCacheDynamicValue()) {
+            return null;
+        }
+        V v;
+        int size = mDynamicValues.size();
+        if (size < MAX_DYNAMIC_VALUE_SIZE) {
             for (int i = size - 1;i >= 0;--i) {
-                v = mHistoryValues.get(i);
+                v = mDynamicValues.get(i);
                 if (timestamp > v.mTimeStamp) {
                     v = onCreateValue(timestamp);
-                    mHistoryValues.add(i + 1, v);
+                    mDynamicValues.add(i + 1, v);
                     return v;
                 } else if (timestamp == v.mTimeStamp) {
                     return v;
                 }
             }
             v = onCreateValue(timestamp);
-            mHistoryValues.add(0, v);
+            mDynamicValues.add(0, v);
         } else {
-            for (int i = mHead - 1;i >= 0;--i) {
-                v = mHistoryValues.get(i);
+            for (int i = mDynamicValueHead - 1; i >= 0; --i) {
+                v = mDynamicValues.get(i);
                 if (timestamp > v.mTimeStamp) {
-                    v = mHistoryValues.get(mHead);
-                    if (i < mHead - 1) {
-                        System.arraycopy(mHistoryValues,
+                    v = mDynamicValues.get(mDynamicValueHead);
+                    if (i < mDynamicValueHead - 1) {
+                        System.arraycopy(mDynamicValues,
                                 i + 1,
-                                mHistoryValues,
+                                mDynamicValues,
                                 i + 2,
-                                mHead - 1 - (i + 1) + 1);
-                        mHistoryValues.set(i + 1, v);
+                                mDynamicValueHead - 1 - (i + 1) + 1);
+                        mDynamicValues.set(i + 1, v);
                     }
                     v.mTimeStamp = timestamp;
-                    if (++mHead == MAX_SIZE) {
-                        mHead = 0;
+                    if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
+                        mDynamicValueHead = 0;
                     }
                     return v;
                 } else if (timestamp == v.mTimeStamp) {
                     return v;
                 }
             }
-            for (int i = MAX_SIZE - 1;i >= mHead;--i) {
-                v = mHistoryValues.get(i);
+            for (int i = MAX_DYNAMIC_VALUE_SIZE - 1; i >= mDynamicValueHead; --i) {
+                v = mDynamicValues.get(i);
                 if (timestamp > v.mTimeStamp) {
-                    v = mHistoryValues.get(mHead);
-                    System.arraycopy(mHistoryValues,
-                            mHead + 1,
-                            mHistoryValues,
-                            mHead,
-                            i - mHead);
-                    mHistoryValues.set(i + 1, v);
-                    if (++mHead == MAX_SIZE) {
-                        mHead = 0;
+                    v = mDynamicValues.get(mDynamicValueHead);
+                    System.arraycopy(mDynamicValues,
+                            mDynamicValueHead + 1,
+                            mDynamicValues,
+                            mDynamicValueHead,
+                            i - mDynamicValueHead);
+                    mDynamicValues.set(i + 1, v);
+                    if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
+                        mDynamicValueHead = 0;
                     }
                     return v;
                 } else if (timestamp == v.mTimeStamp) {
