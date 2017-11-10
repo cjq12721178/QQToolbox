@@ -134,3 +134,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171109-0.10.1(39):
 1. 为ExceptionLog新增几个方法，以便使用
+
+20171110-0.10.2(40):
+1. 修复SimpleCustomizeToast在非主线程中出错的问题

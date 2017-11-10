@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
@@ -24,6 +25,9 @@ import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
+import com.cjq.tool.qqtoolbox.util.DebugTag;
+
+import java.io.Closeable;
 
 public class MainActivity
         extends AppCompatActivity
@@ -126,8 +130,28 @@ public class MainActivity
                 decorator4.setTitleTextSize(R.dimen.super_text_size);
                 decorator4.setCancelLabel(R.string.custom_cancel);
                 break;
-            case R.id.btn_show_simple_toast:
-                SimpleCustomizeToast.show(this, "尼玛");
+            case R.id.btn_show_simple_toast_in_main_thread:
+                SimpleCustomizeToast.show(this, "simple toast在主线程中弹出");
+                break;
+            case R.id.btn_show_normal_toast_in_other_thread:
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            Toast.makeText(MainActivity.this, "normal toast在其他线程中弹出", Toast.LENGTH_SHORT).show();
+                        } catch (Exception e) {
+                            ClosableLog.d(DebugTag.GENERAL_LOG_TAG, "normal toast 果然不靠谱啊!");
+                        }
+                    }
+                }).start();
+                break;
+            case R.id.btn_show_simple_toast_in_other_thread:
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        SimpleCustomizeToast.show(MainActivity.this, "simple toast在其他线程中弹出");
+                    }
+                }).start();
                 break;
             case R.id.btn_switch_fragment:
                 initSwitchableFragmentManager();

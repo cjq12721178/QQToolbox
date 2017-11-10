@@ -1,6 +1,7 @@
 package com.cjq.tool.qbox.ui.toast;
 
 import android.content.Context;
+import android.os.Looper;
 import android.support.annotation.StringRes;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -36,6 +37,13 @@ public class SimpleCustomizeToast {
     }
 
     public static void show(Context context, String information, Decorator decorator) {
+        //防止在工作线程中崩溃
+        boolean needLooper = Looper.getMainLooper().getThread() != Thread.currentThread();
+        if (needLooper) {
+            Looper.prepare();
+        }
+
+        //设置toast
         Toast toast = new Toast(context);
         if (decorator == null) {
             decorator = defaultDecorator;
@@ -43,6 +51,12 @@ public class SimpleCustomizeToast {
         toast.setView(decorator.setInformation(context, information));
         decorator.customize(toast);
         toast.show();
+
+        //在工作线程中处理掉looper
+        if (needLooper) {
+            Looper.loop();
+            Looper.myLooper().quit();
+        }
     }
 
     public static void show(Context context, @StringRes int informationRes, Decorator decorator) {

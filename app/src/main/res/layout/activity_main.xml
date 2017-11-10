@@ -118,10 +118,26 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_show_simple_toast"
-            android:text="show simple toast"
-            app:layout_constraintLeft_toLeftOf="@+id/tv_label_toast"
-            app:layout_constraintTop_toBottomOf="@+id/tv_label_toast"
+            android:id="@+id/btn_show_simple_toast_in_main_thread"
+            android:text="show simple toast in main thread"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_toast"
+            app:layout_constraintTop_toBottomOf="@id/tv_label_toast"
+            android:onClick="onClick"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_show_normal_toast_in_other_thread"
+            android:text="show normal toast in other thread"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_toast"
+            app:layout_constraintTop_toBottomOf="@id/btn_show_simple_toast_in_main_thread"
+            android:onClick="onClick"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_show_simple_toast_in_other_thread"
+            android:text="show simple toast in other thread"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_toast"
+            app:layout_constraintTop_toBottomOf="@id/btn_show_normal_toast_in_other_thread"
             android:onClick="onClick"/>
 
         <TextView
@@ -131,7 +147,7 @@
             android:text="Switchable fragment manager"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@+id/btn_show_simple_toast"
+            app:layout_constraintTop_toBottomOf="@+id/btn_show_simple_toast_in_other_thread"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginStart="16dp"/>
         <Button
