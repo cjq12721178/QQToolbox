@@ -39,18 +39,13 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return mRealTimeValue;
     }
 
-//    public V getLatestValue() {
-//        int size = mHistoryValues.size();
-//        if (size == 0) {
-//            return null;
-//        }
-//        if (canCacheDynamicValue()) {
-//            return mHistoryValues.get(size - 1);
-//        }
-//        return mDynamicValueHead > 0
-//                ? mHistoryValues.get(mDynamicValueHead - 1)
-//                : mHistoryValues.get(MAX_DYNAMIC_VALUE_SIZE - 1);
-//    }
+    public V getLatestValue() {
+        int size = mHistoryValues.size();
+        if (size == 0) {
+            return null;
+        }
+        return mHistoryValues.get(size - 1);
+    }
 
     public boolean canCacheDynamicValue() {
         return MAX_DYNAMIC_VALUE_SIZE > 0;
