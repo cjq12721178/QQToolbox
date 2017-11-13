@@ -73,12 +73,14 @@ public class ExceptionLog {
             return;
         }
 
-        if ((logType & LOG_TYPE_DEBUG) != 0 && isDebuggable()) {
-            Log.d(LOG_TAG, e.getMessage());
-        }
+        if (!TextUtils.isEmpty(e.getMessage())) {
+            if ((logType & LOG_TYPE_DEBUG) != 0 && isDebuggable()) {
+                Log.d(LOG_TAG, e.getMessage());
+            }
 
-        if ((logType & LOG_TYPE_DISPLAY) != 0) {
-            SimpleCustomizeToast.show(context, e.getMessage());
+            if ((logType & LOG_TYPE_DISPLAY) != 0) {
+                SimpleCustomizeToast.show(context, e.getMessage());
+            }
         }
 
         if ((logType & LOG_TYPE_RECORD) != 0) {
