@@ -1,6 +1,8 @@
 package com.cjq.lib.weisi.sensor;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -86,19 +88,45 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
     protected synchronized V addHistoryValue(long timestamp) {
         V v;
-        for (int i = mHistoryValues.size() - 1;i >= 0;--i) {
-            v = mHistoryValues.get(i);
-            if (timestamp > v.mTimeStamp) {
+        int size = mHistoryValues.size();
+        if (size > 0) {
+            v = mHistoryValues.get(size -1);
+            if (timestamp > v.getTimeStamp()) {
                 v = onCreateValue(timestamp);
-                mHistoryValues.add(i + 1, v);
-                return v;
-            } else if (timestamp == v.mTimeStamp) {
-                return v;
+                mHistoryValues.add(v);
+            } else if (timestamp < v.getTimeStamp()) {
+                synchronized (Value.VALUE_COMPARATOR) {
+                    Value.VALUE_COMPARER.mTimeStamp = timestamp;
+                    int position = Collections.binarySearch(mHistoryValues,
+                            Value.VALUE_COMPARER,
+                            Value.VALUE_COMPARATOR);
+                    if (position >= 0) {
+                        v = mHistoryValues.get(position);
+                    } else {
+                        v = onCreateValue(timestamp);
+                        mHistoryValues.add(-position-1, v);
+                    }
+                }
             }
+        } else {
+            v = onCreateValue(timestamp);
+            mHistoryValues.add(v);
         }
-        v = onCreateValue(timestamp);
-        mHistoryValues.add(0, v);
         return v;
+//        V v;
+//        for (int i = mHistoryValues.size() - 1;i >= 0;--i) {
+//            v = mHistoryValues.get(i);
+//            if (timestamp > v.mTimeStamp) {
+//                v = onCreateValue(timestamp);
+//                mHistoryValues.add(i + 1, v);
+//                return v;
+//            } else if (timestamp == v.mTimeStamp) {
+//                return v;
+//            }
+//        }
+//        v = onCreateValue(timestamp);
+//        mHistoryValues.add(0, v);
+//        return v;
     }
 
     protected synchronized V addDynamicValue(long timestamp) {
@@ -166,6 +194,18 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public static class Value {
+
+        private static final Value VALUE_COMPARER = new Value(0);
+        private static final Comparator<Value> VALUE_COMPARATOR = new Comparator<Value>() {
+            @Override
+            public int compare(Value v1, Value v2) {
+                return (v1.mTimeStamp < v2.mTimeStamp)
+                        ? -1
+                        : ((v1.mTimeStamp == v2.mTimeStamp)
+                            ? 0
+                            : 1);
+            }
+        };
 
         long mTimeStamp;
 
