@@ -11,6 +11,10 @@ import java.util.List;
 
 public abstract class ValueContainer<V extends ValueContainer.Value> {
 
+    public static final int ADD_VALUE_FAILED = 0;
+    public static final int NEW_VALUE_ADDED = 1;
+    public static final int VALUE_UPDATED = 2;
+
     protected final int MAX_DYNAMIC_VALUE_SIZE;
     protected final V mRealTimeValue;
     //用于缓存实时数据
@@ -25,7 +29,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         if (maxDynamicValueSize > 0) {
             mDynamicValues = new ArrayList<>(maxDynamicValueSize);
         } else {
-            mDynamicValues = null;
+            mDynamicValues = new ArrayList<>();
         }
         mHistoryValues = new ArrayList<>();
         mDynamicValueHead = 0;
@@ -49,9 +53,9 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return mHistoryValues.get(size - 1);
     }
 
-    public boolean canCacheDynamicValue() {
-        return MAX_DYNAMIC_VALUE_SIZE > 0;
-    }
+//    public boolean canCacheDynamicValue() {
+//        return MAX_DYNAMIC_VALUE_SIZE > 0;
+//    }
 
     //注意：该方法不检查index范围
     public V getHistoryValue(int index) {
@@ -70,9 +74,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public V getDynamicValue(int index) {
-        if (!canCacheDynamicValue()) {
-            return null;
-        }
         int pos = mDynamicValueHead + index - MAX_DYNAMIC_VALUE_SIZE;
         return pos > 0
                 ? mDynamicValues.get(pos)
@@ -80,59 +81,73 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public int getDynamicValueSize() {
-        if (!canCacheDynamicValue()) {
-            return 0;
-        }
         return mDynamicValues.size();
     }
 
-    protected synchronized V addHistoryValue(long timestamp) {
+    //若有新的数据添加，返回position
+    //若只是原有数据的更新，返回-position-1
+    //注意和Collections.binarySearch()返回值相反
+    protected synchronized int addHistoryValue(long timestamp) {
         V v;
         int size = mHistoryValues.size();
         if (size > 0) {
-            v = mHistoryValues.get(size -1);
+            v = mHistoryValues.get(size - 1);
             if (timestamp > v.getTimeStamp()) {
                 v = onCreateValue(timestamp);
                 mHistoryValues.add(v);
+                return size;
             } else if (timestamp < v.getTimeStamp()) {
                 synchronized (Value.VALUE_COMPARATOR) {
                     Value.VALUE_COMPARER.mTimeStamp = timestamp;
                     int position = Collections.binarySearch(mHistoryValues,
                             Value.VALUE_COMPARER,
                             Value.VALUE_COMPARATOR);
-                    if (position >= 0) {
-                        v = mHistoryValues.get(position);
-                    } else {
+                    if (position < 0) {
                         v = onCreateValue(timestamp);
-                        mHistoryValues.add(-position-1, v);
+                        mHistoryValues.add(-position - 1, v);
                     }
+                    return -position - 1;
                 }
             }
+            //-(size - 1) - 1
+            return -size;
         } else {
             v = onCreateValue(timestamp);
             mHistoryValues.add(v);
+            return 0;
         }
-        return v;
-//        V v;
-//        for (int i = mHistoryValues.size() - 1;i >= 0;--i) {
-//            v = mHistoryValues.get(i);
-//            if (timestamp > v.mTimeStamp) {
-//                v = onCreateValue(timestamp);
-//                mHistoryValues.add(i + 1, v);
-//                return v;
-//            } else if (timestamp == v.mTimeStamp) {
-//                return v;
-//            }
-//        }
-//        v = onCreateValue(timestamp);
-//        mHistoryValues.add(0, v);
-//        return v;
     }
 
-    protected synchronized V addDynamicValue(long timestamp) {
-        if (!canCacheDynamicValue()) {
-            return null;
-        }
+//    protected synchronized V addHistoryValue(long timestamp) {
+//        V v;
+//        int size = mHistoryValues.size();
+//        if (size > 0) {
+//            v = mHistoryValues.get(size -1);
+//            if (timestamp > v.getTimeStamp()) {
+//                v = onCreateValue(timestamp);
+//                mHistoryValues.add(v);
+//            } else if (timestamp < v.getTimeStamp()) {
+//                synchronized (Value.VALUE_COMPARATOR) {
+//                    Value.VALUE_COMPARER.mTimeStamp = timestamp;
+//                    int position = Collections.binarySearch(mHistoryValues,
+//                            Value.VALUE_COMPARER,
+//                            Value.VALUE_COMPARATOR);
+//                    if (position >= 0) {
+//                        v = mHistoryValues.get(position);
+//                    } else {
+//                        v = onCreateValue(timestamp);
+//                        mHistoryValues.add(-position-1, v);
+//                    }
+//                }
+//            }
+//        } else {
+//            v = onCreateValue(timestamp);
+//            mHistoryValues.add(v);
+//        }
+//        return v;
+//    }
+
+    protected synchronized int addDynamicValue(long timestamp) {
         V v;
         int size = mDynamicValues.size();
         if (size < MAX_DYNAMIC_VALUE_SIZE) {
@@ -141,13 +156,14 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 if (timestamp > v.mTimeStamp) {
                     v = onCreateValue(timestamp);
                     mDynamicValues.add(i + 1, v);
-                    return v;
+                    return i + 1;
                 } else if (timestamp == v.mTimeStamp) {
-                    return v;
+                    return -i - 1;
                 }
             }
             v = onCreateValue(timestamp);
             mDynamicValues.add(0, v);
+            return 0;
         } else {
             for (int i = mDynamicValueHead - 1; i >= 0; --i) {
                 v = mDynamicValues.get(i);
@@ -162,12 +178,14 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                         mDynamicValues.set(i + 1, v);
                     }
                     v.mTimeStamp = timestamp;
+                    int position = MAX_DYNAMIC_VALUE_SIZE - (mDynamicValueHead - i);
                     if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
                         mDynamicValueHead = 0;
                     }
-                    return v;
+                    return position;
                 } else if (timestamp == v.mTimeStamp) {
-                    return v;
+                    return -(MAX_DYNAMIC_VALUE_SIZE - 1
+                            - (mDynamicValueHead - 1 - i)) - 1;
                 }
             }
             for (int i = MAX_DYNAMIC_VALUE_SIZE - 1; i >= mDynamicValueHead; --i) {
@@ -180,17 +198,92 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                             mDynamicValueHead,
                             i - mDynamicValueHead);
                     mDynamicValues.set(i + 1, v);
+                    int position = i - mDynamicValueHead;
                     if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
                         mDynamicValueHead = 0;
                     }
-                    return v;
+                    return position;
                 } else if (timestamp == v.mTimeStamp) {
-                    return v;
+                    return -(i - mDynamicValueHead) - 1;
                 }
             }
-            v = null;
+            return MAX_DYNAMIC_VALUE_SIZE;
         }
-        return v;
+    }
+
+//    protected synchronized V addDynamicValue(long timestamp) {
+//        if (!canCacheDynamicValue()) {
+//            return null;
+//        }
+//        V v;
+//        int size = mDynamicValues.size();
+//        if (size < MAX_DYNAMIC_VALUE_SIZE) {
+//            for (int i = size - 1;i >= 0;--i) {
+//                v = mDynamicValues.get(i);
+//                if (timestamp > v.mTimeStamp) {
+//                    v = onCreateValue(timestamp);
+//                    mDynamicValues.add(i + 1, v);
+//                    return v;
+//                } else if (timestamp == v.mTimeStamp) {
+//                    return v;
+//                }
+//            }
+//            v = onCreateValue(timestamp);
+//            mDynamicValues.add(0, v);
+//        } else {
+//            for (int i = mDynamicValueHead - 1; i >= 0; --i) {
+//                v = mDynamicValues.get(i);
+//                if (timestamp > v.mTimeStamp) {
+//                    v = mDynamicValues.get(mDynamicValueHead);
+//                    if (i < mDynamicValueHead - 1) {
+//                        System.arraycopy(mDynamicValues,
+//                                i + 1,
+//                                mDynamicValues,
+//                                i + 2,
+//                                mDynamicValueHead - 1 - (i + 1) + 1);
+//                        mDynamicValues.set(i + 1, v);
+//                    }
+//                    v.mTimeStamp = timestamp;
+//                    if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
+//                        mDynamicValueHead = 0;
+//                    }
+//                    return v;
+//                } else if (timestamp == v.mTimeStamp) {
+//                    return v;
+//                }
+//            }
+//            for (int i = MAX_DYNAMIC_VALUE_SIZE - 1; i >= mDynamicValueHead; --i) {
+//                v = mDynamicValues.get(i);
+//                if (timestamp > v.mTimeStamp) {
+//                    v = mDynamicValues.get(mDynamicValueHead);
+//                    System.arraycopy(mDynamicValues,
+//                            mDynamicValueHead + 1,
+//                            mDynamicValues,
+//                            mDynamicValueHead,
+//                            i - mDynamicValueHead);
+//                    mDynamicValues.set(i + 1, v);
+//                    if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
+//                        mDynamicValueHead = 0;
+//                    }
+//                    return v;
+//                } else if (timestamp == v.mTimeStamp) {
+//                    return v;
+//                }
+//            }
+//            v = null;
+//        }
+//        return v;
+//    }
+
+    public int interpretAddResult(int addMethodReturnValue, boolean isRealTime) {
+        if (addMethodReturnValue < 0) {
+            return VALUE_UPDATED;
+        } else if (addMethodReturnValue == MAX_DYNAMIC_VALUE_SIZE
+                && isRealTime) {
+            return ADD_VALUE_FAILED;
+        } else {
+            return NEW_VALUE_ADDED;
+        }
     }
 
     public static class Value {

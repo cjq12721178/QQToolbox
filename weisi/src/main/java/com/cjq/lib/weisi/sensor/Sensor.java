@@ -225,19 +225,19 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         return size;
     }
 
-    public void addDynamicValue(byte dataTypeValue,
+    public int addDynamicValue(byte dataTypeValue,
                                 int dataTypeValueIndex,
                                 ValueBuildDelegator valueBuildDelegator) {
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
-            return;
+            return MAX_DYNAMIC_VALUE_SIZE;
         }
         valueBuildDelegator.setValueBuilder(measurement.getDataType().getValueBuilder());
         long timestamp = valueBuildDelegator.getTimestamp();
         float batteryVoltage = valueBuildDelegator.getBatteryVoltage();
         double rawValue = valueBuildDelegator.getRawValue();
         setRealTimeValue(timestamp, batteryVoltage);
-        setValueContent(addDynamicValue(timestamp), batteryVoltage);
+        int position = setDynamicValueContent(addDynamicValue(timestamp), batteryVoltage);
         measurement.addDynamicValue(timestamp, rawValue);
         if (onDynamicValueCaptureListener != null) {
             onDynamicValueCaptureListener
@@ -248,6 +248,23 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
                             batteryVoltage,
                             rawValue);
         }
+        return position;
+    }
+
+    private int setDynamicValueContent(int position, float batteryVoltage) {
+        if (position < 0) {
+            setValueContent(getDynamicValue(-position - 1), batteryVoltage);
+        } else if (position < MAX_DYNAMIC_VALUE_SIZE) {
+            setValueContent(getDynamicValue(position), batteryVoltage);
+        }
+        return position;
+    }
+
+    private int setHistoryValueContent(int position, float batteryVoltage) {
+        setValueContent(getHistoryValue(position < 0
+                ? -position - 1
+                : position), batteryVoltage);
+        return position;
     }
 
     private void setValueContent(Value value, float batteryVoltage) {
@@ -266,21 +283,21 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         }
     }
 
-    private void addHistoryValue(long timestamp, float voltage) {
-        setValueContent(addHistoryValue(timestamp), voltage);
-    }
+//    private void addHistoryValue(long timestamp, float voltage) {
+//        setValueContent(addHistoryValue(timestamp), voltage);
+//    }
 
-    public void addHistoryValue(byte dataTypeValue,
+    public int addHistoryValue(byte dataTypeValue,
                                 int dataTypeValueIndex,
                                 long timestamp,
                                 float batteryVoltage,
                                 double rawValue) {
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
-            return;
+            return MAX_DYNAMIC_VALUE_SIZE;
         }
-        addHistoryValue(timestamp, batteryVoltage);
         measurement.addHistoryValue(timestamp, rawValue);
+        return setHistoryValueContent(addHistoryValue(timestamp), batteryVoltage);
     }
 
     public long getFirstValueReceivedTimestamp() {

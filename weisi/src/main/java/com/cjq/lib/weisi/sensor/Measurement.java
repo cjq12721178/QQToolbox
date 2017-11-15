@@ -109,13 +109,29 @@ public class Measurement
                 : null;
     }
 
-    void addDynamicValue(long timestamp, double rawValue) {
+    int addDynamicValue(long timestamp, double rawValue) {
         setRealTimeValue(timestamp, rawValue);
-        setValueContent(addDynamicValue(timestamp), rawValue);
+        return setDynamicValueContent(addDynamicValue(timestamp), rawValue);
     }
 
-    void addHistoryValue(long timestamp, double rawValue) {
-        setValueContent(addHistoryValue(timestamp), rawValue);
+    int addHistoryValue(long timestamp, double rawValue) {
+        return setHistoryValueContent(addHistoryValue(timestamp), rawValue);
+    }
+
+    private int setHistoryValueContent(int position, double rawValue) {
+        setValueContent(getHistoryValue(position < 0
+                ? -position - 1
+                : position), rawValue);
+        return position;
+    }
+
+    private int setDynamicValueContent(int position, double rawValue) {
+        if (position < 0) {
+            setValueContent(getDynamicValue(-position - 1), rawValue);
+        } else if (position < MAX_DYNAMIC_VALUE_SIZE) {
+            setValueContent(getDynamicValue(position), rawValue);
+        }
+        return position;
     }
 
     private void setValueContent(Value value, double rawValue) {
