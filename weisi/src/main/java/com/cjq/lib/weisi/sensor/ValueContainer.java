@@ -11,9 +11,20 @@ import java.util.List;
 
 public abstract class ValueContainer<V extends ValueContainer.Value> {
 
+    //分为两种情况，一是在传感器中添加数据的时候，未能按照
+    //dataTypeValue和dataTypeValueIndex找到相应measurement;
+    //二是在添加动态数据的时候，所要加入的数据早于所有已有数据，
+    //这意味着该次数据添加毫无意义
     public static final int ADD_VALUE_FAILED = 0;
+    //当添加数据时在数据集中新增一条数据
     public static final int NEW_VALUE_ADDED = 1;
+    //添加数据时遇到与已有数据集中具有相同timestamp的数据，
+    //则对该条数据的其他信息进行更新
     public static final int VALUE_UPDATED = 2;
+    //在动态添加数据时，由于采用了循环数组以节省内存空间，
+    //当需要新增数据而数据集规模已达预计最大时，取出最早数据，
+    //并将新数据插入相应位置
+    public static final int LOOP_VALUE_ADDED = 3;
 
     protected final int MAX_DYNAMIC_VALUE_SIZE;
     protected final V mRealTimeValue;
@@ -281,6 +292,12 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         } else if (addMethodReturnValue == MAX_DYNAMIC_VALUE_SIZE
                 && isRealTime) {
             return ADD_VALUE_FAILED;
+        } else if (mDynamicValues.size() == MAX_DYNAMIC_VALUE_SIZE
+                && isRealTime) {
+            //此处有一种情况本应属于NEW_VALUE_ADDED，
+            //但由于区别困难所以也放在了LOOP_VALUE_ADDED一类：
+            //即当动态添加数据集规模正好达到最大时的那条数据
+            return LOOP_VALUE_ADDED;
         } else {
             return NEW_VALUE_ADDED;
         }
