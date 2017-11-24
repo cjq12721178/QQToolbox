@@ -25,36 +25,59 @@ public class SerialPortKit {
     private FileInputStream mFileInputStream;
     private FileOutputStream mFileOutputStream;
 
-    public SerialPortKit(File device, int baudRate, int flags)
-            throws SecurityException, IOException {
+    // JNI
+    private native static FileDescriptor open(String path, int baudRate, int flags);
+    private native void close();
+    static {
+        System.loadLibrary("serial_port");
+    }
 
-		/* Check access permission */
-        if (!device.canRead() || !device.canWrite()) {
-            try {
+    public boolean launch(String deviceName, int baudRate, int flags) {
+        return launch(new File("/dev/" + deviceName), baudRate, flags);
+    }
+
+    public boolean launch(File device, int baudRate, int flags) {
+        if (!isLaunch()) {
+            /* Check access permission */
+            if (!device.canRead() || !device.canWrite()) {
+                try {
 				/* Missing read/write permission, trying to chmod the file */
-                Process su;
-                //su = Runtime.getRuntime().exec("su");
-                su = Runtime.getRuntime().exec("/system/bin/su");
-                String cmd = "chmod 777 " + device.getAbsolutePath() + "\n"
-                        + "exit\n";
-                su.getOutputStream().write(cmd.getBytes());
-                if ((su.waitFor() != 0) || !device.canRead()
-                        || !device.canWrite()) {
-                    throw new SecurityException();
+                    Process su;
+                    //su = Runtime.getRuntime().exec("su");
+                    su = Runtime.getRuntime().exec("/system/bin/su");
+                    String cmd = "chmod 777 " + device.getAbsolutePath() + "\n"
+                            + "exit\n";
+                    su.getOutputStream().write(cmd.getBytes());
+                    if ((su.waitFor() != 0) || !device.canRead()
+                            || !device.canWrite()) {
+                        return false;
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    return false;
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new SecurityException();
+            }
+
+            mFd = open(device.getAbsolutePath(), baudRate, flags);
+            if (mFd == null) {
+                Log.e(TAG, "native open returns null");
+            } else {
+                mFileInputStream = new FileInputStream(mFd);
+                mFileOutputStream = new FileOutputStream(mFd);
             }
         }
+        return isLaunch();
+    }
 
-        mFd = open(device.getAbsolutePath(), baudRate, flags);
-        if (mFd == null) {
-            Log.e(TAG, "native open returns null");
-            throw new IOException();
+    public boolean isLaunch() {
+        return mFd != null;
+    }
+
+    public void shutdown() {
+        if (mFd != null) {
+            close();
+            mFd = null;
         }
-        mFileInputStream = new FileInputStream(mFd);
-        mFileOutputStream = new FileOutputStream(mFd);
     }
 
     // Getters and setters
@@ -64,12 +87,5 @@ public class SerialPortKit {
 
     public OutputStream getOutputStream() {
         return mFileOutputStream;
-    }
-
-    // JNI
-    private native static FileDescriptor open(String path, int baudRate, int flags);
-    public native void close();
-    static {
-        System.loadLibrary("serial_port");
     }
 }
