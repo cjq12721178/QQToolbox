@@ -28,7 +28,7 @@ public class ScoutBleSensorProtocol implements Constant {
     private final byte[] mTmpBroadcastAddress = new byte[BROADCAST_ADDRESS_LENGTH];
     private final ValueBuildDelegator mValueBuildDelegator = new ValueBuildDelegator();
 
-    public void analyze(String broadcastAddress, byte[] broadcastData, OnDataAnalyzedListener listener) {
+    public void analyze(String broadcastAddress, byte[] broadcastData, OnFrameAnalyzedListener listener) {
         if (broadcastAddress == null
                 || broadcastData == null
                 || broadcastData.length < MIN_FRAME_LENGTH
