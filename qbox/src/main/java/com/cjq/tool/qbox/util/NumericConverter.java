@@ -1,6 +1,8 @@
 package com.cjq.tool.qbox.util;
 
 
+import android.text.TextUtils;
+
 /**
  * Created by KAT on 2016/6/28.
  */
@@ -113,5 +115,18 @@ public class NumericConverter {
         byte[] bytes = new byte[FLOAT_BYTES];
         floatToBytesByLSB(f, bytes, 0);
         return bytes;
+    }
+
+    public static byte[] hexDataStringToBytes(String s) {
+        if (TextUtils.isEmpty(s)) {
+            return null;
+        }
+        String[] ss = s.split(" ");
+        int length = ss.length;
+        byte[] data = new byte[length];
+        for (int i = 0;i < length;++i) {
+            data[i] = Byte.parseByte(ss[i], 16);
+        }
+        return data;
     }
 }

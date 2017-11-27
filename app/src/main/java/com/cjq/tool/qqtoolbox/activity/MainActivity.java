@@ -4,10 +4,16 @@ import android.content.Intent;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.text.TextUtils;
+import android.view.KeyEvent;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cjq.lib.weisi.communicator.SerialPortKit;
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
@@ -17,6 +23,8 @@ import com.cjq.tool.qbox.ui.manager.SwitchableFragmentManager;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView;
 import com.cjq.tool.qbox.util.ClosableLog;
+import com.cjq.tool.qbox.util.ExceptionLog;
+import com.cjq.tool.qbox.util.NumericConverter;
 import com.cjq.tool.qqtoolbox.R;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleConstraintLayoutDialog;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleLinearLayoutDialog;
@@ -27,7 +35,7 @@ import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
 import com.cjq.tool.qqtoolbox.util.DebugTag;
 
-import java.io.Closeable;
+import java.io.IOException;
 
 public class MainActivity
         extends AppCompatActivity
@@ -39,6 +47,12 @@ public class MainActivity
     private SizeSelfAdaptionTextView mSizeSelfAdaptionTextView;
     private EditText mEtSetText;
     private SortDialog mSortDialog;
+    private SerialPortKit mSerialPortKit;
+    private EditText mEtSerialPortName;
+    private TextView mTvReception;
+    private CheckBox mChkHexEmission;
+    private CheckBox mChkHexReception;
+    private Spinner mSpnBaudRate;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +63,39 @@ public class MainActivity
         mSizeSelfAdaptionTextView = (SizeSelfAdaptionTextView) findViewById(R.id.tv_fix_size);
         mEtSetText = (EditText) findViewById(R.id.et_set_text);
         //findViewById(R.id.tv_text_view_on_click).setOnClickListener(this);
+
+        mEtSerialPortName = (EditText) findViewById(R.id.et_serial_port_name);
+        mTvReception = (TextView) findViewById(R.id.tv_reception);
+        mChkHexEmission = (CheckBox) findViewById(R.id.chk_hex_emission);
+        mChkHexReception = (CheckBox) findViewById(R.id.chk_hex_reception);
+        mSpnBaudRate = (Spinner) findViewById(R.id.spn_baud_rate);
+        mSpnBaudRate.setSelection(16);
+        EditText etEmission = (EditText) findViewById(R.id.et_emission);
+        etEmission.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                int i;
+                CharSequence t = v.getText();
+                char[] text = new char[t.length()];
+                for (i=0; i<t.length(); i++) {
+                    text[i] = t.charAt(i);
+                }
+//                try {
+//                    //mOutputStream.write(new String(text).getBytes());
+//                    //mOutputStream.write('\n');
+//                    //mOutputStream.flush();
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }
+                return false;
+            }
+        });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        closeSerialPort();
     }
 
     @Override
@@ -216,6 +263,58 @@ public class MainActivity
             case R.id.btn_print_activity_and_fragment_lifecycle:
                 startActivity(new Intent(this, PrintLifecycleActivity.class));
                 break;
+            case R.id.btn_open_serial_port:
+                powerOnSerialPort();
+                if (mSerialPortKit == null) {
+                    mSerialPortKit = new SerialPortKit();
+                }
+                String serialPortName = mTvReception.getText().toString();
+                if (TextUtils.isEmpty(serialPortName)) {
+                    SimpleCustomizeToast.show(this, "serial port name can not be empty");
+                } else {
+                    powerOnSerialPort();
+                    if (mSerialPortKit.launch(serialPortName,
+                            Integer.parseInt((String) mSpnBaudRate.getSelectedItem()),
+                            0)) {
+                        SimpleCustomizeToast.show(this, serialPortName + " opened");
+                    } else {
+                        SimpleCustomizeToast.show(this, "open serial port failed");
+                    }
+                }
+                break;
+            case R.id.btn_close_serial_port:
+                closeSerialPort();
+                break;
+        }
+    }
+
+    private void closeSerialPort() {
+        if (mSerialPortKit != null) {
+            mSerialPortKit.shutdown();
+            powerOffSerialPort();
+        }
+    }
+
+    private void powerOnSerialPort() {
+        try {
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 1 > /sys/devices/soc.0/xt_dev.68/xt_dc_in_en"});
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 1 > /sys/devices/soc.0/xt_dev.68/xt_vbat_out_en"});
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_gpio_112"});
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_a"});
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 1 > /sys/devices/soc.0/xt_dev.68/xt_uart_b"});
+        } catch (IOException e) {
+            ExceptionLog.display(e);
+        }
+    }
+
+    private void powerOffSerialPort() {
+        try {
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_dc_in_en"});
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_vbat_out_en"});
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_a"});
+            Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_b"});
+        } catch (IOException e) {
+            ExceptionLog.display(e);
         }
     }
 
