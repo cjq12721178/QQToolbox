@@ -7,8 +7,6 @@ import java.io.FileDescriptor;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 
 /**
  * Created by CJQ on 2017/11/24.
@@ -41,7 +39,7 @@ public class SerialPortKit {
             /* Check access permission */
             if (!device.canRead() || !device.canWrite()) {
                 try {
-				/* Missing read/write permission, trying to chmod the file */
+				/* Missing receive/send permission, trying to chmod the file */
                     Process su;
                     //su = Runtime.getRuntime().exec("su");
                     su = Runtime.getRuntime().exec("/system/bin/su");
@@ -80,12 +78,35 @@ public class SerialPortKit {
         }
     }
 
-    // Getters and setters
-    public InputStream getInputStream() {
-        return mFileInputStream;
+    //若输入流未获取，返回-2
+    public int receive() throws IOException {
+        return mFileInputStream != null
+                ? mFileInputStream.read()
+                : -2;
     }
 
-    public OutputStream getOutputStream() {
-        return mFileOutputStream;
+    public int receive(byte b[]) throws IOException {
+        return receive(b, 0, b.length);
+    }
+
+    //若输入流未获取，返回-2
+    public int receive(byte b[], int off, int len) throws IOException {
+        return mFileInputStream != null
+                ? mFileInputStream.read(b, off, len)
+                : -2;
+    }
+
+    public void send(byte b[]) throws IOException {
+        send(b, 0, b.length);
+    }
+
+    public void send(byte b[], int off, int len) throws IOException {
+        if (mFileOutputStream != null) {
+            mFileOutputStream.write(b, off, len);
+        }
+    }
+
+    public void send(int b) throws IOException {
+        send(new byte[] { (byte) b }, 0, 1);
     }
 }

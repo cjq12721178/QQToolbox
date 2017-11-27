@@ -74,15 +74,20 @@ public class MainActivity
         etEmission.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                int i;
-                CharSequence t = v.getText();
-                char[] text = new char[t.length()];
-                for (i=0; i<t.length(); i++) {
-                    text[i] = t.charAt(i);
-                }
 //                try {
-//                    //mOutputStream.write(new String(text).getBytes());
-//                    //mOutputStream.write('\n');
+//                    if (mSerialPortKit != null) {
+//
+//                    }
+//                }
+//                int i;
+//                CharSequence t = v.getText();
+//                char[] text = new char[t.length()];
+//                for (i=0; i<t.length(); i++) {
+//                    text[i] = t.charAt(i);
+//                }
+//                try {
+//                    //mOutputStream.send(new String(text).getBytes());
+//                    //mOutputStream.send('\n');
 //                    //mOutputStream.flush();
 //                } catch (IOException e) {
 //                    e.printStackTrace();
