@@ -74,11 +74,15 @@ public class MainActivity
         etEmission.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-//                try {
-//                    if (mSerialPortKit != null) {
-//
-//                    }
-//                }
+                if (mSerialPortKit != null) {
+                    try {
+                        mSerialPortKit.send(mChkHexEmission.isChecked()
+                                ? NumericConverter.hexDataStringToBytes(v.getText().toString())
+                                : v.getText().toString().getBytes());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
 //                int i;
 //                CharSequence t = v.getText();
 //                char[] text = new char[t.length()];
