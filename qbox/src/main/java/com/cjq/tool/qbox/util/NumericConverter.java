@@ -129,4 +129,16 @@ public class NumericConverter {
         }
         return data;
     }
+
+    public static String bytesToHexDataString(byte[] data) {
+        if (data == null) {
+            return null;
+        }
+        int len = data.length;
+        StringBuilder builder = new StringBuilder(len * 3);
+        for (int i = 0;i < len;++i) {
+            builder.append(String.format("%02X ", data[i]));
+        }
+        return builder.toString();
+    }
 }

@@ -40,7 +40,7 @@ import java.io.IOException;
 public class MainActivity
         extends AppCompatActivity
         implements View.OnClickListener,
-        SortDialog.OnSortTypeChangedListener {
+        SortDialog.OnSortTypeChangedListener, SerialPortKit.OnDataReceivedListener {
 
     private SwitchableFragmentManager mSwitchableFragmentManager;
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
@@ -285,6 +285,7 @@ public class MainActivity
                     if (mSerialPortKit.launch(serialPortName,
                             Integer.parseInt((String) mSpnBaudRate.getSelectedItem()),
                             0)) {
+                        mSerialPortKit.startListen(this);
                         SimpleCustomizeToast.show(this, serialPortName + " opened");
                     } else {
                         SimpleCustomizeToast.show(this, "open serial port failed");
@@ -360,5 +361,11 @@ public class MainActivity
                 + "R.id.name = " + R.id.name
                 + "R.id.unit = " + R.id.unit);
         ClosableLog.d(SortDialog.TAG, "checkedId = " + checkedId + ", isAscend = " + isAscending);
+    }
+
+    @Override
+    public int onDataReceived(byte[] data, int len) {
+        //mTvReception.append();
+        return 0;
     }
 }
