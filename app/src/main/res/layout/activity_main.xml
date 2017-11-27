@@ -324,18 +324,10 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/btn_close_serial_port"
-            android:text="close"
-            android:onClick="onClick"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_serial_port"/>
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
             android:id="@+id/btn_open_serial_port"
             android:text="open"
             android:onClick="onClick"
-            app:layout_constraintRight_toLeftOf="@id/btn_close_serial_port"
+            app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toBottomOf="@id/tv_serial_port"/>
         <Spinner
             android:layout_width="wrap_content"
@@ -344,7 +336,7 @@
             android:entries="@array/baud_rates"
             android:prompt="@string/baud_rate"
             app:layout_constraintRight_toLeftOf="@id/btn_open_serial_port"
-            app:layout_constraintTop_toBottomOf="@id/tv_serial_port"/>
+            app:layout_constraintBaseline_toBaselineOf="@id/btn_open_serial_port"/>
         <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -353,14 +345,15 @@
             android:hint="input serial port name"
             android:lines="1"
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
-            app:layout_constraintTop_toBottomOf="@id/tv_serial_port"
+            app:layout_constraintBaseline_toBaselineOf="@id/btn_open_serial_port"
             app:layout_constraintRight_toLeftOf="@id/spn_baud_rate"/>
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/chk_hex_emission"
             android:text="HEX"
-            app:layout_constraintRight_toRightOf="parent"
+            android:checked="true"
+            app:layout_constraintRight_toRightOf="@id/btn_open_serial_port"
             app:layout_constraintBaseline_toBaselineOf="@+id/et_emission"/>
         <EditText
             android:layout_width="0dp"
@@ -408,6 +401,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/chk_hex_reception"
             android:text="HEX"
+            android:checked="true"
             app:layout_constraintLeft_toRightOf="@id/btn_clear"
             app:layout_constraintBaseline_toBaselineOf="@id/btn_clear"/>
 

@@ -118,9 +118,6 @@ public class NumericConverter {
     }
 
     public static byte[] hexDataStringToBytes(String s) {
-        if (TextUtils.isEmpty(s)) {
-            return null;
-        }
         String[] ss = s.split(" ");
         int length = ss.length;
         byte[] data = new byte[length];
@@ -131,12 +128,12 @@ public class NumericConverter {
     }
 
     public static String bytesToHexDataString(byte[] data) {
-        if (data == null) {
-            return null;
-        }
-        int len = data.length;
+        return bytesToHexDataString(data, 0, data.length);
+    }
+
+    public static String bytesToHexDataString(byte[] data, int offset, int len) {
         StringBuilder builder = new StringBuilder(len * 3);
-        for (int i = 0;i < len;++i) {
+        for (int i = offset, n = offset + len;i < n;++i) {
             builder.append(String.format("%02X ", data[i]));
         }
         return builder.toString();

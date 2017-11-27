@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
+import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -40,7 +42,7 @@ import java.io.IOException;
 public class MainActivity
         extends AppCompatActivity
         implements View.OnClickListener,
-        SortDialog.OnSortTypeChangedListener, SerialPortKit.OnDataReceivedListener {
+        SortDialog.OnSortTypeChangedListener, SerialPortKit.OnDataReceivedListener, CompoundButton.OnCheckedChangeListener {
 
     private SwitchableFragmentManager mSwitchableFragmentManager;
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
@@ -67,7 +69,9 @@ public class MainActivity
         mEtSerialPortName = (EditText) findViewById(R.id.et_serial_port_name);
         mTvReception = (TextView) findViewById(R.id.tv_reception);
         mChkHexEmission = (CheckBox) findViewById(R.id.chk_hex_emission);
+        mChkHexEmission.setOnCheckedChangeListener(this);
         mChkHexReception = (CheckBox) findViewById(R.id.chk_hex_reception);
+        mChkHexReception.setOnCheckedChangeListener(this);
         mSpnBaudRate = (Spinner) findViewById(R.id.spn_baud_rate);
         mSpnBaudRate.setSelection(16);
         EditText etEmission = (EditText) findViewById(R.id.et_emission);
@@ -273,27 +277,31 @@ public class MainActivity
                 startActivity(new Intent(this, PrintLifecycleActivity.class));
                 break;
             case R.id.btn_open_serial_port:
-                powerOnSerialPort();
-                if (mSerialPortKit == null) {
-                    mSerialPortKit = new SerialPortKit();
-                }
-                String serialPortName = mTvReception.getText().toString();
-                if (TextUtils.isEmpty(serialPortName)) {
-                    SimpleCustomizeToast.show(this, "serial port name can not be empty");
-                } else {
+                Button btnSerialPort = (Button) v;
+                if ("open".equals(btnSerialPort.getText())) {
                     powerOnSerialPort();
-                    if (mSerialPortKit.launch(serialPortName,
-                            Integer.parseInt((String) mSpnBaudRate.getSelectedItem()),
-                            0)) {
-                        mSerialPortKit.startListen(this);
-                        SimpleCustomizeToast.show(this, serialPortName + " opened");
-                    } else {
-                        SimpleCustomizeToast.show(this, "open serial port failed");
+                    if (mSerialPortKit == null) {
+                        mSerialPortKit = new SerialPortKit();
                     }
+                    String serialPortName = mEtSerialPortName.getText().toString();
+                    if (TextUtils.isEmpty(serialPortName)) {
+                        SimpleCustomizeToast.show(this, "serial port name can not be empty");
+                    } else {
+                        powerOnSerialPort();
+                        if (mSerialPortKit.launch(serialPortName,
+                                Integer.parseInt((String) mSpnBaudRate.getSelectedItem()),
+                                0)) {
+                            btnSerialPort.setText("close");
+                            mSerialPortKit.startListen(this);
+                            SimpleCustomizeToast.show(this, serialPortName + " opened");
+                        } else {
+                            SimpleCustomizeToast.show(this, "open serial port failed");
+                        }
+                    }
+                } else {
+                    closeSerialPort();
+                    btnSerialPort.setText("open");
                 }
-                break;
-            case R.id.btn_close_serial_port:
-                closeSerialPort();
                 break;
         }
     }
@@ -365,7 +373,16 @@ public class MainActivity
 
     @Override
     public int onDataReceived(byte[] data, int len) {
-        //mTvReception.append();
+        mTvReception.append(mChkHexReception.isChecked()
+                ? NumericConverter.bytesToHexDataString(data)
+                : new String(data, 0, len));
         return 0;
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        mTvReception.setText(isChecked
+                ? NumericConverter.bytesToHexDataString(mTvReception.getText().toString().getBytes())
+                : new String(NumericConverter.hexDataStringToBytes(mTvReception.getText().toString())));
     }
 }
