@@ -69,7 +69,6 @@ public class MainActivity
         mEtSerialPortName = (EditText) findViewById(R.id.et_serial_port_name);
         mTvReception = (TextView) findViewById(R.id.tv_reception);
         mChkHexEmission = (CheckBox) findViewById(R.id.chk_hex_emission);
-        mChkHexEmission.setOnCheckedChangeListener(this);
         mChkHexReception = (CheckBox) findViewById(R.id.chk_hex_reception);
         mChkHexReception.setOnCheckedChangeListener(this);
         mSpnBaudRate = (Spinner) findViewById(R.id.spn_baud_rate);
@@ -374,7 +373,7 @@ public class MainActivity
     @Override
     public int onDataReceived(byte[] data, int len) {
         mTvReception.append(mChkHexReception.isChecked()
-                ? NumericConverter.bytesToHexDataString(data)
+                ? NumericConverter.bytesToHexDataString(data, 0, len)
                 : new String(data, 0, len));
         return 0;
     }

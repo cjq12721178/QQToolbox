@@ -118,6 +118,9 @@ public class NumericConverter {
     }
 
     public static byte[] hexDataStringToBytes(String s) {
+        if (TextUtils.isEmpty(s)) {
+            return null;
+        }
         String[] ss = s.split(" ");
         int length = ss.length;
         byte[] data = new byte[length];
