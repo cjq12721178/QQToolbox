@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cjq.lib.weisi.communicator.SerialPortKit;
+import com.cjq.lib.weisi.protocol.ScoutUdpSensorProtocol;
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
@@ -42,7 +43,7 @@ import java.io.IOException;
 public class MainActivity
         extends AppCompatActivity
         implements View.OnClickListener,
-        SortDialog.OnSortTypeChangedListener, SerialPortKit.OnDataReceivedListener, CompoundButton.OnCheckedChangeListener {
+        SortDialog.OnSortTypeChangedListener, SerialPortKit.OnDataReceivedListener, CompoundButton.OnCheckedChangeListener, TextView.OnEditorActionListener {
 
     private SwitchableFragmentManager mSwitchableFragmentManager;
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
@@ -55,6 +56,9 @@ public class MainActivity
     private CheckBox mChkHexEmission;
     private CheckBox mChkHexReception;
     private Spinner mSpnBaudRate;
+    private TextView mTvEmission;
+    private String mEmissionTextCopy;
+    private String mReceptionTextCopy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,41 +71,16 @@ public class MainActivity
         //findViewById(R.id.tv_text_view_on_click).setOnClickListener(this);
 
         mEtSerialPortName = (EditText) findViewById(R.id.et_serial_port_name);
-        mTvReception = (TextView) findViewById(R.id.tv_reception);
+        mTvEmission = (TextView) findViewById(R.id.tv_emission_content);
+        mTvReception = (TextView) findViewById(R.id.tv_reception_content);
         mChkHexEmission = (CheckBox) findViewById(R.id.chk_hex_emission);
+        mChkHexEmission.setOnCheckedChangeListener(this);
         mChkHexReception = (CheckBox) findViewById(R.id.chk_hex_reception);
         mChkHexReception.setOnCheckedChangeListener(this);
         mSpnBaudRate = (Spinner) findViewById(R.id.spn_baud_rate);
         mSpnBaudRate.setSelection(16);
         EditText etEmission = (EditText) findViewById(R.id.et_emission);
-        etEmission.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (mSerialPortKit != null) {
-                    try {
-                        mSerialPortKit.send(mChkHexEmission.isChecked()
-                                ? NumericConverter.hexDataStringToBytes(v.getText().toString())
-                                : v.getText().toString().getBytes());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-//                int i;
-//                CharSequence t = v.getText();
-//                char[] text = new char[t.length()];
-//                for (i=0; i<t.length(); i++) {
-//                    text[i] = t.charAt(i);
-//                }
-//                try {
-//                    //mOutputStream.send(new String(text).getBytes());
-//                    //mOutputStream.send('\n');
-//                    //mOutputStream.flush();
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-                return false;
-            }
-        });
+        etEmission.setOnEditorActionListener(this);
     }
 
     @Override
@@ -278,7 +257,7 @@ public class MainActivity
             case R.id.btn_open_serial_port:
                 Button btnSerialPort = (Button) v;
                 if ("open".equals(btnSerialPort.getText())) {
-                    powerOnSerialPort();
+                    //powerOnSerialPort();
                     if (mSerialPortKit == null) {
                         mSerialPortKit = new SerialPortKit();
                     }
@@ -286,7 +265,7 @@ public class MainActivity
                     if (TextUtils.isEmpty(serialPortName)) {
                         SimpleCustomizeToast.show(this, "serial port name can not be empty");
                     } else {
-                        powerOnSerialPort();
+                        //powerOnSerialPort();
                         if (mSerialPortKit.launch(serialPortName,
                                 Integer.parseInt((String) mSpnBaudRate.getSelectedItem()),
                                 0)) {
@@ -302,13 +281,40 @@ public class MainActivity
                     btnSerialPort.setText("open");
                 }
                 break;
+            case R.id.btn_time_synchronization:
+                sendCommand(new ScoutUdpSensorProtocol().makeTimeSynchronizationFrame());
+                break;
+            case R.id.btn_request_data:
+                sendCommand(new ScoutUdpSensorProtocol().makeDataRequestFrame());
+                break;
+            case R.id.btn_serial_port_power:
+                Button btnSerialPortPower = (Button) v;
+                if ("power on".equals(btnSerialPortPower.getText())) {
+                    powerOnSerialPort();
+                    btnSerialPortPower.setText("power off");
+                } else {
+                    powerOffSerialPort();
+                    btnSerialPortPower.setText("power on");
+                }
+                break;
+            case R.id.btn_clear:
+                mTvEmission.setText(null);
+                mTvReception.setText(null);
+                break;
         }
+    }
+
+    private void sendCommand(byte[] command) {
+        mTvEmission.append(NumericConverter.bytesToHexDataString(command));
+        mTvEmission.append("\n");
+        sendData(command);
     }
 
     private void closeSerialPort() {
         if (mSerialPortKit != null) {
             mSerialPortKit.shutdown();
-            powerOffSerialPort();
+            SimpleCustomizeToast.show(this, mEtSerialPortName.getText() + " closed");
+            //powerOffSerialPort();
         }
     }
 
@@ -319,6 +325,7 @@ public class MainActivity
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_gpio_112"});
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_a"});
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 1 > /sys/devices/soc.0/xt_dev.68/xt_uart_b"});
+            SimpleCustomizeToast.show(this, "power on");
         } catch (IOException e) {
             ExceptionLog.display(e);
         }
@@ -330,6 +337,7 @@ public class MainActivity
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_vbat_out_en"});
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_a"});
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_b"});
+            SimpleCustomizeToast.show(this, "power off");
         } catch (IOException e) {
             ExceptionLog.display(e);
         }
@@ -371,17 +379,66 @@ public class MainActivity
     }
 
     @Override
-    public int onDataReceived(byte[] data, int len) {
-        mTvReception.append(mChkHexReception.isChecked()
-                ? NumericConverter.bytesToHexDataString(data, 0, len)
-                : new String(data, 0, len));
-        return 0;
+    public int onDataReceived(final byte[] data, final int len) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mTvReception.append(mChkHexReception.isChecked()
+                        ? NumericConverter.bytesToHexDataString(data, 0, len)
+                        : new String(data, 0, len));
+                if (mChkHexReception.isChecked()) {
+                    mTvReception.append("\n");
+                }
+            }
+        });
+        return len;
     }
 
     @Override
     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        mTvReception.setText(isChecked
-                ? NumericConverter.bytesToHexDataString(mTvReception.getText().toString().getBytes())
-                : new String(NumericConverter.hexDataStringToBytes(mTvReception.getText().toString())));
+        switch (buttonView.getId()) {
+            case R.id.chk_hex_emission: {
+                String tmp = mEmissionTextCopy;
+                mEmissionTextCopy = mTvEmission.getText().toString();
+                mTvEmission.setText(tmp);
+            } break;
+            case R.id.chk_hex_reception: {
+                String tmp = mReceptionTextCopy;
+                mReceptionTextCopy = mTvReception.getText().toString();
+                mTvReception.setText(tmp);
+            } break;
+        }
+//        if (isChecked) {
+//            mTvReception.setText(NumericConverter.bytesToHexDataString(mTvReception.getText().toString().getBytes()));
+//        } else {
+//            CharSequence text = mTvReception.getText();
+//            if (!TextUtils.isEmpty(text)) {
+//                mTvReception.setText(new String(NumericConverter.hexDataStringToBytes(text.toString())));
+//            }
+//        }
+    }
+
+    @Override
+    public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        CharSequence emissionText = v.getText();
+        if (!TextUtils.isEmpty(emissionText)) {
+            mTvEmission.append(emissionText);
+            //mTvEmission.append("\n");
+            sendData(mChkHexEmission.isChecked()
+                    ? NumericConverter.hexDataStringToBytes(emissionText.toString())
+                    : emissionText.toString().getBytes());
+            v.setText(null);
+        }
+        return false;
+    }
+
+    private void sendData(byte[] data) {
+        if (mSerialPortKit != null && data != null) {
+            try {
+                mSerialPortKit.send(data);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -324,11 +324,19 @@
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/btn_serial_port_power"
+            android:text="power on"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/tv_serial_port"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:id="@+id/btn_open_serial_port"
             android:text="open"
             android:onClick="onClick"
             app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_serial_port"/>
+            app:layout_constraintTop_toBottomOf="@id/btn_serial_port_power"/>
         <Spinner
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -344,6 +352,7 @@
             android:text="ttyHSL1"
             android:hint="input serial port name"
             android:lines="1"
+            android:isScrollContainer="true"
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
             app:layout_constraintBaseline_toBaselineOf="@id/btn_open_serial_port"
             app:layout_constraintRight_toLeftOf="@id/spn_baud_rate"/>
@@ -381,13 +390,35 @@
             app:layout_constraintLeft_toRightOf="@id/btn_time_synchronization"
             app:layout_constraintTop_toBottomOf="@id/et_emission"/>
         <TextView
-            android:layout_width="0dp"
-            android:layout_height="300dp"
-            android:id="@+id/tv_reception"
-            android:hint="reception"
-            android:isScrollContainer="true"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_emission_label"
+            android:text="emission"
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
             app:layout_constraintTop_toBottomOf="@id/btn_time_synchronization"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:id="@+id/tv_emission_content"
+            android:isScrollContainer="true"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/tv_emission_label"
+            app:layout_constraintRight_toRightOf="parent"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_reception_label"
+            android:text="reception"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/tv_emission_content"/>
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="150dp"
+            android:id="@+id/tv_reception_content"
+            android:isScrollContainer="true"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/tv_reception_label"
+            app:layout_constraintRight_toRightOf="parent"/>
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -395,7 +426,7 @@
             android:text="clear reception"
             android:onClick="onClick"
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
-            app:layout_constraintTop_toBottomOf="@id/tv_reception"/>
+            app:layout_constraintTop_toBottomOf="@id/tv_reception_content"/>
         <CheckBox
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

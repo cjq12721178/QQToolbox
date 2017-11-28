@@ -124,8 +124,15 @@ public class NumericConverter {
         String[] ss = s.split(" ");
         int length = ss.length;
         byte[] data = new byte[length];
-        for (int i = 0;i < length;++i) {
-            data[i] = Byte.parseByte(ss[i], 16);
+        try {
+            for (int i = 0;i < length;++i) {
+                if (ss[i].length() > 2) {
+                    return null;
+                }
+                data[i] = Byte.parseByte(ss[i], 16);
+            }
+        } catch (NumberFormatException nfe) {
+            data = null;
         }
         return data;
     }
@@ -137,7 +144,7 @@ public class NumericConverter {
     public static String bytesToHexDataString(byte[] data, int offset, int len) {
         StringBuilder builder = new StringBuilder(len * 3);
         for (int i = offset, n = offset + len;i < n;++i) {
-            builder.append(String.format("%02X ", data[i]));
+            builder.append(String.format("%02X ", (data[i] & 0xff)));
         }
         return builder.toString();
     }
