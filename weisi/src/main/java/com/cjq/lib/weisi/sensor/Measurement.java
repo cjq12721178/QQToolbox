@@ -114,7 +114,7 @@ public class Measurement
         return setDynamicValueContent(addDynamicValue(timestamp), rawValue);
     }
 
-    int addHistoryValue(long timestamp, double rawValue) {
+    public int addHistoryValue(long timestamp, double rawValue) {
         return setHistoryValueContent(addHistoryValue(timestamp), rawValue);
     }
 

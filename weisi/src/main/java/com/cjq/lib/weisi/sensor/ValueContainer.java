@@ -107,17 +107,12 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 mHistoryValues.add(v);
                 return size;
             } else if (timestamp < v.getTimeStamp()) {
-                synchronized (Value.VALUE_COMPARATOR) {
-                    Value.VALUE_COMPARER.mTimeStamp = timestamp;
-                    int position = Collections.binarySearch(mHistoryValues,
-                            Value.VALUE_COMPARER,
-                            Value.VALUE_COMPARATOR);
-                    if (position < 0) {
-                        v = onCreateValue(timestamp);
-                        mHistoryValues.add(-position - 1, v);
-                    }
-                    return -position - 1;
+                int position = findHistoryValue(timestamp);
+                if (position < 0) {
+                    v = onCreateValue(timestamp);
+                    mHistoryValues.add(-position - 1, v);
                 }
+                return -position - 1;
             }
             //-(size - 1) - 1
             return -size;
@@ -206,6 +201,52 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
             return LOOP_VALUE_ADDED;
         } else {
             return NEW_VALUE_ADDED;
+        }
+    }
+
+    //若possiblePosition>=0，则在possiblePosition附近寻找时间戳等于timestamp的Value
+    //若possiblePosition<0，则在所有历史数据里面寻找
+    //没有找到返回null
+    public V findHistoryValue(int possiblePosition, long timestamp) {
+        V value = null;
+        if (possiblePosition >= 0) {
+            for (int i = possiblePosition,
+                 j = possiblePosition,
+                 n = getHistoryValueSize();
+                 i < n && i >= 0;) {
+                value = getHistoryValue(i);
+                long valueTimestamp = value.getTimeStamp();
+                if (valueTimestamp == timestamp) {
+                    break;
+                } else if (valueTimestamp > timestamp) {
+                    if (i < j) {
+                        value = null;
+                        break;
+                    }
+                    j = i--;
+                } else {
+                    if (i > j) {
+                        value = null;
+                        break;
+                    }
+                    j = i++;
+                }
+            }
+        } else {
+            int position = findHistoryValue(timestamp);
+            if (position >= 0) {
+                value = mHistoryValues.get(position);
+            }
+        }
+        return value;
+    }
+
+    private int findHistoryValue(long timestamp) {
+        synchronized (Value.VALUE_COMPARER) {
+            Value.VALUE_COMPARER.mTimeStamp = timestamp;
+            return Collections.binarySearch(mHistoryValues,
+                    Value.VALUE_COMPARER,
+                    Value.VALUE_COMPARATOR);
         }
     }
 
