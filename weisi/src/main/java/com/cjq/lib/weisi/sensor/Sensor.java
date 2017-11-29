@@ -304,6 +304,23 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         return setHistoryValueContent(addHistoryValue(timestamp), batteryVoltage);
     }
 
+    public int addHistoryValue(long measurementValueId, long timestamp, double rawValue) {
+        return MeasurementIdentifier.getAddress(measurementValueId) == mRawAddress
+                ? addHistoryValue(
+                        MeasurementIdentifier.getDataTypeValue(measurementValueId),
+                        MeasurementIdentifier.getDataTypeValueIndex(measurementValueId),
+                        timestamp, rawValue)
+                : MAX_DYNAMIC_VALUE_SIZE;
+    }
+
+    public int addHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, double rawValue) {
+        Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
+        if (measurement == null) {
+            return MAX_DYNAMIC_VALUE_SIZE;
+        }
+        return measurement.addHistoryValue(timestamp, rawValue);
+    }
+
     public long getFirstValueReceivedTimestamp() {
         return mFirstValueReceivedTimestamp;
     }
