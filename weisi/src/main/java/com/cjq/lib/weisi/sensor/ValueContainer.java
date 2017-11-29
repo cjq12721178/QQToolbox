@@ -107,7 +107,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 mHistoryValues.add(v);
                 return size;
             } else if (timestamp < v.getTimeStamp()) {
-                int position = findHistoryValue(timestamp);
+                int position = findHistoryValuePosition(timestamp);
                 if (position < 0) {
                     v = onCreateValue(timestamp);
                     mHistoryValues.add(-position - 1, v);
@@ -204,12 +204,19 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         }
     }
 
+    public V findHistoryValue(int possiblePosition, long timestamp) {
+        int actualPosition = findHistoryValuePosition(possiblePosition, timestamp);
+        return actualPosition >= 0
+                ? mHistoryValues.get(actualPosition)
+                : null;
+    }
+
     //若possiblePosition>=0，则在possiblePosition附近寻找时间戳等于timestamp的Value
     //若possiblePosition<0，则在所有历史数据里面寻找
-    //没有找到返回null
-    public V findHistoryValue(int possiblePosition, long timestamp) {
-        V value = null;
+    //没有找到返回负数
+    public int findHistoryValuePosition(int possiblePosition, long timestamp) {
         if (possiblePosition >= 0) {
+            V value;
             for (int i = possiblePosition,
                  j = possiblePosition,
                  n = getHistoryValueSize();
@@ -217,31 +224,26 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 value = getHistoryValue(i);
                 long valueTimestamp = value.getTimeStamp();
                 if (valueTimestamp == timestamp) {
-                    break;
+                    return i;
                 } else if (valueTimestamp > timestamp) {
                     if (i < j) {
-                        value = null;
                         break;
                     }
                     j = i--;
                 } else {
                     if (i > j) {
-                        value = null;
                         break;
                     }
                     j = i++;
                 }
             }
         } else {
-            int position = findHistoryValue(timestamp);
-            if (position >= 0) {
-                value = mHistoryValues.get(position);
-            }
+            return findHistoryValuePosition(timestamp);
         }
-        return value;
+        return -1;
     }
 
-    private int findHistoryValue(long timestamp) {
+    private int findHistoryValuePosition(long timestamp) {
         synchronized (Value.VALUE_COMPARER) {
             Value.VALUE_COMPARER.mTimeStamp = timestamp;
             return Collections.binarySearch(mHistoryValues,
