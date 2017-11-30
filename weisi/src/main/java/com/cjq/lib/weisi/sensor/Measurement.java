@@ -91,7 +91,7 @@ public class Measurement
     }
 
     void setRealTimeValue(long timestamp, double rawValue) {
-        synchronized (mRealTimeValue) {
+        if (mRealTimeValue.mTimeStamp < timestamp) {
             mRealTimeValue.mTimeStamp = timestamp;
             mRealTimeValue.mRawValue = rawValue;
         }
@@ -109,7 +109,7 @@ public class Measurement
                 : null;
     }
 
-    int addDynamicValue(long timestamp, double rawValue) {
+    int addDynamicValue(int address, long timestamp, double rawValue) {
         setRealTimeValue(timestamp, rawValue);
         return setDynamicValueContent(addDynamicValue(timestamp), rawValue);
     }

@@ -20,7 +20,7 @@ public class SensorManager {
         return getSensor(address, null, autoCreate);
     }
 
-    public static Sensor createDynamicSensor(int address, SensorDecorator decorator) {
+    public static Sensor createSensor(int address, SensorDecorator decorator) {
         return getSensor(address, decorator, true);
     }
 
@@ -51,5 +51,16 @@ public class SensorManager {
                 }
             }
         }
+    }
+
+    public static synchronized int getSensorWithHistoryValuesCount() {
+        int count = 0;
+        for (Sensor sensor :
+                SENSOR_MAP.values()) {
+            if (sensor.getHistoryValueSize() > 0) {
+                ++count;
+            }
+        }
+        return count;
     }
 }

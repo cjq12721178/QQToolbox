@@ -51,6 +51,10 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         setDecorator(decorator);
     }
 
+    public static void setOnDynamicValueCaptureListener(OnDynamicValueCaptureListener listener) {
+        onDynamicValueCaptureListener = listener;
+    }
+
     private void generateMeasurementCollections() {
         int size = getMeasurementSizeForKinds();
         if (size != mMeasurementKinds.size()) {
@@ -226,8 +230,8 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     public int addDynamicValue(byte dataTypeValue,
-                                int dataTypeValueIndex,
-                                ValueBuildDelegator valueBuildDelegator) {
+                               int dataTypeValueIndex,
+                               ValueBuildDelegator valueBuildDelegator) {
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
             return MAX_DYNAMIC_VALUE_SIZE;
@@ -237,18 +241,14 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         float batteryVoltage = valueBuildDelegator.getBatteryVoltage();
         double rawValue = valueBuildDelegator.getRawValue();
         setRealTimeValue(timestamp, batteryVoltage);
-        int position = setDynamicValueContent(addDynamicValue(timestamp), batteryVoltage);
-        measurement.addDynamicValue(timestamp, rawValue);
-        if (onDynamicValueCaptureListener != null) {
-            onDynamicValueCaptureListener
-                    .onDynamicValueCapture(mRawAddress,
-                            dataTypeValue,
-                            dataTypeValueIndex,
-                            timestamp,
-                            batteryVoltage,
-                            rawValue);
+        if (measurement.mRealTimeValue.mTimeStamp < timestamp
+                && onDynamicValueCaptureListener != null) {
+            onDynamicValueCaptureListener.onMeasurementValueCapture(
+                    mRawAddress, dataTypeValue, dataTypeValueIndex,
+                    timestamp, rawValue);
         }
-        return position;
+        measurement.addDynamicValue(mRawAddress, timestamp, rawValue);
+        return setDynamicValueContent(addDynamicValue(timestamp), batteryVoltage);
     }
 
     private int setDynamicValueContent(int position, float batteryVoltage) {
@@ -280,6 +280,12 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
             }
             mRealTimeValue.mTimeStamp = timestamp;
             mRealTimeValue.mBatteryVoltage = batteryVoltage;
+            if (onDynamicValueCaptureListener != null) {
+                onDynamicValueCaptureListener
+                        .onSensorValueCapture(mRawAddress,
+                                timestamp,
+                                batteryVoltage);
+            }
         }
     }
 
@@ -358,6 +364,23 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 
     private static final ModifiableDataType MEASUREMENT_GET_COMPARER = new ModifiableDataType();
 
+    public interface OnDynamicValueCaptureListener {
+//        void onDynamicValueCapture(int address,
+//                                   byte dataTypeValue,
+//                                   int dataTypeValueIndex,
+//                                   long timestamp,
+//                                   float batteryVoltage,
+//                                   double rawValue);
+        void onSensorValueCapture(int address,
+                                  long timestamp,
+                                  float batteryVoltage);
+        void onMeasurementValueCapture(int address,
+                                       byte dataTypeValue,
+                                       int dataTypeValueIndex,
+                                       long timestamp,
+                                       double rawValue);
+    }
+
     private static class ModifiableDataType implements DataTypeValueGetter {
 
         private byte mModifiableValue;
@@ -386,16 +409,4 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         }
     }
 
-    public static void setOnDynamicValueCaptureListener(OnDynamicValueCaptureListener listener) {
-        onDynamicValueCaptureListener = listener;
-    }
-
-    public interface OnDynamicValueCaptureListener {
-        void onDynamicValueCapture(int address,
-                                   byte dataTypeValue,
-                                   int dataTypeValueIndex,
-                                   long timestamp,
-                                   float batteryVoltage,
-                                   double rawValue);
-    }
 }
