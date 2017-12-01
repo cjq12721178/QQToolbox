@@ -232,23 +232,34 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     public int addDynamicValue(byte dataTypeValue,
                                int dataTypeValueIndex,
                                ValueBuildDelegator valueBuildDelegator) {
+        //获取相应测量量
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
             return MAX_DYNAMIC_VALUE_SIZE;
         }
+        //解析原始数据
         valueBuildDelegator.setValueBuilder(measurement.getDataType().getValueBuilder());
         long timestamp = valueBuildDelegator.getTimestamp();
         float batteryVoltage = valueBuildDelegator.getBatteryVoltage();
         double rawValue = valueBuildDelegator.getRawValue();
+        boolean canValueCaptured = measurement.mRealTimeValue.mTimeStamp < timestamp
+                && onDynamicValueCaptureListener != null;
+        //设置传感器实时数据
         setRealTimeValue(timestamp, batteryVoltage);
-        if (measurement.mRealTimeValue.mTimeStamp < timestamp
-                && onDynamicValueCaptureListener != null) {
-            onDynamicValueCaptureListener.onMeasurementValueCapture(
-                    mRawAddress, dataTypeValue, dataTypeValueIndex,
-                    timestamp, rawValue);
-        }
+        //将传感器实时数据添加至实时数据缓存
+        int result = setDynamicValueContent(addDynamicValue(timestamp), batteryVoltage);
+        //为测量量添加动态数据（包括实时数据及其缓存）
         measurement.addDynamicValue(mRawAddress, timestamp, rawValue);
-        return setDynamicValueContent(addDynamicValue(timestamp), batteryVoltage);
+        //传感器及其测量量实时数据捕获
+        if (canValueCaptured) {
+            onDynamicValueCaptureListener.onDynamicValueCapture(
+                    mRawAddress,
+                    dataTypeValue, dataTypeValueIndex,
+                    timestamp,
+                    batteryVoltage,
+                    rawValue);
+        }
+        return result;
     }
 
     private int setDynamicValueContent(int position, float batteryVoltage) {
@@ -280,31 +291,14 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
             }
             mRealTimeValue.mTimeStamp = timestamp;
             mRealTimeValue.mBatteryVoltage = batteryVoltage;
-            if (onDynamicValueCaptureListener != null) {
-                onDynamicValueCaptureListener
-                        .onSensorValueCapture(mRawAddress,
-                                timestamp,
-                                batteryVoltage);
-            }
+//            if (onDynamicValueCaptureListener != null) {
+//                onDynamicValueCaptureListener
+//                        .onSensorValueCapture(mRawAddress,
+//                                timestamp,
+//                                batteryVoltage);
+//            }
         }
     }
-
-//    private void addHistoryValue(long timestamp, float voltage) {
-//        setValueContent(addHistoryValue(timestamp), voltage);
-//    }
-
-//    public int addHistoryValue(byte dataTypeValue,
-//                                int dataTypeValueIndex,
-//                                long timestamp,
-//                                float batteryVoltage,
-//                                double rawValue) {
-//        Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
-//        if (measurement == null) {
-//            return MAX_DYNAMIC_VALUE_SIZE;
-//        }
-//        measurement.addHistoryValue(timestamp, rawValue);
-//        return setHistoryValueContent(addHistoryValue(timestamp), batteryVoltage);
-//    }
 
     public int addHistoryValue(long timestamp, float batteryVoltage) {
         return setHistoryValueContent(addHistoryValue(timestamp), batteryVoltage);
@@ -365,20 +359,20 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     private static final ModifiableDataType MEASUREMENT_GET_COMPARER = new ModifiableDataType();
 
     public interface OnDynamicValueCaptureListener {
-//        void onDynamicValueCapture(int address,
-//                                   byte dataTypeValue,
-//                                   int dataTypeValueIndex,
-//                                   long timestamp,
-//                                   float batteryVoltage,
-//                                   double rawValue);
-        void onSensorValueCapture(int address,
-                                  long timestamp,
-                                  float batteryVoltage);
-        void onMeasurementValueCapture(int address,
-                                       byte dataTypeValue,
-                                       int dataTypeValueIndex,
-                                       long timestamp,
-                                       double rawValue);
+        void onDynamicValueCapture(int address,
+                                   byte dataTypeValue,
+                                   int dataTypeValueIndex,
+                                   long timestamp,
+                                   float batteryVoltage,
+                                   double rawValue);
+//        void onSensorValueCapture(int address,
+//                                  long timestamp,
+//                                  float batteryVoltage);
+//        void onMeasurementValueCapture(int address,
+//                                       byte dataTypeValue,
+//                                       int dataTypeValueIndex,
+//                                       long timestamp,
+//                                       double rawValue);
     }
 
     private static class ModifiableDataType implements DataTypeValueGetter {
