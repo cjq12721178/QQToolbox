@@ -41,26 +41,33 @@ public class ScoutUdpSensorProtocol implements Constant {
     private final ValueBuildDelegator mValueBuildDelegator = new ValueBuildDelegator();
 
     public void analyze(byte[] udpData, OnFrameAnalyzedListener listener) {
+        analyze(udpData, 0, udpData.length, listener);
+    }
+
+    public void analyze(byte[] udpData, int offset, int length, OnFrameAnalyzedListener listener) {
         //判断数据是否为空，以及数据长度是否大于最小数据长度
-        if (udpData == null || listener == null || udpData.length < MIN_FRAME_LENGTH) {
+        if (listener == null
+                || offset < 0
+                || offset + length > udpData.length
+                || length < MIN_FRAME_LENGTH) {
             return;
         }
 
         //记录实际数据域长度（除去命令码长度之后的长度）
-        int realDataZoneLength = NumericConverter.int8ToUInt16(udpData[START_CHARACTER.length + BASE_STATION_ADDRESS_LENGTH]) - COMMAND_CODE_LENGTH;
+        int realDataZoneLength = NumericConverter.int8ToUInt16(udpData[offset + START_CHARACTER.length + BASE_STATION_ADDRESS_LENGTH]) - COMMAND_CODE_LENGTH;
         //计算实际数据长度
         int realDataLength = MIN_FRAME_LENGTH + realDataZoneLength;
         //检查起始符和结束符
-        if (udpData[0] != START_CHARACTER[0]
-                || udpData[1] != START_CHARACTER[1]
-                || udpData[realDataLength - 2] != END_CHARACTER[0]
-                || udpData[realDataLength - 1] != END_CHARACTER[1]) {
+        if (udpData[offset] != START_CHARACTER[0]
+                || udpData[offset + 1] != START_CHARACTER[1]
+                || udpData[offset + realDataLength - 2] != END_CHARACTER[0]
+                || udpData[offset + realDataLength - 1] != END_CHARACTER[1]) {
             return;
         }
 
         //计算CRC16并校验
         if (!Crc.isCorrect16(udpData,
-                START_CHARACTER.length,
+                offset + START_CHARACTER.length,
                 BASE_STATION_ADDRESS_LENGTH
                         + DATA_ZONE_LENGTH_LENGTH
                         + COMMAND_CODE_LENGTH
@@ -70,14 +77,12 @@ public class ScoutUdpSensorProtocol implements Constant {
             return;
         }
 
-        analyzeDataZone(udpData, DATA_ZONE_POSITION, realDataZoneLength, listener);
+        analyzeDataZone(udpData, offset + DATA_ZONE_POSITION, realDataZoneLength, listener);
     }
 
     private void analyzeDataZone(byte[] data, int dataZoneStart, int realDataZoneLength, OnFrameAnalyzedListener listener) {
         //获取并校验命令码
-        int commandCode = (byte)(data[START_CHARACTER.length
-                + BASE_STATION_ADDRESS_LENGTH
-                + DATA_ZONE_LENGTH_LENGTH] -
+        int commandCode = (byte)(data[dataZoneStart] -
                 FIXED_DIFFERENCE_FROM_COMMAND_TO_RESPONSE);
 
         //目前只需要这两个命令
