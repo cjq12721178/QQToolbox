@@ -32,23 +32,32 @@ public class UdpDataValueBuilder implements ValueBuilder {
 
     @Override
     public long buildTimestamp(byte[] src, long timestampIndex) {
-        long lastTime, currTime;
         int calendarPos = (int) timestampIndex;
-        lastTime = TIMESTAMP_BUILDER.getTimeInMillis();
-        TIMESTAMP_BUILDER.set(ADJUSTED_YEAR,
-                src[calendarPos] & 0x0f,
-                src[++calendarPos],
-                src[++calendarPos],
-                src[++calendarPos],
-                src[++calendarPos]);
-        currTime = TIMESTAMP_BUILDER.getTimeInMillis();
-        //跨年修正，属于那种基本不会发生的情况
-        if (currTime < lastTime) {
-            ADJUSTED_YEAR = new GregorianCalendar().get(Calendar.YEAR);
-            TIMESTAMP_BUILDER.set(Calendar.YEAR, ADJUSTED_YEAR);
+        //若基站或者其他网关设备没有打上时间戳，取本地系统时间
+        if (src[calendarPos] == 0
+                && src[calendarPos + 1] == 0
+                && src[calendarPos + 2] == 0
+                && src[calendarPos + 3] == 0
+                && src[calendarPos + 4] == 0) {
+            return TIMESTAMP_BUILDER.getTimeInMillis();
+        } else {
+            long lastTime, currTime;
+            lastTime = TIMESTAMP_BUILDER.getTimeInMillis();
+            TIMESTAMP_BUILDER.set(ADJUSTED_YEAR,
+                    src[calendarPos] & 0x0f,
+                    src[++calendarPos],
+                    src[++calendarPos],
+                    src[++calendarPos],
+                    src[++calendarPos]);
             currTime = TIMESTAMP_BUILDER.getTimeInMillis();
+            //跨年修正，属于那种基本不会发生的情况
+            if (currTime < lastTime) {
+                ADJUSTED_YEAR = new GregorianCalendar().get(Calendar.YEAR);
+                TIMESTAMP_BUILDER.set(Calendar.YEAR, ADJUSTED_YEAR);
+                currTime = TIMESTAMP_BUILDER.getTimeInMillis();
+            }
+            return currTime;
         }
-        return currTime;
     }
 
     @Override
