@@ -161,7 +161,9 @@ public class Crc {
                     ? calc16ByMsb(buf, position, length)
                     : calc16ByLsb(buf, position, length));
         return isCrcMsb
-                ? (crc16 & 0xff) == buf[crcPos + 1] && (crc16 >> 8) == buf[crcPos]
-                : (crc16 & 0xff) == buf[crcPos] && (crc16 >> 8) == buf[crcPos + 1];
+                ? crc16 == (((buf[crcPos] & 0xff) << 8) | (buf[crcPos + 1] & 0xff))
+                : crc16 == (((buf[crcPos + 1] & 0xff) << 8) | (buf[crcPos] & 0xff));
+//                ? (crc16 & 0xff) == buf[crcPos + 1] && (crc16 >> 8) == buf[crcPos]
+//                : (crc16 & 0xff) == buf[crcPos] && (crc16 >> 8) == buf[crcPos + 1];
     }
 }
