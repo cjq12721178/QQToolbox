@@ -212,14 +212,23 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public int findDynamicValuePosition(int possiblePosition, long timestamp) {
-        if (possiblePosition >= 0) {
+        return findValuePosition(true, possiblePosition, timestamp);
+    }
+
+    //若possiblePosition>=0，则在possiblePosition附近寻找时间戳等于timestamp的Value
+    //若possiblePosition<0，则在所有数据里面寻找
+    //没有找到返回负数
+    private int findValuePosition(boolean isRealTime, int possiblePosition, long timestamp) {
+        int size = isRealTime ? getDynamicValueSize() : getHistoryValueSize();
+        if (possiblePosition >= 0 && possiblePosition < size) {
             V value;
             for (int currentPosition = possiblePosition,
-                 lastPosition = possiblePosition,
-                 n = getDynamicValueSize();
-                 currentPosition < n && currentPosition >= 0;) {
-                value = getDynamicValue(currentPosition);
-                long valueTimestamp = value.getTimeStamp();
+                 lastPosition = currentPosition;
+                 currentPosition < size && currentPosition >= 0;) {
+                value = isRealTime
+                        ? getDynamicValue(currentPosition)
+                        : getHistoryValue(currentPosition);
+                long valueTimestamp = value.mTimeStamp;
                 if (valueTimestamp == timestamp) {
                     return currentPosition;
                 } else if (valueTimestamp > timestamp) {
@@ -235,7 +244,9 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 }
             }
         } else {
-            return findDynamicValuePosition(timestamp);
+            return isRealTime
+                    ? findDynamicValuePosition(timestamp)
+                    : findHistoryValuePosition(timestamp);
         }
         return -1;
     }
@@ -293,36 +304,8 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 : null;
     }
 
-    //若possiblePosition>=0，则在possiblePosition附近寻找时间戳等于timestamp的Value
-    //若possiblePosition<0，则在所有历史数据里面寻找
-    //没有找到返回负数
     public int findHistoryValuePosition(int possiblePosition, long timestamp) {
-        if (possiblePosition >= 0) {
-            V value;
-            for (int currentPosition = possiblePosition,
-                 lastPosition = possiblePosition,
-                 n = getHistoryValueSize();
-                 currentPosition < n && currentPosition >= 0;) {
-                value = getHistoryValue(currentPosition);
-                long valueTimestamp = value.getTimeStamp();
-                if (valueTimestamp == timestamp) {
-                    return currentPosition;
-                } else if (valueTimestamp > timestamp) {
-                    if (currentPosition > lastPosition) {
-                        break;
-                    }
-                    lastPosition = currentPosition--;
-                } else {
-                    if (currentPosition < lastPosition) {
-                        break;
-                    }
-                    lastPosition = currentPosition++;
-                }
-            }
-        } else {
-            return findHistoryValuePosition(timestamp);
-        }
-        return -1;
+        return findValuePosition(false, possiblePosition, timestamp);
     }
 
     private int findHistoryValuePosition(long timestamp) {
