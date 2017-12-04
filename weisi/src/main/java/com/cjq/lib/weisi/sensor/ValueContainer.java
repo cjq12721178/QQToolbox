@@ -205,7 +205,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public V findDynamicValue(int possiblePosition, long timestamp) {
-        int actualPosition = findHistoryValuePosition(possiblePosition, timestamp);
+        int actualPosition = findDynamicValuePosition(possiblePosition, timestamp);
         return actualPosition >= 0
                 ? getDynamicValue(actualPosition)
                 : null;
@@ -240,23 +240,30 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return -1;
     }
 
+    //返回的是数组中的物理位置
     private int findDynamicValuePosition(long timestamp) {
         if (mDynamicValues.size() == 0) {
             return -1;
         }
         synchronized (Value.VALUE_COMPARER) {
+            int position;
             Value.VALUE_COMPARER.mTimeStamp = timestamp;
-            return timestamp >= mDynamicValues.get(0).mTimeStamp
-                    ? indexedBinarySearch(mHistoryValues,
+            if (timestamp >= mDynamicValues.get(0).mTimeStamp) {
+                position = indexedBinarySearch(mHistoryValues,
                         0,
                         mDynamicValueHead - 1,
                         Value.VALUE_COMPARER,
-                        Value.VALUE_COMPARATOR)
-                    : indexedBinarySearch(mHistoryValues,
+                        Value.VALUE_COMPARATOR);
+                return position >= 0
+                        ? MAX_DYNAMIC_VALUE_SIZE - mDynamicValueHead + position
+                        : position;
+            } else {
+                return indexedBinarySearch(mHistoryValues,
                         mDynamicValueHead,
                         mDynamicValues.size() - 1,
                         Value.VALUE_COMPARER,
                         Value.VALUE_COMPARATOR);
+            }
         }
     }
 
