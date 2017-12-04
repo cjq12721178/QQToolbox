@@ -214,24 +214,24 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     public int findDynamicValuePosition(int possiblePosition, long timestamp) {
         if (possiblePosition >= 0) {
             V value;
-            for (int i = possiblePosition,
-                 j = possiblePosition,
+            for (int currentPosition = possiblePosition,
+                 lastPosition = possiblePosition,
                  n = getDynamicValueSize();
-                 i < n && i >= 0;) {
-                value = getDynamicValue(i);
+                 currentPosition < n && currentPosition >= 0;) {
+                value = getDynamicValue(currentPosition);
                 long valueTimestamp = value.getTimeStamp();
                 if (valueTimestamp == timestamp) {
-                    return i;
+                    return currentPosition;
                 } else if (valueTimestamp > timestamp) {
-                    if (i < j) {
+                    if (currentPosition > lastPosition) {
                         break;
                     }
-                    j = i--;
+                    lastPosition = currentPosition--;
                 } else {
-                    if (i > j) {
+                    if (currentPosition < lastPosition) {
                         break;
                     }
-                    j = i++;
+                    lastPosition = currentPosition++;
                 }
             }
         } else {
@@ -299,24 +299,24 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     public int findHistoryValuePosition(int possiblePosition, long timestamp) {
         if (possiblePosition >= 0) {
             V value;
-            for (int i = possiblePosition,
-                 j = possiblePosition,
+            for (int currentPosition = possiblePosition,
+                 lastPosition = possiblePosition,
                  n = getHistoryValueSize();
-                 i < n && i >= 0;) {
-                value = getHistoryValue(i);
+                 currentPosition < n && currentPosition >= 0;) {
+                value = getHistoryValue(currentPosition);
                 long valueTimestamp = value.getTimeStamp();
                 if (valueTimestamp == timestamp) {
-                    return i;
+                    return currentPosition;
                 } else if (valueTimestamp > timestamp) {
-                    if (i < j) {
+                    if (currentPosition > lastPosition) {
                         break;
                     }
-                    j = i--;
+                    lastPosition = currentPosition--;
                 } else {
-                    if (i > j) {
+                    if (currentPosition < lastPosition) {
                         break;
                     }
-                    j = i++;
+                    lastPosition = currentPosition++;
                 }
             }
         } else {
