@@ -204,6 +204,81 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         }
     }
 
+    public V findDynamicValue(int possiblePosition, long timestamp) {
+        int actualPosition = findHistoryValuePosition(possiblePosition, timestamp);
+        return actualPosition >= 0
+                ? getDynamicValue(actualPosition)
+                : null;
+    }
+
+    public int findDynamicValuePosition(int possiblePosition, long timestamp) {
+        if (possiblePosition >= 0) {
+            V value;
+            for (int i = possiblePosition,
+                 j = possiblePosition,
+                 n = getDynamicValueSize();
+                 i < n && i >= 0;) {
+                value = getDynamicValue(i);
+                long valueTimestamp = value.getTimeStamp();
+                if (valueTimestamp == timestamp) {
+                    return i;
+                } else if (valueTimestamp > timestamp) {
+                    if (i < j) {
+                        break;
+                    }
+                    j = i--;
+                } else {
+                    if (i > j) {
+                        break;
+                    }
+                    j = i++;
+                }
+            }
+        } else {
+            return findDynamicValuePosition(timestamp);
+        }
+        return -1;
+    }
+
+    private int findDynamicValuePosition(long timestamp) {
+        if (mDynamicValues.size() == 0) {
+            return -1;
+        }
+        synchronized (Value.VALUE_COMPARER) {
+            Value.VALUE_COMPARER.mTimeStamp = timestamp;
+            return timestamp >= mDynamicValues.get(0).mTimeStamp
+                    ? indexedBinarySearch(mHistoryValues,
+                        0,
+                        mDynamicValueHead - 1,
+                        Value.VALUE_COMPARER,
+                        Value.VALUE_COMPARATOR)
+                    : indexedBinarySearch(mHistoryValues,
+                        mDynamicValueHead,
+                        mDynamicValues.size() - 1,
+                        Value.VALUE_COMPARER,
+                        Value.VALUE_COMPARATOR);
+        }
+    }
+
+    private static <T> int indexedBinarySearch(List<? extends T> l, int start, int end, T key, Comparator<? super T> c) {
+        int low = start;
+        int high = end;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            T midVal = l.get(mid);
+            int cmp = c.compare(midVal, key);
+
+            if (cmp < 0)
+                low = mid + 1;
+            else if (cmp > 0)
+                high = mid - 1;
+            else
+                return mid; // key found
+        }
+        return -(low + 1);  // key not found
+    }
+
     public V findHistoryValue(int possiblePosition, long timestamp) {
         int actualPosition = findHistoryValuePosition(possiblePosition, timestamp);
         return actualPosition >= 0

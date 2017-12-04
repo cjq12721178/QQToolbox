@@ -239,7 +239,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         }
         //解析原始数据
         valueBuildDelegator.setValueBuilder(measurement.getDataType().getValueBuilder());
-        long timestamp = valueBuildDelegator.getTimestamp();
+        long timestamp = correctTimestamp(valueBuildDelegator.getTimestamp());
         float batteryVoltage = valueBuildDelegator.getBatteryVoltage();
         double rawValue = valueBuildDelegator.getRawValue();
         boolean canValueCaptured = measurement.mRealTimeValue.mTimeStamp < timestamp
@@ -260,6 +260,14 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
                     rawValue);
         }
         return result;
+    }
+
+    //对于接收到的动态数据，若其时间差在1秒以内，视其为相同时间戳
+    private long correctTimestamp(long currentDynamicValueTimestamp) {
+        long delta = currentDynamicValueTimestamp - mRealTimeValue.mTimeStamp;
+        return delta > 0 && delta < 1000
+                ? mRealTimeValue.mTimeStamp
+                : currentDynamicValueTimestamp;
     }
 
     private int setDynamicValueContent(int position, float batteryVoltage) {
