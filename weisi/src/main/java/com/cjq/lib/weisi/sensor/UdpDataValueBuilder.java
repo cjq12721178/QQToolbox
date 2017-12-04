@@ -39,7 +39,7 @@ public class UdpDataValueBuilder implements ValueBuilder {
                 && src[calendarPos + 2] == 0
                 && src[calendarPos + 3] == 0
                 && src[calendarPos + 4] == 0) {
-            return TIMESTAMP_BUILDER.getTimeInMillis();
+            return System.currentTimeMillis();
         } else {
             long lastTime, currTime;
             lastTime = TIMESTAMP_BUILDER.getTimeInMillis();
