@@ -253,12 +253,14 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
     //返回的是数组中的物理位置
     private int findDynamicValuePosition(long timestamp) {
-        if (mDynamicValues.size() == 0) {
-            return -1;
-        }
         synchronized (Value.VALUE_COMPARER) {
             int position;
             Value.VALUE_COMPARER.mTimeStamp = timestamp;
+            if (mDynamicValueHead == 0) {
+                return Collections.binarySearch(mDynamicValues,
+                        Value.VALUE_COMPARER,
+                        Value.VALUE_COMPARATOR);
+            }
             if (timestamp >= mDynamicValues.get(0).mTimeStamp) {
                 position = indexedBinarySearch(mHistoryValues,
                         0,
