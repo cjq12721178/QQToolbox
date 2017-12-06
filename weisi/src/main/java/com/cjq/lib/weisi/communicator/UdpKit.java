@@ -185,9 +185,13 @@ public class UdpKit {
         try {
             stopListen();
             mLaunched = false;
+            if (mOnSendThreadExecutor != null) {
+                mOnSendThreadExecutor = null;
+            }
             if (mSocket != null) {
                 mSocket.close();
             }
+            setErrorOccurredListener(null);
         } catch (Exception e) {
             onErrorProcess(e);
         }
@@ -195,5 +199,9 @@ public class UdpKit {
 
     public void stopListen() {
         mListening = false;
+        if (mOnReceiveThreadExecutor != null) {
+            mOnReceiveThreadExecutor.mOnDataReceivedListener = null;
+            mOnReceiveThreadExecutor = null;
+        }
     }
 }

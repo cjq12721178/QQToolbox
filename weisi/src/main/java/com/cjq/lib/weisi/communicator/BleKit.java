@@ -106,6 +106,7 @@ public class BleKit {
                     mHandler.removeCallbacks(mOnStartScan);
                 }
             }
+            mLeScanCallback = null;
         }
     }
 
