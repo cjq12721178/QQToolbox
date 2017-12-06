@@ -129,7 +129,7 @@ public class UdpKit {
         }
     }
 
-    private void sendData(InetAddress ip, int port, byte[] data) throws IOException {
+    public void sendData(InetAddress ip, int port, byte[] data) throws IOException {
         mSendPacket.setData(data);
         mSendPacket.setAddress(ip);
         mSendPacket.setPort(port);
