@@ -155,3 +155,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171128-0.12.3(46):
 1. 修复修复16进制字符串数据转byte数组的方法的问题
+
+20171206-0.13.0(47):
+1. 新增preferenceUI组件，目前有IPPreference和PortPreference两种
