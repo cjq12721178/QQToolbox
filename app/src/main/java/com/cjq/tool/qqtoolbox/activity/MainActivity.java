@@ -36,6 +36,7 @@ import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
+import com.cjq.tool.qqtoolbox.util.CrashHandler;
 import com.cjq.tool.qqtoolbox.util.DebugTag;
 
 import java.io.IOException;
@@ -65,7 +66,9 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        ExceptionLog.initialize(this, "QQToolBox");
         ClosableLog.setEnablePrint(true);
+        Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(this));
         mSizeSelfAdaptionTextView = (SizeSelfAdaptionTextView) findViewById(R.id.tv_fix_size);
         mEtSetText = (EditText) findViewById(R.id.et_set_text);
         //findViewById(R.id.tv_text_view_on_click).setOnClickListener(this);
@@ -300,6 +303,9 @@ public class MainActivity
             case R.id.btn_clear:
                 mTvEmission.setText(null);
                 mTvReception.setText(null);
+                break;
+            case R.id.btn_open_settings_activity:
+                startActivity(new Intent(this, SettingsActivity.class));
                 break;
         }
     }

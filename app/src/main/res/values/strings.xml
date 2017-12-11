@@ -3,6 +3,11 @@
     <string name="hao">好的</string>
     <string name="custom_cancel">怎么可能</string>
     <string name="baud_rate">Baud rate</string>
+    <string name="preference_key_save_value_type">save_value_type</string>
+    <string name="preference_key_save_value_type_enable">enable</string>
+    <string name="preference_title_save_value_type">是否保存</string>
+    <string name="preference_title_input_number">只输入数字</string>
+    <string name="preference_key_switch">switch_enable</string>
     <string-array name="baud_rates">
         <item>50</item>
         <item>75</item>

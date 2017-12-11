@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory>
+        <CheckBoxPreference
+            android:key="@string/preference_key_save_value_type_enable"
+            android:title="@string/preference_title_save_value_type"
+            android:summary="是"
+            android:checked="true"/>
+        <SwitchPreferenceCompat
+            android:key="@string/preference_key_switch"
+            android:title="switch title"
+            android:checked="true"/>
+        <EditTextPreference
+            android:key="@string/preference_key_save_value_type"
+            android:title="@string/preference_title_input_number"
+            android:inputType="number"/>
+    </PreferenceCategory>
+    <PreferenceCategory>
+        <Preference
+            android:title="another category"/>
+    </PreferenceCategory>
+</PreferenceScreen>

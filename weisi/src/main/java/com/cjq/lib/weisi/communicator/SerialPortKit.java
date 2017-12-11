@@ -34,8 +34,8 @@ public class SerialPortKit {
         System.loadLibrary("serial_port");
     }
 
-    public boolean launch(String deviceName, int baudRate, int flags) {
-        return launch(new File("/dev/" + deviceName), baudRate, flags);
+    public boolean launch(String devicePath, int baudRate, int flags) {
+        return launch(new File(devicePath), baudRate, flags);
     }
 
     public boolean launch(File device, int baudRate, int flags) {

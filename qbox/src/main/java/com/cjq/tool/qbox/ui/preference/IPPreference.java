@@ -1,6 +1,7 @@
 package com.cjq.tool.qbox.ui.preference;
 
 import android.content.Context;
+
 import android.preference.EditTextPreference;
 import android.text.InputFilter;
 import android.text.Spanned;

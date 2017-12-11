@@ -158,3 +158,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171206-0.13.0(47):
 1. 新增preferenceUI组件，目前有IPPreference和PortPreference两种
+
+20171211-0.14.0(48):
+1. 新增SerialPortFinder用以罗列可用串口设备和名称
