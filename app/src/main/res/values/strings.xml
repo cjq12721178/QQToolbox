@@ -8,6 +8,9 @@
     <string name="preference_title_save_value_type">是否保存</string>
     <string name="preference_title_input_number">只输入数字</string>
     <string name="preference_key_switch">switch_enable</string>
+    <string name="preference_key_serial_port_baud_rate">serial_port_baud_rate</string>
+    <string name="preference_title_serial_port_baud_rate">波特率</string>
+
     <string-array name="baud_rates">
         <item>50</item>
         <item>75</item>

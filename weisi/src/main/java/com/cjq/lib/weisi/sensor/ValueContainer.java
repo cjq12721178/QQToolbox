@@ -1,6 +1,7 @@
 package com.cjq.lib.weisi.sensor;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -85,7 +86,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
     public V getDynamicValue(int index) {
         int pos = mDynamicValueHead + index - MAX_DYNAMIC_VALUE_SIZE;
-        return pos > 0
+        return pos >= 0
                 ? mDynamicValues.get(pos)
                 : mDynamicValues.get(mDynamicValueHead + index);
     }
@@ -144,20 +145,24 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
             for (int i = mDynamicValueHead - 1; i >= 0; --i) {
                 v = mDynamicValues.get(i);
                 if (timestamp > v.mTimeStamp) {
-                    v = mDynamicValues.get(mDynamicValueHead);
-                    if (i < mDynamicValueHead - 1) {
-                        System.arraycopy(mDynamicValues,
-                                i + 1,
-                                mDynamicValues,
-                                i + 2,
-                                mDynamicValueHead - 1 - (i + 1) + 1);
-                        mDynamicValues.set(i + 1, v);
+                    if (i == mDynamicValueHead - 1) {
+                        v = mDynamicValues.get(mDynamicValueHead);
+                    } else {
+                        v = mDynamicValues.remove(mDynamicValueHead);
+                        mDynamicValues.add(i + 1, v);
                     }
+//                    v = mDynamicValues.get(mDynamicValueHead);
+//                    if (i < mDynamicValueHead - 1) {
+//                        System.arraycopy(mDynamicValues,
+//                                i + 1,
+//                                mDynamicValues,
+//                                i + 2,
+//                                mDynamicValueHead - 1 - (i + 1) + 1);
+//                        mDynamicValues.set(i + 1, v);
+//                    }
                     v.mTimeStamp = timestamp;
                     int position = MAX_DYNAMIC_VALUE_SIZE - (mDynamicValueHead - i);
-                    if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
-                        mDynamicValueHead = 0;
-                    }
+                    increaseDynamicValueHead();
                     return position;
                 } else if (timestamp == v.mTimeStamp) {
                     return -(MAX_DYNAMIC_VALUE_SIZE - 1
@@ -167,23 +172,34 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
             for (int i = MAX_DYNAMIC_VALUE_SIZE - 1; i >= mDynamicValueHead; --i) {
                 v = mDynamicValues.get(i);
                 if (timestamp > v.mTimeStamp) {
-                    v = mDynamicValues.get(mDynamicValueHead);
-                    System.arraycopy(mDynamicValues,
-                            mDynamicValueHead + 1,
-                            mDynamicValues,
-                            mDynamicValueHead,
-                            i - mDynamicValueHead);
-                    mDynamicValues.set(i + 1, v);
                     int position = i - mDynamicValueHead;
-                    if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
-                        mDynamicValueHead = 0;
+                    if (i == MAX_DYNAMIC_VALUE_SIZE - 1) {
+                        v = mDynamicValues.get(mDynamicValueHead);
+                        increaseDynamicValueHead();
+                    } else {
+                        v = mDynamicValues.remove(mDynamicValueHead);
+                        mDynamicValues.add(i, v);
                     }
+                    v.mTimeStamp = timestamp;
+//                    v = mDynamicValues.get(mDynamicValueHead);
+//                    System.arraycopy(mDynamicValues,
+//                            mDynamicValueHead + 1,
+//                            mDynamicValues,
+//                            mDynamicValueHead,
+//                            i - mDynamicValueHead);
+//                    mDynamicValues.set(i + 1, v);
                     return position;
                 } else if (timestamp == v.mTimeStamp) {
                     return -(i - mDynamicValueHead) - 1;
                 }
             }
             return MAX_DYNAMIC_VALUE_SIZE;
+        }
+    }
+
+    private void increaseDynamicValueHead() {
+        if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
+            mDynamicValueHead = 0;
         }
     }
 
@@ -341,6 +357,10 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
         public long getTimeStamp() {
             return mTimeStamp;
+        }
+
+        protected void setTimeStamp(long timeStamp) {
+            mTimeStamp = timeStamp;
         }
     }
 }

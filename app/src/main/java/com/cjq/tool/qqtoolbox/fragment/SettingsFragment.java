@@ -5,9 +5,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.support.annotation.StringRes;
+import android.support.v7.preference.DialogPreference;
 import android.support.v7.preference.EditTextPreference;
+import android.support.v7.preference.ListPreference;
 import android.support.v7.preference.Preference;
 import android.support.v7.preference.PreferenceFragmentCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.cjq.tool.qqtoolbox.R;
@@ -52,6 +55,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         preference.setOnPreferenceChangeListener(this);
         //preference.setPersistent(false);
         onPreferenceChange(preference, getBaseStationPort());
+        ListPreference listPreference = (ListPreference) findPreference(getString(R.string.preference_key_serial_port_baud_rate));
+        listPreference.setOnPreferenceChangeListener(this);
+        onPreferenceChange(listPreference, "115200");
     }
 
     @Override
@@ -76,6 +82,21 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
 //            return false;
 //        }
         preference.setSummary(newValue.toString());
+        if (preference instanceof EditTextPreference) {
+            EditTextPreference editTextPreference = (EditTextPreference) preference;
+            if (TextUtils.isEmpty(editTextPreference.getText())) {
+                editTextPreference.setPersistent(false);
+                editTextPreference.setText(newValue.toString());
+                editTextPreference.setPersistent(true);
+            }
+        } else if (preference instanceof ListPreference) {
+            ListPreference listPreference = (ListPreference) preference;
+            if (TextUtils.isEmpty(listPreference.getValue())) {
+                listPreference.setPersistent(false);
+                listPreference.setValue(newValue.toString());
+                listPreference.setPersistent(true);
+            }
+        }
         return true;
     }
 }
