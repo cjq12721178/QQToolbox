@@ -156,6 +156,15 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 : null;
     }
 
+    public boolean hasHistoryValue() {
+        for (int i = 0, poolSize = mHistoryValues.size();i < poolSize;++i) {
+            if (mHistoryValues.get(i).mValues.size() > 0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public int getHistoryValueSize() {
         return getHistoryValueSize(mHistoryValues.size());
     }
@@ -611,7 +620,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
             }
         };
 
-        private long mIntradayStartTime;
+        private final long mIntradayStartTime;
         private List<V> mValues;
 
         public DailyHistoryValuePool(long dateTime) {

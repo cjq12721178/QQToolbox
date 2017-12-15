@@ -57,7 +57,7 @@ public class SensorManager {
         int count = 0;
         for (Sensor sensor :
                 SENSOR_MAP.values()) {
-            if (sensor.getHistoryValueSize() > 0) {
+            if (sensor.hasHistoryValue()) {
                 ++count;
             }
         }
