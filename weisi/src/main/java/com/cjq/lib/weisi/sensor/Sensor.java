@@ -1,5 +1,8 @@
 package com.cjq.lib.weisi.sensor;
 
+import com.cjq.tool.qbox.util.ExpandCollections;
+import com.cjq.tool.qbox.util.ExpandComparator;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -77,28 +80,30 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
             return;
         }
         mDecorator = decorator;
-        if (decorator == null) {
-            for (Measurement measurement :
-                    mMeasurementKinds) {
-                measurement.setDecorator(null);
-            }
-        } else {
-            Iterator<Measurement> measurementIterator = mMeasurementKinds.iterator();
-            Measurement measurement = measurementIterator.next();
-            MeasurementDecorator[] measurementDecorators = decorator.getMeasurementDecorators();
-            for (int measurementDecoratorIndex = 0;
-                 measurementDecoratorIndex < measurementDecorators.length
-                    && measurement != null;) {
-                if (measurement.getDataType().mValue
-                        == measurementDecorators[measurementDecoratorIndex].getDataTypeValue()) {
-                    measurement.setDecorator(measurementDecorators[measurementDecoratorIndex]);
-                    measurement = measurement.getNextSameDataTypeMeasurement();
-                    if (measurement == null) {
+        synchronized (mMeasurementKinds) {
+            if (decorator == null) {
+                for (Measurement measurement :
+                        mMeasurementKinds) {
+                    measurement.setDecorator(null);
+                }
+            } else {
+                Iterator<Measurement> measurementIterator = mMeasurementKinds.iterator();
+                Measurement measurement = measurementIterator.next();
+                MeasurementDecorator[] measurementDecorators = decorator.getMeasurementDecorators();
+                for (int measurementDecoratorIndex = 0;
+                     measurementDecoratorIndex < measurementDecorators.length
+                             && measurement != null;) {
+                    if (measurement.getDataType().mValue
+                            == measurementDecorators[measurementDecoratorIndex].getDataTypeValue()) {
+                        measurement.setDecorator(measurementDecorators[measurementDecoratorIndex]);
+                        measurement = measurement.getNextSameDataTypeMeasurement();
+                        if (measurement == null) {
+                            measurement = measurementIterator.next();
+                        }
+                        ++measurementDecoratorIndex;
+                    } else {
                         measurement = measurementIterator.next();
                     }
-                    ++measurementDecoratorIndex;
-                } else {
-                    measurement = measurementIterator.next();
                 }
             }
         }
@@ -116,14 +121,16 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
                 ConfigurationManager.getDataType(mRawAddress, dataTypeValue, true),
                 decorator,
                 MAX_DYNAMIC_VALUE_SIZE);
-        if (position >= 0) {
-            mMeasurementKinds.get(position)
-                    .getLastSameDataTypeMeasurement()
-                    .setSameDataTypeMeasurement(newMeasurement);
-        } else {
-            mMeasurementKinds.add(-position - 1, newMeasurement);
+        synchronized (mMeasurementKinds) {
+            if (position >= 0) {
+                mMeasurementKinds.get(position)
+                        .getLastSameDataTypeMeasurement()
+                        .setSameDataTypeMeasurement(newMeasurement);
+            } else {
+                mMeasurementKinds.add(-position - 1, newMeasurement);
+            }
+            generateMeasurementCollections();
         }
-        generateMeasurementCollections();
         return newMeasurement;
     }
 
@@ -166,34 +173,46 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     private Measurement getMeasurementByPositionImpl(int position, int index) {
-        Measurement result = mMeasurementKinds.get(position);
-        for (int i = 0;
-             i < index && (result = result.getNextSameDataTypeMeasurement()) != null;
-             ++i);
-        return result;
+        synchronized (mMeasurementKinds) {
+            Measurement result = mMeasurementKinds.get(position);
+            for (int i = 0;
+                 i < index && (result = result.getNextSameDataTypeMeasurement()) != null;
+                 ++i);
+            return result;
+        }
     }
 
     public int getMeasurementPosition(byte dataTypeValue) {
-        int position, size = mMeasurementKinds.size();
-        if (size > MEASUREMENT_SEARCH_THRESHOLD) {
-            synchronized (MEASUREMENT_GET_COMPARER) {
-                MEASUREMENT_GET_COMPARER.setDataTypeValue(dataTypeValue);
-                position = Collections.binarySearch(mMeasurementKinds,
-                        MEASUREMENT_GET_COMPARER,
-                        MEASUREMENT_GET_COMPARATOR);
-            }
-            return position;
-        } else {
-            byte currentValue;
-            for (position = 0;position < size;++position) {
-                currentValue = mMeasurementKinds.get(position).getDataType().getValue();
-                if (currentValue == dataTypeValue) {
-                    return position;
-                } else if (dataTypeValue < currentValue) {
-                    return -(position + 1);
+        synchronized (mMeasurementKinds) {
+            int position, size = mMeasurementKinds.size();
+            if (size > MEASUREMENT_SEARCH_THRESHOLD) {
+                return ExpandCollections.binarySearch(mMeasurementKinds,
+                        dataTypeValue,
+                        MEASUREMENT_SEARCH_HELPER);
+//            synchronized (mMeasurementKinds) {
+//                return ExpandCollections.binarySearch(mMeasurementKinds,
+//                        dataTypeValue,
+//                        MEASUREMENT_SEARCH_HELPER);
+//            }
+//            synchronized (MEASUREMENT_GET_COMPARER) {
+//                MEASUREMENT_GET_COMPARER.setDataTypeValue(dataTypeValue);
+//                position = Collections.binarySearch(mMeasurementKinds,
+//                        MEASUREMENT_GET_COMPARER,
+//                        MEASUREMENT_GET_COMPARATOR);
+//            }
+//            return position;
+            } else {
+                byte currentValue;
+                for (position = 0;position < size;++position) {
+                    currentValue = mMeasurementKinds.get(position).getDataType().getValue();
+                    if (currentValue == dataTypeValue) {
+                        return position;
+                    } else if (dataTypeValue < currentValue) {
+                        return -(position + 1);
+                    }
                 }
+                return -(position + 1);
             }
-            return -(position + 1);
         }
     }
 
@@ -341,6 +360,23 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         mNetInTimestamp = netInTimestamp;
     }
 
+    @Override
+    public void setIntraday(long dateTime) {
+        setIntraday(dateTime, true);
+    }
+
+    public void setIntraday(long dateTime, boolean withMeasurements) {
+        super.setIntraday(dateTime);
+        if (withMeasurements) {
+            List<Measurement> measurements = getMeasurementCollections();
+            synchronized (measurements) {
+                for (int i = 0, n = measurements.size();i < n;++i) {
+                    measurements.get(i).setIntraday(dateTime);
+                }
+            }
+        }
+    }
+
     public State getState() {
         if (mRealTimeValue.mTimestamp == 0) {
             return State.NEVER_CONNECTED;
@@ -356,15 +392,22 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         OFF_LINE
     }
 
-    private static final Comparator<DataTypeValueGetter> MEASUREMENT_GET_COMPARATOR = new Comparator<DataTypeValueGetter>() {
-
+    private static final ExpandComparator<Measurement, Byte> MEASUREMENT_SEARCH_HELPER = new ExpandComparator<Measurement, Byte>() {
         @Override
-        public int compare(DataTypeValueGetter o1, DataTypeValueGetter o2) {
-            return o1.getDataTypeValue() - o2.getDataTypeValue();
+        public int compare(Measurement measurement, Byte targetDataTypeValue) {
+            return measurement.getDataType().mValue - targetDataTypeValue;
         }
     };
 
-    private static final ModifiableDataType MEASUREMENT_GET_COMPARER = new ModifiableDataType();
+//    private static final Comparator<DataTypeValueGetter> MEASUREMENT_GET_COMPARATOR = new Comparator<DataTypeValueGetter>() {
+//
+//        @Override
+//        public int compare(DataTypeValueGetter o1, DataTypeValueGetter o2) {
+//            return o1.getDataTypeValue() - o2.getDataTypeValue();
+//        }
+//    };
+
+    //private static final ModifiableDataType MEASUREMENT_GET_COMPARER = new ModifiableDataType();
 
     public interface OnDynamicValueCaptureListener {
         void onDynamicValueCapture(int address,
@@ -383,19 +426,19 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 //                                       double rawValue);
     }
 
-    private static class ModifiableDataType implements DataTypeValueGetter {
-
-        private byte mModifiableValue;
-
-        public void setDataTypeValue(byte value) {
-            mModifiableValue = value;
-        }
-
-        @Override
-        public byte getDataTypeValue() {
-            return mModifiableValue;
-        }
-    }
+//    private static class ModifiableDataType implements DataTypeValueGetter {
+//
+//        private byte mModifiableValue;
+//
+//        public void setDataTypeValue(byte value) {
+//            mModifiableValue = value;
+//        }
+//
+//        @Override
+//        public byte getDataTypeValue() {
+//            return mModifiableValue;
+//        }
+//    }
 
     public static class Value extends ValueContainer.Value {
 

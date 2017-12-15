@@ -2,6 +2,9 @@ package com.cjq.lib.weisi.sensor;
 
 import android.content.Context;
 
+import com.cjq.tool.qbox.util.ExpandCollections;
+import com.cjq.tool.qbox.util.ExpandComparator;
+
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -61,13 +64,17 @@ public class ConfigurationManager {
         List<Configuration> configurations = getConfigurations(address);
         if (configurations == null)
             return null;
-        synchronized (CONFIGURATION_SEARCHER) {
-            CONFIGURATION_SEARCHER.mStartAddress = address;
-            int index = Collections.binarySearch(configurations,
-                    CONFIGURATION_SEARCHER,
-                    CONFIGURATION_SEARCH_COMPARATOR);
-            return index >= 0 ? configurations.get(index) : null;
-        }
+        int position = ExpandCollections.binarySearch(configurations,
+                address,
+                CONFIGURATION_SEARCH_COMPARATOR);
+        return position >= 0 ? configurations.get(position) : null;
+//        synchronized (CONFIGURATION_SEARCHER) {
+//            CONFIGURATION_SEARCHER.mStartAddress = address;
+//            int index = Collections.binarySearch(configurations,
+//                    CONFIGURATION_SEARCHER,
+//                    CONFIGURATION_SEARCH_COMPARATOR);
+//            return index >= 0 ? configurations.get(index) : null;
+//        }
     }
 
     public static boolean isBleSensor(int address) {
@@ -91,14 +98,27 @@ public class ConfigurationManager {
         return dataType;
     }
 
-    private static final Configuration CONFIGURATION_SEARCHER = new Configuration();
-    private static final Comparator<Configuration> CONFIGURATION_SEARCH_COMPARATOR = new Comparator<Configuration>() {
+//    private static final Configuration CONFIGURATION_SEARCHER = new Configuration();
+//    private static final Comparator<Configuration> CONFIGURATION_SEARCH_COMPARATOR = new Comparator<Configuration>() {
+//        @Override
+//        public int compare(Configuration c1, Configuration c2) {
+//            if (c1.mEndAddress < c2.mStartAddress) {
+//                return -1;
+//            }
+//            if (c1.mStartAddress > c2.mStartAddress) {
+//                return 1;
+//            }
+//            return 0;
+//        }
+//    };
+
+    private static final ExpandComparator<Configuration, Integer> CONFIGURATION_SEARCH_COMPARATOR = new ExpandComparator<Configuration, Integer>() {
         @Override
-        public int compare(Configuration c1, Configuration c2) {
-            if (c1.mEndAddress < c2.mStartAddress) {
+        public int compare(Configuration configuration, Integer targetAddress) {
+            if (configuration.mEndAddress < targetAddress) {
                 return -1;
             }
-            if (c1.mStartAddress > c2.mStartAddress) {
+            if (configuration.mStartAddress > targetAddress) {
                 return 1;
             }
             return 0;

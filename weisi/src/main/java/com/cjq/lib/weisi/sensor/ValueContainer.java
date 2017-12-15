@@ -5,8 +5,6 @@ import com.cjq.tool.qbox.util.ExpandComparator;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -61,7 +59,9 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public void setIntraday(long dateTime) {
-        mCurrentDailyHistoryValuePool = getDailyHistoryValuePool(dateTime);
+        if (mCurrentDailyHistoryValuePool == null || !mCurrentDailyHistoryValuePool.contains(dateTime)) {
+            mCurrentDailyHistoryValuePool = getDailyHistoryValuePool(dateTime);
+        }
     }
 
     public long getIntraday() {
@@ -89,43 +89,43 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return mRealTimeValue;
     }
 
-    public V getEarliestValue() {
+    public V getEarliestHistoryValue() {
         return mHistoryValues.size() > 0
-                ? getSomedayEarliestValue(mHistoryValues.get(0))
+                ? getSomedayEarliestHistoryValue(mHistoryValues.get(0))
                 : null;
     }
 
-    public V getIntradayEarliestValue() {
-        return getSomedayEarliestValue(mCurrentDailyHistoryValuePool);
+    public V getIntradayEarliestHistoryValue() {
+        return getSomedayEarliestHistoryValue(mCurrentDailyHistoryValuePool);
     }
 
-    public V getSomedayEarliestValue(long somedayMills) {
-        return getSomedayEarliestValue(findDailyHistoryValuePool(somedayMills));
+    public V getSomedayEarliestHistoryValue(long somedayMills) {
+        return getSomedayEarliestHistoryValue(findDailyHistoryValuePool(somedayMills));
     }
 
-    private V getSomedayEarliestValue(DailyHistoryValuePool<V> pool) {
+    private V getSomedayEarliestHistoryValue(DailyHistoryValuePool<V> pool) {
         return pool != null
                 ? pool.getEarliestValue()
                 : null;
     }
 
-    public V getLatestValue() {
+    public V getLatestHistoryValue() {
         int size = mHistoryValues.size();
         if (size == 0) {
             return null;
         }
-        return getSomedayLatestValue(mHistoryValues.get(size - 1));
+        return getSomedayLatestHistoryValue(mHistoryValues.get(size - 1));
     }
 
-    public V getIntradayLatestValue() {
-        return getSomedayLatestValue(mCurrentDailyHistoryValuePool);
+    public V getIntradayLatestHistoryValue() {
+        return getSomedayLatestHistoryValue(mCurrentDailyHistoryValuePool);
     }
 
-    public V getSomedayLatestValue(long somedayMills) {
-        return getSomedayLatestValue(findDailyHistoryValuePool(somedayMills));
+    public V getSomedayLatestHistoryValue(long somedayMills) {
+        return getSomedayLatestHistoryValue(findDailyHistoryValuePool(somedayMills));
     }
 
-    private V getSomedayLatestValue(DailyHistoryValuePool<V> pool) {
+    private V getSomedayLatestHistoryValue(DailyHistoryValuePool<V> pool) {
         return pool != null
                 ? pool.getLatestValue()
                 : null;
@@ -157,7 +157,16 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public int getHistoryValueSize() {
-        return mHistoryValues.size();
+        return getHistoryValueSize(mHistoryValues.size());
+    }
+
+    //统计positionBefore之前的历史数据数量
+    public int getHistoryValueSize(int positionBefore) {
+        int size = 0;
+        for (int i = 0;i < positionBefore;++i) {
+            size += mHistoryValues.get(i).mValues.size();
+        }
+        return size;
     }
 
     public int getIntradayHistoryValueSize() {
@@ -233,33 +242,34 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return pool;
     }
 
-    protected synchronized int addDynamicValue(long timestamp) {
-        V v;
-        int size = mDynamicValues.size();
-        if (size < MAX_DYNAMIC_VALUE_SIZE) {
-            for (int i = size - 1;i >= 0;--i) {
-                v = mDynamicValues.get(i);
-                if (timestamp > v.mTimestamp) {
-                    v = onCreateValue(timestamp);
-                    mDynamicValues.add(i + 1, v);
-                    return i + 1;
-                } else if (timestamp == v.mTimestamp) {
-                    return -i - 1;
-                }
-            }
-            v = onCreateValue(timestamp);
-            mDynamicValues.add(0, v);
-            return 0;
-        } else {
-            for (int i = mDynamicValueHead - 1; i >= 0; --i) {
-                v = mDynamicValues.get(i);
-                if (timestamp > v.mTimestamp) {
-                    if (i == mDynamicValueHead - 1) {
-                        v = mDynamicValues.get(mDynamicValueHead);
-                    } else {
-                        v = mDynamicValues.remove(mDynamicValueHead);
+    protected int addDynamicValue(long timestamp) {
+        synchronized (mDynamicValues) {
+            V v;
+            int size = mDynamicValues.size();
+            if (size < MAX_DYNAMIC_VALUE_SIZE) {
+                for (int i = size - 1;i >= 0;--i) {
+                    v = mDynamicValues.get(i);
+                    if (timestamp > v.mTimestamp) {
+                        v = onCreateValue(timestamp);
                         mDynamicValues.add(i + 1, v);
+                        return i + 1;
+                    } else if (timestamp == v.mTimestamp) {
+                        return -i - 1;
                     }
+                }
+                v = onCreateValue(timestamp);
+                mDynamicValues.add(0, v);
+                return 0;
+            } else {
+                for (int i = mDynamicValueHead - 1; i >= 0; --i) {
+                    v = mDynamicValues.get(i);
+                    if (timestamp > v.mTimestamp) {
+                        if (i == mDynamicValueHead - 1) {
+                            v = mDynamicValues.get(mDynamicValueHead);
+                        } else {
+                            v = mDynamicValues.remove(mDynamicValueHead);
+                            mDynamicValues.add(i + 1, v);
+                        }
 //                    v = mDynamicValues.get(mDynamicValueHead);
 //                    if (i < mDynamicValueHead - 1) {
 //                        System.arraycopy(mDynamicValues,
@@ -269,27 +279,27 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 //                                mDynamicValueHead - 1 - (i + 1) + 1);
 //                        mDynamicValues.set(i + 1, v);
 //                    }
-                    v.mTimestamp = timestamp;
-                    int position = MAX_DYNAMIC_VALUE_SIZE - (mDynamicValueHead - i);
-                    increaseDynamicValueHead();
-                    return position;
-                } else if (timestamp == v.mTimestamp) {
-                    return -(MAX_DYNAMIC_VALUE_SIZE - 1
-                            - (mDynamicValueHead - 1 - i)) - 1;
-                }
-            }
-            for (int i = MAX_DYNAMIC_VALUE_SIZE - 1; i >= mDynamicValueHead; --i) {
-                v = mDynamicValues.get(i);
-                if (timestamp > v.mTimestamp) {
-                    int position = i - mDynamicValueHead;
-                    if (i == MAX_DYNAMIC_VALUE_SIZE - 1) {
-                        v = mDynamicValues.get(mDynamicValueHead);
+                        v.mTimestamp = timestamp;
+                        int position = MAX_DYNAMIC_VALUE_SIZE - (mDynamicValueHead - i);
                         increaseDynamicValueHead();
-                    } else {
-                        v = mDynamicValues.remove(mDynamicValueHead);
-                        mDynamicValues.add(i, v);
+                        return position;
+                    } else if (timestamp == v.mTimestamp) {
+                        return -(MAX_DYNAMIC_VALUE_SIZE - 1
+                                - (mDynamicValueHead - 1 - i)) - 1;
                     }
-                    v.mTimestamp = timestamp;
+                }
+                for (int i = MAX_DYNAMIC_VALUE_SIZE - 1; i >= mDynamicValueHead; --i) {
+                    v = mDynamicValues.get(i);
+                    if (timestamp > v.mTimestamp) {
+                        int position = i - mDynamicValueHead;
+                        if (i == MAX_DYNAMIC_VALUE_SIZE - 1) {
+                            v = mDynamicValues.get(mDynamicValueHead);
+                            increaseDynamicValueHead();
+                        } else {
+                            v = mDynamicValues.remove(mDynamicValueHead);
+                            mDynamicValues.add(i, v);
+                        }
+                        v.mTimestamp = timestamp;
 //                    v = mDynamicValues.get(mDynamicValueHead);
 //                    System.arraycopy(mDynamicValues,
 //                            mDynamicValueHead + 1,
@@ -297,12 +307,13 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 //                            mDynamicValueHead,
 //                            i - mDynamicValueHead);
 //                    mDynamicValues.set(i + 1, v);
-                    return position;
-                } else if (timestamp == v.mTimestamp) {
-                    return -(i - mDynamicValueHead) - 1;
+                        return position;
+                    } else if (timestamp == v.mTimestamp) {
+                        return -(i - mDynamicValueHead) - 1;
+                    }
                 }
+                return MAX_DYNAMIC_VALUE_SIZE;
             }
-            return MAX_DYNAMIC_VALUE_SIZE;
         }
     }
 
@@ -490,7 +501,26 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 : null;
     }
 
+    //返回在所有历史数据中的位置
     public int findHistoryValuePosition(int possiblePosition, long timestamp) {
+        int poolPosition = findDailyHistoryValuePoolPosition(timestamp);
+        return poolPosition >= 0
+                ? getHistoryValueSize(poolPosition)
+                + mHistoryValues.get(poolPosition).findValuePosition(possiblePosition, timestamp)
+                : -1;
+    }
+
+    public V findIntradayHistoryValue(int possiblePosition, long timestamp) {
+        return mCurrentDailyHistoryValuePool.findValue(possiblePosition, timestamp);
+    }
+
+    //返回在当日历史数据中的位置
+    public int findIntradayHistoryValuePosition(int possiblePosition, long timestamp) {
+        return mCurrentDailyHistoryValuePool.findValuePosition(possiblePosition, timestamp);
+    }
+
+    //返回在当日历史数据中的位置
+    public int findSomedayHistoryValuePosition(int possiblePosition, long timestamp) {
         int position = findDailyHistoryValuePoolPosition(timestamp);
         return position >= 0
                 ? mHistoryValues.get(position).findValuePosition(possiblePosition, timestamp)
@@ -517,7 +547,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 //        }
 //    }
 
-    public static class Value implements TimeComparable {
+    public static class Value {
 
         private static final Value VALUE_COMPARER = new Value(0);
         private static final ExpandComparator<Value, Long> SEARCH_HELPER = new ExpandComparator<Value, Long>() {
@@ -547,7 +577,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
             mTimestamp = timestamp;
         }
 
-        @Override
         public long getTimestamp() {
             return mTimestamp;
         }
@@ -563,14 +592,22 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         private static final ExpandComparator<DailyHistoryValuePool, Long> CLASSIFIER = new ExpandComparator<DailyHistoryValuePool, Long>() {
             @Override
             public int compare(DailyHistoryValuePool dailyHistoryValuePool, Long date) {
-                long delta = date - dailyHistoryValuePool.mIntradayStartTime;
-                if (delta < 0) {
-                    return -1;
-                } else if (delta - ONE_DAY_MILLISECONDS < 0) {
+                long delta = dailyHistoryValuePool.mIntradayStartTime - date;
+                if (delta > 0) {
+                    return 1;
+                } else if (delta + ONE_DAY_MILLISECONDS > 0) {
                     return 0;
                 } else {
-                    return 1;
+                    return -1;
                 }
+//                long delta = date - dailyHistoryValuePool.mIntradayStartTime;
+//                if (delta < 0) {
+//                    return -1;
+//                } else if (delta - ONE_DAY_MILLISECONDS < 0) {
+//                    return 0;
+//                } else {
+//                    return 1;
+//                }
             }
         };
 
@@ -608,29 +645,31 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         //若有新的数据添加，返回position
         //若只是原有数据的更新，返回-position-1
         //注意和Collections.binarySearch()返回值相反
-        protected synchronized int addValue(ValueContainer<V> container, long timestamp) {
-            V v;
-            int size = mValues.size();
-            if (size > 0) {
-                v = mValues.get(size - 1);
-                if (timestamp > v.getTimestamp()) {
+        protected int addValue(ValueContainer<V> container, long timestamp) {
+            synchronized (mValues) {
+                V v;
+                int size = mValues.size();
+                if (size > 0) {
+                    v = mValues.get(size - 1);
+                    if (timestamp > v.getTimestamp()) {
+                        v = container.onCreateValue(timestamp);
+                        mValues.add(v);
+                        return size;
+                    } else if (timestamp < v.getTimestamp()) {
+                        int position = findValuePosition(timestamp);
+                        if (position < 0) {
+                            v = container.onCreateValue(timestamp);
+                            mValues.add(-position - 1, v);
+                        }
+                        return -position - 1;
+                    }
+                    //-(size - 1) - 1
+                    return -size;
+                } else {
                     v = container.onCreateValue(timestamp);
                     mValues.add(v);
-                    return size;
-                } else if (timestamp < v.getTimestamp()) {
-                    int position = findValuePosition(timestamp);
-                    if (position < 0) {
-                        v = container.onCreateValue(timestamp);
-                        mValues.add(-position - 1, v);
-                    }
-                    return -position - 1;
+                    return 0;
                 }
-                //-(size - 1) - 1
-                return -size;
-            } else {
-                v = container.onCreateValue(timestamp);
-                mValues.add(v);
-                return 0;
             }
         }
 
@@ -664,6 +703,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                         lastPosition = currentPosition++;
                     }
                 }
+
             } else {
                 return findValuePosition(timestamp);
             }
