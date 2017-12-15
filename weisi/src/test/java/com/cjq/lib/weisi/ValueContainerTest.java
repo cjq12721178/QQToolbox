@@ -18,7 +18,7 @@ public class ValueContainerTest {
         ValueContainerImpl valueContainer = new ValueContainerImpl(maxValueSize);
         for (int i = 0;i < maxValueSize;++i) {
             valueContainer.addDynamicValue(i, i);
-            assertEquals(i, valueContainer.getDynamicValue(i).getTimeStamp());
+            assertEquals(i, valueContainer.getDynamicValue(i).getTimestamp());
             assertEquals(i, valueContainer.getDynamicValue(i).getBatteryVoltage(), 0.01);
         }
     }
@@ -30,7 +30,7 @@ public class ValueContainerTest {
         for (int i = 0;i < 30;++i) {
             if (i >= maxValueSize) {
                 for (int j = 0, k = i - maxValueSize;j < maxValueSize;++j, ++k) {
-                    assertEquals(k, valueContainer.getDynamicValue(j).getTimeStamp());
+                    assertEquals(k, valueContainer.getDynamicValue(j).getTimestamp());
                     assertEquals(k, valueContainer.getDynamicValue(j).getBatteryVoltage(), 0.01);
                 }
             }
@@ -45,7 +45,7 @@ public class ValueContainerTest {
         for (int sum = 50, i = sum;i > 0;--i) {
             valueContainer.addDynamicValue(i, i);
             for (int j = 0, n = valueContainer.getDynamicValueSize(), k = sum - n + 1;j < n;++j, ++k) {
-                assertEquals(k, valueContainer.getDynamicValue(j).getTimeStamp());
+                assertEquals(k, valueContainer.getDynamicValue(j).getTimestamp());
                 assertEquals(k, valueContainer.getDynamicValue(j).getBatteryVoltage(), 0.01);
             }
         }
@@ -68,8 +68,8 @@ public class ValueContainerTest {
         }
 
         private void setRealTimeValue(long timestamp, float batteryVoltage) {
-            if (mRealTimeValue.getTimeStamp() < timestamp) {
-                mRealTimeValue.setTimeStamp(timestamp);
+            if (mRealTimeValue.getTimestamp() < timestamp) {
+                mRealTimeValue.setTimestamp(timestamp);
                 mRealTimeValue.mBatteryVoltage = batteryVoltage;
             }
         }
@@ -99,8 +99,8 @@ public class ValueContainerTest {
             }
 
             @Override
-            public void setTimeStamp(long timeStamp) {
-                super.setTimeStamp(timeStamp);
+            public void setTimestamp(long timeStamp) {
+                super.setTimestamp(timeStamp);
             }
 
             public float getBatteryVoltage() {

@@ -91,20 +91,20 @@ public class Measurement
     }
 
     void setRealTimeValue(long timestamp, double rawValue) {
-        if (mRealTimeValue.mTimeStamp < timestamp) {
-            mRealTimeValue.mTimeStamp = timestamp;
+        if (mRealTimeValue.mTimestamp < timestamp) {
+            mRealTimeValue.mTimestamp = timestamp;
             mRealTimeValue.mRawValue = rawValue;
         }
     }
 
     public String getDecoratedRealTimeValue() {
-        return mRealTimeValue.mTimeStamp != 0
+        return mRealTimeValue.mTimestamp != 0
                 ? mDataType.getDecoratedValue(mRealTimeValue.mRawValue)
                 : null;
     }
 
     public String getDecoratedRealTimeValueWithUnit() {
-        return mRealTimeValue.mTimeStamp != 0
+        return mRealTimeValue.mTimestamp != 0
                 ? mDataType.getDecoratedValueWithUnit(mRealTimeValue.mRawValue)
                 : null;
     }

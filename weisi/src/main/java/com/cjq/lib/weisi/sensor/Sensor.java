@@ -242,7 +242,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         long timestamp = correctTimestamp(valueBuildDelegator.getTimestamp());
         float batteryVoltage = valueBuildDelegator.getBatteryVoltage();
         double rawValue = valueBuildDelegator.getRawValue();
-        boolean canValueCaptured = measurement.mRealTimeValue.mTimeStamp < timestamp
+        boolean canValueCaptured = measurement.mRealTimeValue.mTimestamp < timestamp
                 && onDynamicValueCaptureListener != null;
         //设置传感器实时数据
         setRealTimeValue(timestamp, batteryVoltage);
@@ -264,9 +264,9 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 
     //对于接收到的动态数据，若其时间差在1秒以内，视其为相同时间戳
     private long correctTimestamp(long currentDynamicValueTimestamp) {
-        long delta = currentDynamicValueTimestamp - mRealTimeValue.mTimeStamp;
+        long delta = currentDynamicValueTimestamp - mRealTimeValue.mTimestamp;
         return delta > 0 && delta < 1000
-                ? mRealTimeValue.mTimeStamp
+                ? mRealTimeValue.mTimestamp
                 : currentDynamicValueTimestamp;
     }
 
@@ -293,11 +293,11 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     private void setRealTimeValue(long timestamp, float batteryVoltage) {
-        if (mRealTimeValue.mTimeStamp < timestamp) {
-            if (mRealTimeValue.mTimeStamp == 0) {
+        if (mRealTimeValue.mTimestamp < timestamp) {
+            if (mRealTimeValue.mTimestamp == 0) {
                 mFirstValueReceivedTimestamp = timestamp;
             }
-            mRealTimeValue.mTimeStamp = timestamp;
+            mRealTimeValue.mTimestamp = timestamp;
             mRealTimeValue.mBatteryVoltage = batteryVoltage;
 //            if (onDynamicValueCaptureListener != null) {
 //                onDynamicValueCaptureListener
@@ -342,10 +342,10 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     public State getState() {
-        if (mRealTimeValue.mTimeStamp == 0) {
+        if (mRealTimeValue.mTimestamp == 0) {
             return State.NEVER_CONNECTED;
         }
-        return System.currentTimeMillis() - mRealTimeValue.mTimeStamp < MAX_COMMUNICATION_BREAK_TIME
+        return System.currentTimeMillis() - mRealTimeValue.mTimestamp < MAX_COMMUNICATION_BREAK_TIME
                 ? State.ON_LINE
                 : State.OFF_LINE;
     }
