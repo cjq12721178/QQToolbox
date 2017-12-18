@@ -96,9 +96,14 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public V getEarliestHistoryValue() {
-        return mHistoryValues.size() > 0
-                ? getSomedayEarliestHistoryValue(mHistoryValues.get(0))
-                : null;
+        V result = null;
+        for (int i = 0, n = mHistoryValues.size();i < n;++i) {
+            result = getSomedayEarliestHistoryValue(mHistoryValues.get(i));
+            if (result != null) {
+                break;
+            }
+        }
+        return result;
     }
 
     public V getIntradayEarliestHistoryValue() {
@@ -116,11 +121,19 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     public V getLatestHistoryValue() {
-        int size = mHistoryValues.size();
-        if (size == 0) {
-            return null;
+        V result = null;
+        for (int i = mHistoryValues.size() - 1;i >= 0;--i) {
+            result = getSomedayLatestHistoryValue(mHistoryValues.get(i));
+            if (result != null) {
+                break;
+            }
         }
-        return getSomedayLatestHistoryValue(mHistoryValues.get(size - 1));
+        return result;
+//        int size = mHistoryValues.size();
+//        if (size == 0) {
+//            return null;
+//        }
+//        return getSomedayLatestHistoryValue(mHistoryValues.get(size - 1));
     }
 
     public V getIntradayLatestHistoryValue() {
