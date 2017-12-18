@@ -70,6 +70,12 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 : 0;
     }
 
+    public boolean isIntraday(long dateTime) {
+        return mCurrentDailyHistoryValuePool != null
+                ? mCurrentDailyHistoryValuePool.contains(dateTime)
+                : false;
+    }
+
     private DailyHistoryValuePool<V> findDailyHistoryValuePool(long dateTime) {
         int position = findDailyHistoryValuePoolPosition(dateTime);
         return position >= 0 ? mHistoryValues.get(position) : null;
