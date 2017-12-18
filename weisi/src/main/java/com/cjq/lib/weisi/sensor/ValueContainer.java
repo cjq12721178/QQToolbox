@@ -631,6 +631,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
         public DailyHistoryValuePool(long dateTime) {
             Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(dateTime);
             calendar.set(Calendar.HOUR, 0);
             calendar.set(Calendar.MINUTE, 0);
             calendar.set(Calendar.SECOND, 0);
