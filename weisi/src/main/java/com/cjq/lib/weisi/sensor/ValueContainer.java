@@ -33,9 +33,9 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     protected final V mRealTimeValue;
     //用于缓存实时数据
     private final List<V> mDynamicValues;
-    //private final List<V> mHistoryValues;
     private final List<DailyHistoryValuePool<V>> mHistoryValues;
     private int mDynamicValueHead;
+    private int mDynamicValueSum;
     protected String mName;
     private DailyHistoryValuePool<V> mCurrentDailyHistoryValuePool;
 
@@ -47,9 +47,14 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         } else {
             mDynamicValues = new ArrayList<>();
         }
-        //mHistoryValues = new ArrayList<>();
         mHistoryValues = new ArrayList<>();
         mDynamicValueHead = 0;
+        mDynamicValueSum = 0;
+    }
+
+    private V createDynamicValue(long timestamp) {
+        ++mDynamicValueSum;
+        return onCreateValue(timestamp);
     }
 
     protected abstract V onCreateValue(long timestamp);
@@ -82,10 +87,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     }
 
     private int findDailyHistoryValuePoolPosition(long dateTime) {
-//        synchronized (Value.VALUE_COMPARER) {
-//            Value.VALUE_COMPARER.mTimestamp = dateTime;
-//            return Collections.binarySearch(mHistoryValues, dateTime, DailyHistoryValuePool.CLASSIFIER);
-//        }
         synchronized (mHistoryValues) {
             return ExpandCollections.binarySearch(mHistoryValues, dateTime, DailyHistoryValuePool.CLASSIFIER);
         }
@@ -129,11 +130,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
             }
         }
         return result;
-//        int size = mHistoryValues.size();
-//        if (size == 0) {
-//            return null;
-//        }
-//        return getSomedayLatestHistoryValue(mHistoryValues.get(size - 1));
     }
 
     public V getIntradayLatestHistoryValue() {
@@ -221,20 +217,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return mDynamicValues.size();
     }
 
-//    //若有新的数据添加，返回position
-//    //若只是原有数据的更新，返回-position-1
-//    //注意和Collections.binarySearch()返回值相反
-//    protected synchronized int addHistoryValue(long timestamp) {
-//        DailyHistoryValuePool<V> pool;
-//        if (mCurrentDailyHistoryValuePool != null
-//                && mCurrentDailyHistoryValuePool.contains(timestamp)) {
-//            pool = mCurrentDailyHistoryValuePool;
-//        } else {
-//            pool = getDailyHistoryValuePool(timestamp);
-//        }
-//        return pool.addValue(this, timestamp);
-//    }
-
     protected DailyHistoryValuePool<V> fastGetDailyHistoryValuePool(long timestamp) {
         DailyHistoryValuePool<V> pool;
         if (mCurrentDailyHistoryValuePool != null
@@ -268,14 +250,14 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 for (int i = size - 1;i >= 0;--i) {
                     v = mDynamicValues.get(i);
                     if (timestamp > v.mTimestamp) {
-                        v = onCreateValue(timestamp);
+                        v = createDynamicValue(timestamp);
                         mDynamicValues.add(i + 1, v);
                         return i + 1;
                     } else if (timestamp == v.mTimestamp) {
                         return -i - 1;
                     }
                 }
-                v = onCreateValue(timestamp);
+                v = createDynamicValue(timestamp);
                 mDynamicValues.add(0, v);
                 return 0;
             } else {
@@ -328,14 +310,11 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     public int interpretAddResult(int addMethodReturnValue, boolean isRealTime) {
         if (addMethodReturnValue < 0) {
             return VALUE_UPDATED;
-        } else if (addMethodReturnValue == MAX_DYNAMIC_VALUE_SIZE
-                && isRealTime) {
+        } else if (isRealTime
+                && addMethodReturnValue == MAX_DYNAMIC_VALUE_SIZE) {
             return ADD_VALUE_FAILED;
-        } else if (mDynamicValues.size() == MAX_DYNAMIC_VALUE_SIZE
-                && isRealTime) {
-            //此处有一种情况本应属于NEW_VALUE_ADDED，
-            //但由于区别困难所以也放在了LOOP_VALUE_ADDED一类：
-            //即当动态添加数据集规模正好达到最大时的那条数据
+        } else if (isRealTime
+                && mDynamicValueSum > MAX_DYNAMIC_VALUE_SIZE) {
             return LOOP_VALUE_ADDED;
         } else {
             return NEW_VALUE_ADDED;
@@ -348,10 +327,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 ? getDynamicValue(actualPosition)
                 : null;
     }
-
-//    public int findDynamicValuePosition(int possiblePosition, long timestamp) {
-//        return findValuePosition(true, possiblePosition, timestamp);
-//    }
 
     //若possiblePosition>=0，则在possiblePosition附近寻找时间戳等于timestamp的Value
     //若possiblePosition<0，则在所有数据里面寻找
@@ -385,47 +360,10 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return -1;
     }
 
-//    //若possiblePosition>=0，则在possiblePosition附近寻找时间戳等于timestamp的Value
-//    //若possiblePosition<0，则在所有数据里面寻找
-//    //没有找到返回负数
-//    private int findValuePosition(boolean isRealTime, int possiblePosition, long timestamp) {
-//        int size = isRealTime ? getDynamicValueSize() : getHistoryValueSize();
-//        if (possiblePosition >= 0 && possiblePosition < size) {
-//            V value;
-//            for (int currentPosition = possiblePosition,
-//                 lastPosition = currentPosition;
-//                 currentPosition < size && currentPosition >= 0;) {
-//                value = isRealTime
-//                        ? getDynamicValue(currentPosition)
-//                        : getHistoryValue(currentPosition);
-//                long valueTimestamp = value.mTimestamp;
-//                if (valueTimestamp == timestamp) {
-//                    return currentPosition;
-//                } else if (valueTimestamp > timestamp) {
-//                    if (currentPosition > lastPosition) {
-//                        break;
-//                    }
-//                    lastPosition = currentPosition--;
-//                } else {
-//                    if (currentPosition < lastPosition) {
-//                        break;
-//                    }
-//                    lastPosition = currentPosition++;
-//                }
-//            }
-//        } else {
-//            return isRealTime
-//                    ? findDynamicValuePosition(timestamp)
-//                    : findHistoryValuePosition(timestamp);
-//        }
-//        return -1;
-//    }
-
     //返回的是数组中的物理位置
     private int findDynamicValuePosition(long timestamp) {
         synchronized (mDynamicValues) {
             int position;
-            //Value.VALUE_COMPARER.mTimestamp = timestamp;
             if (mDynamicValueHead == 0) {
                 return ExpandCollections.binarySearch(mDynamicValues,
                         timestamp,
@@ -450,51 +388,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                         Value.SEARCH_HELPER);
             }
         }
-//        synchronized (Value.VALUE_COMPARER) {
-//            int position;
-//            Value.VALUE_COMPARER.mTimestamp = timestamp;
-//            if (mDynamicValueHead == 0) {
-//                return Collections.binarySearch(mDynamicValues,
-//                        Value.VALUE_COMPARER,
-//                        Value.VALUE_COMPARATOR);
-//            }
-//            if (timestamp >= mDynamicValues.get(0).mTimestamp) {
-//                position = indexedBinarySearch(mDynamicValues,
-//                        0,
-//                        mDynamicValueHead - 1,
-//                        Value.VALUE_COMPARER,
-//                        Value.VALUE_COMPARATOR);
-//                return position >= 0
-//                        ? MAX_DYNAMIC_VALUE_SIZE - mDynamicValueHead + position
-//                        : position;
-//            } else {
-//                return indexedBinarySearch(mDynamicValues,
-//                        mDynamicValueHead,
-//                        mDynamicValues.size() - 1,
-//                        Value.VALUE_COMPARER,
-//                        Value.VALUE_COMPARATOR);
-//            }
-//        }
     }
-
-//    private static <T> int indexedBinarySearch(List<? extends T> l, int start, int end, T key, Comparator<? super T> c) {
-//        int low = start;
-//        int high = end;
-//
-//        while (low <= high) {
-//            int mid = (low + high) >>> 1;
-//            T midVal = l.get(mid);
-//            int cmp = c.compare(midVal, key);
-//
-//            if (cmp < 0)
-//                low = mid + 1;
-//            else if (cmp > 0)
-//                high = mid - 1;
-//            else
-//                return mid; // key found
-//        }
-//        return -(low + 1);  // key not found
-//    }
 
     public V findHistoryValue(int possiblePosition, long timestamp) {
         int position = findDailyHistoryValuePoolPosition(timestamp);
@@ -529,29 +423,9 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 : -1;
     }
 
-//    public V findHistoryValue(int possiblePosition, long timestamp) {
-//        int actualPosition = findHistoryValuePosition(possiblePosition, timestamp);
-//        return actualPosition >= 0
-//                ? mHistoryValues.get(actualPosition)
-//                : null;
-//    }
-//
-//    public int findHistoryValuePosition(int possiblePosition, long timestamp) {
-//        return findValuePosition(false, possiblePosition, timestamp);
-//    }
-//
-//    private int findHistoryValuePosition(long timestamp) {
-//        synchronized (Value.VALUE_COMPARER) {
-//            Value.VALUE_COMPARER.mTimestamp = timestamp;
-//            return Collections.binarySearch(mHistoryValues,
-//                    Value.VALUE_COMPARER,
-//                    Value.VALUE_COMPARATOR);
-//        }
-//    }
-
     public static class Value {
 
-        private static final Value VALUE_COMPARER = new Value(0);
+        //private static final Value VALUE_COMPARER = new Value(0);
         private static final ExpandComparator<Value, Long> SEARCH_HELPER = new ExpandComparator<Value, Long>() {
             @Override
             public int compare(Value value, Long targetTimestamp) {
@@ -562,16 +436,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                         : 1);
             }
         };
-//        private static final Comparator<Value> VALUE_COMPARATOR = new Comparator<Value>() {
-//            @Override
-//            public int compare(Value v1, Value v2) {
-//                return (v1.mTimestamp < v2.mTimestamp)
-//                        ? -1
-//                        : ((v1.mTimestamp == v2.mTimestamp)
-//                            ? 0
-//                            : 1);
-//            }
-//        };
 
         long mTimestamp;
 
@@ -602,14 +466,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 } else {
                     return -1;
                 }
-//                long delta = date - dailyHistoryValuePool.mIntradayStartTime;
-//                if (delta < 0) {
-//                    return -1;
-//                } else if (delta - ONE_DAY_MILLISECONDS < 0) {
-//                    return 0;
-//                } else {
-//                    return 1;
-//                }
             }
         };
 
@@ -670,7 +526,6 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                         }
                         return -position - 1;
                     }
-                    //-(size - 1) - 1
                     return -size;
                 } else {
                     v = container.onCreateValue(timestamp);
@@ -719,17 +574,10 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
         private int findValuePosition(long timestamp) {
             synchronized (mValues) {
-                //Value.VALUE_COMPARER.mTimestamp = timestamp;
                 return ExpandCollections.binarySearch(mValues,
                         timestamp,
                         Value.SEARCH_HELPER);
             }
-//            synchronized (Value.VALUE_COMPARER) {
-//                Value.VALUE_COMPARER.mTimestamp = timestamp;
-//                return Collections.binarySearch(mValues,
-//                        Value.VALUE_COMPARER,
-//                        Value.VALUE_COMPARATOR);
-//            }
         }
     }
 }
