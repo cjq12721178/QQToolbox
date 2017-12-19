@@ -115,15 +115,21 @@ public class Measurement
     }
 
     int addHistoryValue(long timestamp, double rawValue) {
-        return setHistoryValueContent(addHistoryValue(timestamp), rawValue);
+        DailyHistoryValuePool<Value> pool = fastGetDailyHistoryValuePool(timestamp);
+        int position = pool.addValue(this, timestamp);
+        setValueContent(pool.getValue((position < 0
+                ? -position - 1
+                : position)), rawValue);
+        return position;
+        //return setHistoryValueContent(addHistoryValue(timestamp), rawValue);
     }
 
-    private int setHistoryValueContent(int position, double rawValue) {
-        setValueContent(getHistoryValue(position < 0
-                ? -position - 1
-                : position), rawValue);
-        return position;
-    }
+//    private int setHistoryValueContent(int position, double rawValue) {
+//        setValueContent(getHistoryValue(position < 0
+//                ? -position - 1
+//                : position), rawValue);
+//        return position;
+//    }
 
     private int setDynamicValueContent(int position, double rawValue) {
         if (position < 0) {

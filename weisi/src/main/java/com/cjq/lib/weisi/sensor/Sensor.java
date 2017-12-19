@@ -299,6 +299,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     private int setHistoryValueContent(int position, float batteryVoltage) {
+
         setValueContent(getHistoryValue(position < 0
                 ? -position - 1
                 : position), batteryVoltage);
@@ -328,22 +329,28 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     public int addHistoryValue(long timestamp, float batteryVoltage) {
-        return setHistoryValueContent(addHistoryValue(timestamp), batteryVoltage);
+        DailyHistoryValuePool<Value> pool = fastGetDailyHistoryValuePool(timestamp);
+        int position = pool.addValue(this, timestamp);
+        setValueContent(pool.getValue((position < 0
+                ? -position - 1
+                : position)), batteryVoltage);
+        return position;
     }
 
     public int addHistoryValue(long measurementValueId, long timestamp, double rawValue) {
-        return MeasurementIdentifier.getAddress(measurementValueId) == mRawAddress
-                ? addHistoryValue(
-                        MeasurementIdentifier.getDataTypeValue(measurementValueId),
-                        MeasurementIdentifier.getDataTypeValueIndex(measurementValueId),
-                        timestamp, rawValue)
-                : MAX_DYNAMIC_VALUE_SIZE;
+        if (MeasurementIdentifier.getAddress(measurementValueId) == mRawAddress) {
+            return addHistoryValue(
+                    MeasurementIdentifier.getDataTypeValue(measurementValueId),
+                    MeasurementIdentifier.getDataTypeValueIndex(measurementValueId),
+                    timestamp, rawValue);
+        }
+        throw new IllegalArgumentException("address not matched, value not belong to sensor");
     }
 
     public int addHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, double rawValue) {
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
-            return MAX_DYNAMIC_VALUE_SIZE;
+            throw new NullPointerException("no appropriate measurement found");
         }
         return measurement.addHistoryValue(timestamp, rawValue);
     }
