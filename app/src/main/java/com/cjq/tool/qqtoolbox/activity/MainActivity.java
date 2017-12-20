@@ -307,6 +307,9 @@ public class MainActivity
             case R.id.btn_open_settings_activity:
                 startActivity(new Intent(this, SettingsActivity.class));
                 break;
+            case R.id.btn_open_usb_activity:
+                startActivity(new Intent(this, UsbDebugActivity.class));
+                break;
         }
     }
 
