@@ -170,3 +170,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171221-0.15.2(51):
 1. 调整targetSdkVersion使其与targetSdkVersion保持一致
+
+20171221-0.15.3(52):
+1. 修复NumericConverter类hexDataStringToBytes方法抛出异常的问题

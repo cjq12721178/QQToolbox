@@ -22,6 +22,7 @@ import com.cjq.lib.weisi.communicator.usb.UsbSerialPort;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialProber;
 import com.cjq.lib.weisi.util.HexDump;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
+import com.cjq.tool.qbox.util.NumericConverter;
 import com.cjq.tool.qqtoolbox.R;
 
 import java.io.IOException;
@@ -52,11 +53,9 @@ public class UsbDebugActivity
         @Override
         public void onReceive(Context context, Intent intent) {
             if (ACTION_USB_PERMISSION.equals(intent.getAction())) {
-                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                //UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                    if (device == mUsbSerialDriver.getDevice()) {
-                        openDeviceAndSetParameter();
-                    }
+                    openDeviceAndSetParameter();
                 } else {
                     SimpleCustomizeToast.show(context, "用户不允许访问USB设备！");
                 }
@@ -215,7 +214,7 @@ public class UsbDebugActivity
             case R.id.btn_send:
                 if (mUsbSerialPort != null) {
                     try {
-                        mUsbSerialPort.write(HexDump.hexStringToByteArray(mEtSend.getText().toString()), 5000);
+                        mUsbSerialPort.write(NumericConverter.hexDataStringToBytes(mEtSend.getText().toString()), 5000);
                     } catch (IOException e) {
                         SimpleCustomizeToast.show(this, e.getMessage());
                     }

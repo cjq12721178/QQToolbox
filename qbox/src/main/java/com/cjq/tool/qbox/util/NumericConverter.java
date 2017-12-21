@@ -129,7 +129,7 @@ public class NumericConverter {
                 if (ss[i].length() > 2) {
                     return null;
                 }
-                data[i] = Byte.parseByte(ss[i], 16);
+                data[i] = (byte) Integer.parseInt(ss[i], 16);
             }
         } catch (NumberFormatException nfe) {
             data = null;
