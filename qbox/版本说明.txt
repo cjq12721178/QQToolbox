@@ -164,3 +164,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20171215-0.15.0(49):
 1. 新增ExpandCollections类和ExpandComparator接口，用于扩展标准Collections类的功能，实现binarySearch时Key和Value类型相异，以及自定义搜索范围
+
+20171221-0.15.1(50):
+1. 修复SerialPortFinder获取串口设备方法运行异常的问题
