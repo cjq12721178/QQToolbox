@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -56,7 +57,7 @@ public class BleKit {
     //intervalTime = 0，不间断扫描，此时durationTime无意义
     //intervalTime > 0，间隔intervalTime时间段扫描，持续durationTime时间段
     //intervalTime < 0，进行单次扫描
-    public void startScan(BluetoothAdapter.LeScanCallback leScanCallback,
+    public boolean startScan(BluetoothAdapter.LeScanCallback leScanCallback,
                           long intervalTime,
                           long durationTime) {
         stopScan();
@@ -69,16 +70,23 @@ public class BleKit {
             mDurationTime = durationTime;
             mOnStartScan.run();
         }
+        return mScanning;
     }
 
     private Runnable mOnStartScan = new Runnable() {
         @Override
         public void run() {
-            if (mIntervalTime != 0) {
-                mHandler.postDelayed(mOnStopScan, mDurationTime);
-            }
             mScanning = true;
-            mBluetoothAdapter.startLeScan(mLeScanCallback);
+            if (!mBluetoothAdapter.isEnabled()) {
+                mBluetoothAdapter.enable();
+            }
+            if (mBluetoothAdapter.startLeScan(mLeScanCallback)) {
+                if (mIntervalTime != 0) {
+                    mHandler.postDelayed(mOnStopScan, mDurationTime);
+                }
+            } else {
+                mScanning = false;
+            }
         }
     };
 
