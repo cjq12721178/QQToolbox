@@ -29,6 +29,8 @@
         </activity>
         <activity android:name=".activity.UsbDebugActivity">
         </activity>
+        <activity android:name=".activity.UdpDebugActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -24,6 +24,8 @@ package com.cjq.lib.weisi.communicator.usb;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 
+import com.cjq.lib.weisi.communicator.Communicator;
+
 import java.io.IOException;
 
 /**
@@ -31,7 +33,7 @@ import java.io.IOException;
  *
  * @author mike wakerly (opensource@hoho.com)
  */
-public interface UsbSerialPort {
+public interface UsbSerialPort extends Communicator {
 
     /** 5 data bits. */
     public static final int DATABITS_5 = 5;
@@ -116,12 +118,46 @@ public interface UsbSerialPort {
     /**
      * Reads as many bytes as possible into the destination buffer.
      *
-     * @param dest the destination byte buffer
+     * @param dst the destination byte buffer
      * @param timeoutMillis the timeout for reading
      * @return the actual number of bytes read
      * @throws IOException if an error occurred during reading
      */
-    public int read(final byte[] dest, final int timeoutMillis) throws IOException;
+    public int read(final byte[] dst, final int timeoutMillis) throws IOException;
+
+    /**
+     * Reads as many bytes as possible into the destination buffer.
+     *
+     * @param dst the destination byte buffer
+     * @param offset the index of the first byte in the buffer to receive
+     * @param length the length of the data to receive
+     * @param timeoutMillis the timeout for reading
+     * @return the actual number of bytes read
+     * @throws IOException if an error occurred during reading
+     */
+    public int read(final byte[] dst, int offset, int length, final int timeoutMillis) throws IOException;
+
+    /**
+     * Reads as many bytes as possible into the destination buffer.
+     *
+     * @param dst the destination byte buffer
+     * @param timeoutMillis the timeout for reading
+     * @return the actual number of bytes read
+     * @throws IOException if an error occurred during reading
+     */
+    public int readWithBuffer(final byte[] dst, final int timeoutMillis) throws IOException;
+
+    /**
+     * Writes as many bytes as possible from the source buffer.
+     *
+     * @param src the source byte buffer
+     * @param offset the index of the first byte in the buffer to send
+     * @param length the length of the data to send
+     * @param timeoutMillis the timeout for writing
+     * @return the actual number of bytes written
+     * @throws IOException if an error occurred during writing
+     */
+    public int write(final byte[] src, int offset, int length, final int timeoutMillis) throws IOException;
 
     /**
      * Writes as many bytes as possible from the source buffer.
@@ -132,6 +168,16 @@ public interface UsbSerialPort {
      * @throws IOException if an error occurred during writing
      */
     public int write(final byte[] src, final int timeoutMillis) throws IOException;
+
+    /**
+     * Writes as many bytes as possible from the source buffer.
+     *
+     * @param src the source byte buffer
+     * @param timeoutMillis the timeout for writing
+     * @return the actual number of bytes written
+     * @throws IOException if an error occurred during writing
+     */
+    public int writeWithBuffer(final byte[] src, final int timeoutMillis) throws IOException;
 
     /**
      * Sets various serial port parameters.

@@ -255,3 +255,13 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20171221-3.0.1(70):
 1. 调整targetSdkVersion使其与targetSdkVersion保持一致
+
+20171222-3.1.0(71):
+1. 调整UsbSerialPort接口，新增以下方法：
+   (1) int read(final byte[] dst, int offset, int length, final int timeoutMillis) throws IOException;
+   (2) int readWithBuffer(final byte[] dst, final int timeoutMillis) throws IOException;
+   (3) int write(final byte[] src, int offset, int length, final int timeoutMillis) throws IOException;
+   (4) int writeWithBuffer(final byte[] src, final int timeoutMillis) throws IOException;
+2. 新增DataReceiver类，专门用于读取通讯模块数据
+3. 新增SyncDataReceiver类，用于读取数据采用阻塞模式的通讯模块
+4. 新增Communicator接口，通讯类实现该接口配合DataReceiver类以提供数据接收服务

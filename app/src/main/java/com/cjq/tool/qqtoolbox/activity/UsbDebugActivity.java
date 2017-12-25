@@ -17,11 +17,12 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
+import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialDriver;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialPort;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialProber;
-import com.cjq.lib.weisi.util.HexDump;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
+import com.cjq.tool.qbox.util.ExceptionLog;
 import com.cjq.tool.qbox.util.NumericConverter;
 import com.cjq.tool.qqtoolbox.R;
 
@@ -32,7 +33,7 @@ import java.util.List;
 public class UsbDebugActivity
         extends AppCompatActivity
         implements AdapterView.OnItemSelectedListener,
-        View.OnClickListener {
+        View.OnClickListener, DataReceiver.Listener {
 
     private static final String ACTION_USB_PERMISSION = "com.example.usbdemo.action.ACTION_USB_PERMISSION";
 
@@ -47,7 +48,8 @@ public class UsbDebugActivity
     private EditText mEtSend;
     private TextView mTvReceive;
     private List<UsbSerialDriver> mAvailableDrivers;
-    private Thread mListenThread;
+    //private Thread mListenThread;
+    private DataReceiver mUsbDataReceiver;
 
     private BroadcastReceiver mUsbDeviceReceiver = new BroadcastReceiver() {
         @Override
@@ -92,6 +94,7 @@ public class UsbDebugActivity
         mSpnParity.setSelection(0, false);
         findViewById(R.id.btn_send).setOnClickListener(this);
         findViewById(R.id.btn_open_device).setOnClickListener(this);
+        findViewById(R.id.btn_close_device).setOnClickListener(this);
         mEtSend = (EditText) findViewById(R.id.et_send);
         mTvReceive = (TextView) findViewById(R.id.tv_receive_content);
 
@@ -135,39 +138,45 @@ public class UsbDebugActivity
     }
 
     private void startListen() {
-        if (mListenThread == null) {
-            mListenThread = new Thread(mUsbSerialPortListener);
-        }
-        mListenThread.start();
+//        if (mListenThread == null) {
+//            mListenThread = new Thread(mUsbSerialPortListener);
+//        }
+//        mListenThread.start();
+        mUsbDataReceiver = new DataReceiver(mUsbSerialPort);
+        mUsbDataReceiver.startListen(this);
     }
 
     public void stopListen() {
-        if (mListenThread != null && mListenThread.isAlive()) {
-            mListenThread.interrupt();
-            mListenThread = null;
+//        if (mListenThread != null && mListenThread.isAlive()) {
+//            mListenThread.interrupt();
+//            mListenThread = null;
+//        }
+        if (mUsbDataReceiver != null) {
+            mUsbDataReceiver.stopListen();
         }
     }
 
-    private Runnable mUsbSerialPortListener = new Runnable() {
-        @Override
-        public void run() {
-            final byte[] data = new byte[2048];
-            while (!mListenThread.isInterrupted()) {
-                try {
-                    final int receivedLen = mUsbSerialPort.read(data, 5000);
-                    if (receivedLen > 0) {
-                        runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                mTvReceive.append(HexDump.dumpHexString(data, 0, receivedLen));
-                            }
-                        });
-                    }
-                } catch (IOException e) {
-                }
-            }
-        }
-    };
+//    private Runnable mUsbSerialPortListener = new Runnable() {
+//        @Override
+//        public void run() {
+//            final byte[] data = new byte[2048];
+//            data[0] = 0x37;
+//            while (!mListenThread.isInterrupted()) {
+//                try {
+//                    final int receivedLen = ((Cp21xxSerialDriver.Cp21xxSerialPort) mUsbSerialPort).read(data, 1, data.length - 1, 5000);
+//                    if (receivedLen > 0) {
+//                        runOnUiThread(new Runnable() {
+//                            @Override
+//                            public void run() {
+//                                mTvReceive.append(HexDump.dumpHexString(data, 0, receivedLen));
+//                            }
+//                        });
+//                    }
+//                } catch (IOException e) {
+//                }
+//            }
+//        }
+//    };
 
     private int getStopBits() {
         switch (mSpnStopBits.getSelectedItemPosition()) {
@@ -215,6 +224,7 @@ public class UsbDebugActivity
                 if (mUsbSerialPort != null) {
                     try {
                         mUsbSerialPort.write(NumericConverter.hexDataStringToBytes(mEtSend.getText().toString()), 5000);
+                        //mUsbSerialPort.write(new byte[] { 0x12, (byte) 0xAA, (byte) 0xAA, (byte) 0xFF, (byte) 0xFF, 0x01, 0x6C, (byte) 0x9E, 0x1B, 0x55, 0x55 }, 1, 10, 5000);
                     } catch (IOException e) {
                         SimpleCustomizeToast.show(this, e.getMessage());
                     }
@@ -223,7 +233,6 @@ public class UsbDebugActivity
             case R.id.btn_open_device:
                 int position = mSpnSelectDevice.getSelectedItemPosition();
                 if (position >= 0) {
-                    closeDevice();
                     mUsbSerialDriver = mAvailableDrivers.get(position);
                     UsbDevice device = mUsbSerialDriver.getDevice();
                     if (mUsbManager.hasPermission(device)) {
@@ -234,6 +243,27 @@ public class UsbDebugActivity
                     }
                 }
                 break;
+            case R.id.btn_close_device:
+                closeDevice();
+                break;
         }
+    }
+
+    @Override
+    public int onDataReceived(final byte[] data, final int len) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mTvReceive.append(NumericConverter.bytesToHexDataString(data, 0, len));
+                mTvReceive.append("\n");
+            }
+        });
+        return len;
+    }
+
+    @Override
+    public boolean onErrorOccurred(Exception e) {
+        ExceptionLog.debug(e);
+        return false;
     }
 }

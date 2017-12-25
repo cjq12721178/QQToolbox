@@ -15,6 +15,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.SerialPortKit;
 import com.cjq.lib.weisi.protocol.ScoutUdpSensorProtocol;
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
@@ -44,7 +45,10 @@ import java.io.IOException;
 public class MainActivity
         extends AppCompatActivity
         implements View.OnClickListener,
-        SortDialog.OnSortTypeChangedListener, SerialPortKit.OnDataReceivedListener, CompoundButton.OnCheckedChangeListener, TextView.OnEditorActionListener {
+        SortDialog.OnSortTypeChangedListener,
+        CompoundButton.OnCheckedChangeListener,
+        TextView.OnEditorActionListener,
+        DataReceiver.Listener {
 
     private SwitchableFragmentManager mSwitchableFragmentManager;
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
@@ -52,6 +56,7 @@ public class MainActivity
     private EditText mEtSetText;
     private SortDialog mSortDialog;
     private SerialPortKit mSerialPortKit;
+    private DataReceiver mSerialPortDataReceiver;
     private EditText mEtSerialPortName;
     private TextView mTvReception;
     private CheckBox mChkHexEmission;
@@ -273,7 +278,9 @@ public class MainActivity
                                 Integer.parseInt((String) mSpnBaudRate.getSelectedItem()),
                                 0)) {
                             btnSerialPort.setText("close");
-                            mSerialPortKit.startListen(this);
+                            //mSerialPortKit.startListen(this);
+                            mSerialPortDataReceiver = new DataReceiver(mSerialPortKit);
+                            mSerialPortDataReceiver.startListen(this);
                             SimpleCustomizeToast.show(this, serialPortName + " opened");
                         } else {
                             SimpleCustomizeToast.show(this, "open serial port failed");
@@ -310,6 +317,9 @@ public class MainActivity
             case R.id.btn_open_usb_activity:
                 startActivity(new Intent(this, UsbDebugActivity.class));
                 break;
+            case R.id.btn_open_udp_activity:
+                startActivity(new Intent(this, UdpDebugActivity.class));
+                break;
         }
     }
 
@@ -321,6 +331,7 @@ public class MainActivity
 
     private void closeSerialPort() {
         if (mSerialPortKit != null) {
+            mSerialPortDataReceiver.stopListen();
             mSerialPortKit.shutdown();
             SimpleCustomizeToast.show(this, mEtSerialPortName.getText() + " closed");
             //powerOffSerialPort();
@@ -401,6 +412,11 @@ public class MainActivity
             }
         });
         return len;
+    }
+
+    @Override
+    public boolean onErrorOccurred(Exception e) {
+        return false;
     }
 
     @Override

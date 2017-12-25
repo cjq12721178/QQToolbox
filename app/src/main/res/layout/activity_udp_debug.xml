@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.cjq.tool.qqtoolbox.activity.UdpDebugActivity">
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_launch"
+        android:text="启动UDP"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_start_listen"
+        android:text="开始监听"
+        app:layout_constraintTop_toBottomOf="@id/btn_launch"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_send"
+        android:text="发送数据"
+        app:layout_constraintTop_toBottomOf="@id/btn_start_listen"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_stop_listen"
+        android:text="停止监听"
+        app:layout_constraintTop_toBottomOf="@id/btn_send"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_shutdown"
+        android:text="关闭UDP"
+        app:layout_constraintTop_toBottomOf="@id/btn_stop_listen"/>
+
+</android.support.constraint.ConstraintLayout>

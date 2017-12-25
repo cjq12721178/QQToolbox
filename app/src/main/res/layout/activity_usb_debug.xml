@@ -113,12 +113,19 @@
         app:layout_constraintBaseline_toBaselineOf="@id/tv_stop_bits"/>
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:id="@+id/btn_open_device"
         android:text="打开USB设备"
-        android:gravity="center"
         app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_stop_bits"
+        app:layout_constraintRight_toLeftOf="@id/gl_middle_vertical"/>
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btn_close_device"
+        android:text="关闭USB设备"
+        app:layout_constraintLeft_toRightOf="@id/gl_middle_vertical"
         app:layout_constraintTop_toBottomOf="@id/tv_stop_bits"
         app:layout_constraintRight_toRightOf="parent"/>
 

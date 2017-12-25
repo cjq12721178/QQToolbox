@@ -23,6 +23,9 @@ package com.cjq.lib.weisi.communicator.usb;
 
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
+import android.hardware.usb.UsbEndpoint;
+
+import com.cjq.lib.weisi.communicator.Communicator;
 
 import java.io.IOException;
 
@@ -126,10 +129,95 @@ abstract class CommonUsbSerialPort implements UsbSerialPort {
     public abstract void close() throws IOException;
 
     @Override
-    public abstract int read(final byte[] dest, final int timeoutMillis) throws IOException;
+    public int read(final byte[] dst, final int timeoutMillis) throws IOException {
+        return read(dst, 0, dst.length, timeoutMillis);
+    }
+
+    protected int read(UsbEndpoint readEndPoint, byte[] dst, int offset, int length, int timeoutMillis) throws IOException {
+        int numBytesRead = mConnection.bulkTransfer(readEndPoint,
+                dst, offset, length, timeoutMillis);
+        if (numBytesRead < 0) {
+            // This sucks: we get -1 on timeout, not 0 as preferred.
+            // We *should* use UsbRequest, except it has a bug/api oversight
+            // where there is no way to determine the number of bytes read
+            // in response :\ -- http://b.android.com/28023
+            return 0;
+        }
+        return numBytesRead;
+    }
+
+    protected int readWithBuffer(UsbEndpoint readEndPoint, byte[] dst, int timeoutMillis) throws IOException {
+        final int numBytesRead;
+        synchronized (mReadBufferLock) {
+            int readAmt = Math.min(dst.length, mReadBuffer.length);
+            numBytesRead = mConnection.bulkTransfer(readEndPoint, mReadBuffer, readAmt,
+                    timeoutMillis);
+            if (numBytesRead < 0) {
+                // This sucks: we get -1 on timeout, not 0 as preferred.
+                // We *should* use UsbRequest, except it has a bug/api oversight
+                // where there is no way to determine the number of bytes read
+                // in response :\ -- http://b.android.com/28023
+                return 0;
+            }
+            System.arraycopy(mReadBuffer, 0, dst, 0, numBytesRead);
+        }
+        return numBytesRead;
+    }
 
     @Override
-    public abstract int write(final byte[] src, final int timeoutMillis) throws IOException;
+    public int write(final byte[] src, final int timeoutMillis) throws IOException {
+        return write(src, 0, src.length, timeoutMillis);
+    }
+
+    protected int write(UsbEndpoint writeEndPoint, byte[] src, int offset, int length, int timeoutMillis) throws IOException {
+        int writeOffset = offset;
+        int writeLength = length;
+        int amtWritten;
+
+        while (writeOffset < offset + length) {
+            amtWritten = mConnection.bulkTransfer(writeEndPoint, src, writeOffset, writeLength,
+                        timeoutMillis);
+            if (amtWritten <= 0) {
+                throw new IOException("Error writing " + writeLength
+                        + " bytes at offset " + writeOffset + " length=" + src.length);
+            }
+            writeOffset += amtWritten;
+            writeLength -= amtWritten;
+        }
+        return writeOffset - offset;
+    }
+
+    protected int writeWithBuffer(UsbEndpoint writeEndPoint, byte[] src, int timeoutMillis) throws IOException {
+        int offset = 0;
+
+        while (offset < src.length) {
+            final int writeLength;
+            final int amtWritten;
+
+            synchronized (mWriteBufferLock) {
+                final byte[] writeBuffer;
+
+                writeLength = Math.min(src.length - offset, mWriteBuffer.length);
+                if (offset == 0) {
+                    writeBuffer = src;
+                } else {
+                    // bulkTransfer does not support offsets, make a copy.
+                    System.arraycopy(src, offset, mWriteBuffer, 0, writeLength);
+                    writeBuffer = mWriteBuffer;
+                }
+
+                amtWritten = mConnection.bulkTransfer(writeEndPoint, writeBuffer, writeLength,
+                        timeoutMillis);
+            }
+            if (amtWritten <= 0) {
+                throw new IOException("Error writing " + writeLength
+                        + " bytes at offset " + offset + " length=" + src.length);
+            }
+
+            offset += amtWritten;
+        }
+        return offset;
+    }
 
     @Override
     public abstract void setParameters(
@@ -164,4 +252,12 @@ abstract class CommonUsbSerialPort implements UsbSerialPort {
         return !flushReadBuffers && !flushWriteBuffers;
     }
 
+    @Override
+    public int read(byte[] dst, int offset, int length) throws IOException {
+        return read(dst, offset, length, 5000);
+    }
+
+    @Override
+    public void stopRead() {
+    }
 }

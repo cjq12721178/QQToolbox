@@ -235,89 +235,139 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
             mConnection = null;
         }
 
+//        @Override
+//        public int readWithBuffer(byte[] dst, int timeoutMillis) throws IOException {
+//            if (mEnableAsyncReads) {
+//              final UsbRequest request = new UsbRequest();
+//              try {
+//                request.initialize(mConnection, mReadEndpoint);
+//                final ByteBuffer buf = ByteBuffer.wrap(dst);
+//                if (!request.queue(buf, dst.length)) {
+//                  throw new IOException("Error queueing request.");
+//                }
+//
+//                final UsbRequest response = mConnection.requestWait();
+//                if (response == null) {
+//                  throw new IOException("Null response");
+//                }
+//
+//                final int nread = buf.position();
+//                if (nread > 0) {
+//                  //Log.d(TAG, HexDump.dumpHexString(dest, 0, Math.min(32, dest.length)));
+//                  return nread;
+//                } else {
+//                  return 0;
+//                }
+//              } finally {
+//                request.close();
+//              }
+//            }
+//
+//            final int numBytesRead;
+//            synchronized (mReadBufferLock) {
+//                int readAmt = Math.min(dst.length, mReadBuffer.length);
+//                numBytesRead = mConnection.bulkTransfer(mReadEndpoint, mReadBuffer, readAmt,
+//                        timeoutMillis);
+//                if (numBytesRead < 0) {
+//                    // This sucks: we get -1 on timeout, not 0 as preferred.
+//                    // We *should* use UsbRequest, except it has a bug/api oversight
+//                    // where there is no way to determine the number of bytes read
+//                    // in response :\ -- http://b.android.com/28023
+//                    if (timeoutMillis == Integer.MAX_VALUE) {
+//                        // Hack: Special case "~infinite timeout" as an error.
+//                        return -1;
+//                    }
+//                    return 0;
+//                }
+//                System.arraycopy(mReadBuffer, 0, dst, 0, numBytesRead);
+//            }
+//            return numBytesRead;
+//        }
+
+
         @Override
-        public int read(byte[] dest, int timeoutMillis) throws IOException {
-            if (mEnableAsyncReads) {
-              final UsbRequest request = new UsbRequest();
-              try {
+        public int read(byte[] dst, int offset, int length, int timeoutMillis) throws IOException {
+            return mEnableAsyncReads
+                    ? asyncRead(dst, offset, length, timeoutMillis)
+                    : read(mReadEndpoint, dst, offset, length, timeoutMillis);
+        }
+
+        @Override
+        public int readWithBuffer(byte[] dst, int timeoutMillis) throws IOException {
+            return mEnableAsyncReads
+                    ? asyncRead(dst, 0, dst.length, timeoutMillis)
+                    : readWithBuffer(mReadEndpoint, dst, timeoutMillis);
+        }
+
+        private int asyncRead(byte[] dst, int offset, int length, int timeoutMillis) throws IOException {
+            final UsbRequest request = new UsbRequest();
+            try {
                 request.initialize(mConnection, mReadEndpoint);
-                final ByteBuffer buf = ByteBuffer.wrap(dest);
-                if (!request.queue(buf, dest.length)) {
-                  throw new IOException("Error queueing request.");
+                final ByteBuffer buf = ByteBuffer.wrap(dst, offset, length);
+                if (!request.queue(buf, length)) {
+                    throw new IOException("Error queueing request.");
                 }
 
                 final UsbRequest response = mConnection.requestWait();
                 if (response == null) {
-                  throw new IOException("Null response");
+                    throw new IOException("Null response");
                 }
 
                 final int nread = buf.position();
                 if (nread > 0) {
-                  //Log.d(TAG, HexDump.dumpHexString(dest, 0, Math.min(32, dest.length)));
-                  return nread;
+                    //Log.d(TAG, HexDump.dumpHexString(dest, 0, Math.min(32, dest.length)));
+                    return nread;
                 } else {
-                  return 0;
-                }
-              } finally {
-                request.close();
-              }
-            }
-
-            final int numBytesRead;
-            synchronized (mReadBufferLock) {
-                int readAmt = Math.min(dest.length, mReadBuffer.length);
-                numBytesRead = mConnection.bulkTransfer(mReadEndpoint, mReadBuffer, readAmt,
-                        timeoutMillis);
-                if (numBytesRead < 0) {
-                    // This sucks: we get -1 on timeout, not 0 as preferred.
-                    // We *should* use UsbRequest, except it has a bug/api oversight
-                    // where there is no way to determine the number of bytes read
-                    // in response :\ -- http://b.android.com/28023
-                    if (timeoutMillis == Integer.MAX_VALUE) {
-                        // Hack: Special case "~infinite timeout" as an error.
-                        return -1;
-                    }
                     return 0;
                 }
-                System.arraycopy(mReadBuffer, 0, dest, 0, numBytesRead);
+            } finally {
+                request.close();
             }
-            return numBytesRead;
         }
 
         @Override
-        public int write(byte[] src, int timeoutMillis) throws IOException {
-            // TODO(mikey): Nearly identical to FtdiSerial write. Refactor.
-            int offset = 0;
-
-            while (offset < src.length) {
-                final int writeLength;
-                final int amtWritten;
-
-                synchronized (mWriteBufferLock) {
-                    final byte[] writeBuffer;
-
-                    writeLength = Math.min(src.length - offset, mWriteBuffer.length);
-                    if (offset == 0) {
-                        writeBuffer = src;
-                    } else {
-                        // bulkTransfer does not support offsets, make a copy.
-                        System.arraycopy(src, offset, mWriteBuffer, 0, writeLength);
-                        writeBuffer = mWriteBuffer;
-                    }
-
-                    amtWritten = mConnection.bulkTransfer(mWriteEndpoint, writeBuffer, writeLength,
-                            timeoutMillis);
-                }
-                if (amtWritten <= 0) {
-                    throw new IOException("Error writing " + writeLength
-                            + " bytes at offset " + offset + " length=" + src.length);
-                }
-
-                Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
-                offset += amtWritten;
-            }
-            return offset;
+        public int write(byte[] src, int offset, int length, int timeoutMillis) throws IOException {
+            return write(mWriteEndpoint, src, offset, length, timeoutMillis);
         }
+
+        @Override
+        public int writeWithBuffer(byte[] src, int timeoutMillis) throws IOException {
+            return writeWithBuffer(mWriteEndpoint, src, timeoutMillis);
+        }
+
+        //        @Override
+//        public int write(byte[] src, int timeoutMillis) throws IOException {
+//            int offset = 0;
+//
+//            while (offset < src.length) {
+//                final int writeLength;
+//                final int amtWritten;
+//
+//                synchronized (mWriteBufferLock) {
+//                    final byte[] writeBuffer;
+//
+//                    writeLength = Math.min(src.length - offset, mWriteBuffer.length);
+//                    if (offset == 0) {
+//                        writeBuffer = src;
+//                    } else {
+//                        // bulkTransfer does not support offsets, make a copy.
+//                        System.arraycopy(src, offset, mWriteBuffer, 0, writeLength);
+//                        writeBuffer = mWriteBuffer;
+//                    }
+//
+//                    amtWritten = mConnection.bulkTransfer(mWriteEndpoint, writeBuffer, writeLength,
+//                            timeoutMillis);
+//                }
+//                if (amtWritten <= 0) {
+//                    throw new IOException("Error writing " + writeLength
+//                            + " bytes at offset " + offset + " length=" + src.length);
+//                }
+//
+//                Log.d(TAG, "Wrote amt=" + amtWritten + " attempted=" + writeLength);
+//                offset += amtWritten;
+//            }
+//            return offset;
+//        }
 
         @Override
         public void setParameters(int baudRate, int dataBits, int stopBits, int parity) {
@@ -397,6 +447,10 @@ public class CdcAcmSerialDriver implements UsbSerialDriver {
             sendAcmControlMessage(SET_CONTROL_LINE_STATE, value, null);
         }
 
+        @Override
+        public boolean canRead() {
+            return mReadEndpoint != null;
+        }
     }
 
     public static Map<Integer, int[]> getSupportedDevices() {

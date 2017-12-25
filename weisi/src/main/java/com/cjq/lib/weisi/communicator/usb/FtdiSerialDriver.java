@@ -276,88 +276,145 @@ public class FtdiSerialDriver implements UsbSerialDriver {
             }
         }
 
+//        @Override
+//        public int read(byte[] dst, int timeoutMillis) throws IOException {
+//            final UsbEndpoint endpoint = mDevice.getInterface(0).getEndpoint(0);
+//
+//            if (ENABLE_ASYNC_READS) {
+//                final int readAmt;
+//                synchronized (mReadBufferLock) {
+//                    // mReadBuffer is only used for maximum read size.
+//                    readAmt = Math.min(dst.length, mReadBuffer.length);
+//                }
+//
+//                final UsbRequest request = new UsbRequest();
+//                request.initialize(mConnection, endpoint);
+//
+//                final ByteBuffer buf = ByteBuffer.wrap(dst);
+//                if (!request.queue(buf, readAmt)) {
+//                    throw new IOException("Error queueing request.");
+//                }
+//
+//                final UsbRequest response = mConnection.requestWait();
+//                if (response == null) {
+//                    throw new IOException("Null response");
+//                }
+//
+//                final int payloadBytesRead = buf.position() - MODEM_STATUS_HEADER_LENGTH;
+//                if (payloadBytesRead > 0) {
+//                    Log.d(TAG, HexDump.dumpHexString(dst, 0, Math.min(32, dst.length)));
+//                    return payloadBytesRead;
+//                } else {
+//                    return 0;
+//                }
+//            } else {
+//                final int totalBytesRead;
+//
+//                synchronized (mReadBufferLock) {
+//                    final int readAmt = Math.min(dst.length, mReadBuffer.length);
+//                    totalBytesRead = mConnection.bulkTransfer(endpoint, mReadBuffer,
+//                            readAmt, timeoutMillis);
+//
+//                    if (totalBytesRead < MODEM_STATUS_HEADER_LENGTH) {
+//                        throw new IOException("Expected at least " + MODEM_STATUS_HEADER_LENGTH + " bytes");
+//                    }
+//
+//                    return filterStatusBytes(mReadBuffer, dst, totalBytesRead, endpoint.getMaxPacketSize());
+//                }
+//            }
+//        }
+
+
         @Override
-        public int read(byte[] dest, int timeoutMillis) throws IOException {
+        public int read(byte[] dst, int offset, int length, int timeoutMillis) throws IOException {
             final UsbEndpoint endpoint = mDevice.getInterface(0).getEndpoint(0);
-
-            if (ENABLE_ASYNC_READS) {
-                final int readAmt;
-                synchronized (mReadBufferLock) {
-                    // mReadBuffer is only used for maximum read size.
-                    readAmt = Math.min(dest.length, mReadBuffer.length);
-                }
-
-                final UsbRequest request = new UsbRequest();
-                request.initialize(mConnection, endpoint);
-
-                final ByteBuffer buf = ByteBuffer.wrap(dest);
-                if (!request.queue(buf, readAmt)) {
-                    throw new IOException("Error queueing request.");
-                }
-
-                final UsbRequest response = mConnection.requestWait();
-                if (response == null) {
-                    throw new IOException("Null response");
-                }
-
-                final int payloadBytesRead = buf.position() - MODEM_STATUS_HEADER_LENGTH;
-                if (payloadBytesRead > 0) {
-                    Log.d(TAG, HexDump.dumpHexString(dest, 0, Math.min(32, dest.length)));
-                    return payloadBytesRead;
-                } else {
-                    return 0;
-                }
-            } else {
-                final int totalBytesRead;
-
-                synchronized (mReadBufferLock) {
-                    final int readAmt = Math.min(dest.length, mReadBuffer.length);
-                    totalBytesRead = mConnection.bulkTransfer(endpoint, mReadBuffer,
-                            readAmt, timeoutMillis);
-
-                    if (totalBytesRead < MODEM_STATUS_HEADER_LENGTH) {
-                        throw new IOException("Expected at least " + MODEM_STATUS_HEADER_LENGTH + " bytes");
-                    }
-
-                    return filterStatusBytes(mReadBuffer, dest, totalBytesRead, endpoint.getMaxPacketSize());
-                }
-            }
+            return ENABLE_ASYNC_READS
+                    ? asyncRead(endpoint, dst, offset, length, timeoutMillis)
+                    : read(endpoint, dst, offset, length, timeoutMillis);
         }
 
         @Override
-        public int write(byte[] src, int timeoutMillis) throws IOException {
-            final UsbEndpoint endpoint = mDevice.getInterface(0).getEndpoint(1);
-            int offset = 0;
+        public int readWithBuffer(byte[] dst, int timeoutMillis) throws IOException {
+            final UsbEndpoint endpoint = mDevice.getInterface(0).getEndpoint(0);
+            return ENABLE_ASYNC_READS
+                    ? asyncRead(endpoint, dst, 0, dst.length, timeoutMillis)
+                    : readWithBuffer(endpoint, dst, timeoutMillis);
+        }
 
-            while (offset < src.length) {
-                final int writeLength;
-                final int amtWritten;
-
-                synchronized (mWriteBufferLock) {
-                    final byte[] writeBuffer;
-
-                    writeLength = Math.min(src.length - offset, mWriteBuffer.length);
-                    if (offset == 0) {
-                        writeBuffer = src;
-                    } else {
-                        // bulkTransfer does not support offsets, make a copy.
-                        System.arraycopy(src, offset, mWriteBuffer, 0, writeLength);
-                        writeBuffer = mWriteBuffer;
-                    }
-
-                    amtWritten = mConnection.bulkTransfer(endpoint, writeBuffer, writeLength,
-                            timeoutMillis);
-                }
-
-                if (amtWritten <= 0) {
-                    throw new IOException("Error writing " + writeLength
-                            + " bytes at offset " + offset + " length=" + src.length);
-                }
-
-                Log.d(TAG, "Wrote amtWritten=" + amtWritten + " attempted=" + writeLength);
-                offset += amtWritten;
+        private int asyncRead(UsbEndpoint readEndPoint, byte[] dst, int offset, int length, int timeoutMillis) throws IOException {
+            final int readAmt;
+            synchronized (mReadBufferLock) {
+                // mReadBuffer is only used for maximum read size.
+                readAmt = Math.min(length, mReadBuffer.length);
             }
-            return offset;
+
+            final UsbRequest request = new UsbRequest();
+            request.initialize(mConnection, readEndPoint);
+
+            final ByteBuffer buf = ByteBuffer.wrap(dst, offset, length);
+            if (!request.queue(buf, readAmt)) {
+                throw new IOException("Error queueing request.");
+            }
+
+            final UsbRequest response = mConnection.requestWait();
+            if (response == null) {
+                throw new IOException("Null response");
+            }
+
+            final int payloadBytesRead = buf.position() - MODEM_STATUS_HEADER_LENGTH;
+            if (payloadBytesRead > 0) {
+                //Log.d(TAG, HexDump.dumpHexString(dst, 0, Math.min(32, dst.length)));
+                return payloadBytesRead;
+            } else {
+                return 0;
+            }
+        }
+
+//        @Override
+//        public int write(byte[] src, int timeoutMillis) throws IOException {
+//            final UsbEndpoint endpoint = mDevice.getInterface(0).getEndpoint(1);
+//            int offset = 0;
+//
+//            while (offset < src.length) {
+//                final int writeLength;
+//                final int amtWritten;
+//
+//                synchronized (mWriteBufferLock) {
+//                    final byte[] writeBuffer;
+//
+//                    writeLength = Math.min(src.length - offset, mWriteBuffer.length);
+//                    if (offset == 0) {
+//                        writeBuffer = src;
+//                    } else {
+//                        // bulkTransfer does not support offsets, make a copy.
+//                        System.arraycopy(src, offset, mWriteBuffer, 0, writeLength);
+//                        writeBuffer = mWriteBuffer;
+//                    }
+//
+//                    amtWritten = mConnection.bulkTransfer(endpoint, writeBuffer, writeLength,
+//                            timeoutMillis);
+//                }
+//
+//                if (amtWritten <= 0) {
+//                    throw new IOException("Error writing " + writeLength
+//                            + " bytes at offset " + offset + " length=" + src.length);
+//                }
+//
+//                Log.d(TAG, "Wrote amtWritten=" + amtWritten + " attempted=" + writeLength);
+//                offset += amtWritten;
+//            }
+//            return offset;
+//        }
+
+
+        @Override
+        public int write(byte[] src, int offset, int length, int timeoutMillis) throws IOException {
+            return write(mDevice.getInterface(0).getEndpoint(1), src, offset, length, timeoutMillis);
+        }
+
+        @Override
+        public int writeWithBuffer(byte[] src, int timeoutMillis) throws IOException {
+            return writeWithBuffer(mDevice.getInterface(0).getEndpoint(1), src, timeoutMillis);
         }
 
         private int setBaudRate(int baudRate) throws IOException {
@@ -565,6 +622,11 @@ public class FtdiSerialDriver implements UsbSerialDriver {
                 }
             }
             return true;
+        }
+
+        @Override
+        public boolean canRead() {
+            return mDevice.getInterface(0).getEndpoint(0) != null;
         }
     }
 

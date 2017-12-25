@@ -14,7 +14,7 @@ import java.io.IOException;
  * Created by CJQ on 2017/11/24.
  */
 
-public class SerialPortKit {
+public class SerialPortKit implements Communicator {
 
     private static final String TAG = "SerialPort";
 
@@ -24,8 +24,8 @@ public class SerialPortKit {
     private FileDescriptor mFd;
     private FileInputStream mFileInputStream;
     private FileOutputStream mFileOutputStream;
-    private boolean mListening;
-    private OnCommunicatorErrorOccurredListener mErrorOccurredListener;
+    //private boolean mListening;
+    //private OnCommunicatorErrorOccurredListener mErrorOccurredListener;
 
     // JNI
     private native static FileDescriptor open(String path, int baudRate, int flags);
@@ -55,7 +55,7 @@ public class SerialPortKit {
                         return false;
                     }
                 } catch (Exception e) {
-                    processError(e);
+                    //processError(e);
                     return false;
                 }
             }
@@ -76,22 +76,24 @@ public class SerialPortKit {
     }
 
     public void shutdown() {
-        stopListen();
+        //stopListen();
         if (mFd != null) {
             close();
             mFd = null;
+            mFileInputStream = null;
+            mFileOutputStream = null;
         }
     }
 
-    public void setErrorOccurredListener(OnCommunicatorErrorOccurredListener listener) {
-        mErrorOccurredListener = listener;
-    }
-
-    public void processError(Exception e) {
-        if (mErrorOccurredListener != null) {
-            mErrorOccurredListener.onErrorOccurred(e);
-        }
-    }
+//    public void setErrorOccurredListener(OnCommunicatorErrorOccurredListener listener) {
+//        mErrorOccurredListener = listener;
+//    }
+//
+//    public void processError(Exception e) {
+//        if (mErrorOccurredListener != null) {
+//            mErrorOccurredListener.onErrorOccurred(e);
+//        }
+//    }
 
     //若输入流未获取，返回-2
     public int receive() throws IOException {
@@ -125,59 +127,76 @@ public class SerialPortKit {
         send(new byte[] { (byte) b }, 0, 1);
     }
 
-    public void startListen(final OnDataReceivedListener listener) {
-        if (mFileInputStream == null
-                || listener == null
-                || mListening) {
-            return;
-        }
-        Thread thread = new Thread() {
-
-            @Override
-            public void run() {
-                int receivedLen;
-                int handledLen;
-                int offset = 0;
-                mListening = true;
-                byte[] data = new byte[2048];
-                while (mListening && !isInterrupted()) {
-                    try {
-                        if (mFileInputStream != null) {
-                            receivedLen = mFileInputStream.read(data, offset, data.length - offset);
-                            handledLen = listener.onDataReceived(data, offset + receivedLen);
-                            offset = saveUnhandledData(data, offset + receivedLen, handledLen);
-                        }
-                    } catch (IOException e) {
-                        processError(e);
-                    }
-                }
-                mListening = false;
-            }
-        };
-        thread.start();
+    @Override
+    public int read(byte[] dst, int offset, int length) throws IOException {
+        int result = receive(dst, offset, length);
+        return result >= 0
+                ? result
+                : 0;
     }
 
-    public void stopListen() {
-        if (mListening) {
-            mListening = false;
-        }
+    @Override
+    public boolean canRead() {
+        return mFileInputStream != null;
     }
 
-    private int saveUnhandledData(byte[] data, int receivedLen, int handledLen) {
-        if (handledLen >= receivedLen) {
-            return 0;
-        } else if (handledLen > 0 && handledLen < receivedLen) {
-            for (int i = handledLen; i < receivedLen; ++i) {
-                data[i - handledLen] = data[i];
-            }
-            return receivedLen - handledLen;
-        } else {
-            return receivedLen;
-        }
+    @Override
+    public void stopRead() {
     }
 
-    public interface OnDataReceivedListener {
-        //返回已处理字节数
-        int onDataReceived(byte[] data, int len);
-    }
+//    public void startListen(final OnDataReceivedListener listener) {
+//        if (mFileInputStream == null
+//                || listener == null
+//                || mListening) {
+//            return;
+//        }
+//        Thread thread = new Thread() {
+//
+//            @Override
+//            public void run() {
+//                int receivedLen;
+//                int handledLen;
+//                int offset = 0;
+//                mListening = true;
+//                byte[] data = new byte[2048];
+//                while (mListening && !isInterrupted()) {
+//                    try {
+//                        if (mFileInputStream != null) {
+//                            receivedLen = mFileInputStream.read(data, offset, data.length - offset);
+//                            handledLen = listener.onDataReceived(data, offset + receivedLen);
+//                            offset = saveUnhandledData(data, offset + receivedLen, handledLen);
+//                        }
+//                    } catch (IOException e) {
+//                        processError(e);
+//                    }
+//                }
+//                mListening = false;
+//            }
+//        };
+//        thread.start();
+//    }
+//
+//    public void stopListen() {
+//        if (mListening) {
+//            mListening = false;
+//        }
+//    }
+//
+//    private int saveUnhandledData(byte[] data, int receivedLen, int handledLen) {
+//        if (handledLen >= receivedLen) {
+//            return 0;
+//        } else if (handledLen > 0 && handledLen < receivedLen) {
+//            for (int i = handledLen; i < receivedLen; ++i) {
+//                data[i - handledLen] = data[i];
+//            }
+//            return receivedLen - handledLen;
+//        } else {
+//            return receivedLen;
+//        }
+//    }
+//
+//    public interface OnDataReceivedListener {
+//        //返回已处理字节数
+//        int onDataReceived(byte[] data, int len);
+//    }
 }
