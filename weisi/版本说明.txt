@@ -265,3 +265,7 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 2. 新增DataReceiver类，专门用于读取通讯模块数据
 3. 新增SyncDataReceiver类，用于读取数据采用阻塞模式的通讯模块
 4. 新增Communicator接口，通讯类实现该接口配合DataReceiver类以提供数据接收服务
+
+20171226-3.2.0(72):
+1. 新增UsbKit类，进一步简化USB通讯
+2. 为ScoutUdpSensorProtocol类新增方法analyzeMultiplePackages，用以解析多包或者分包数据

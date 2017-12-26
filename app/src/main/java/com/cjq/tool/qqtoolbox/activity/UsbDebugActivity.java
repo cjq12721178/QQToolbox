@@ -8,6 +8,7 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -53,8 +54,44 @@ public class UsbDebugActivity
 
     private BroadcastReceiver mUsbDeviceReceiver = new BroadcastReceiver() {
         @Override
-        public void onReceive(Context context, Intent intent) {
-            if (ACTION_USB_PERMISSION.equals(intent.getAction())) {
+        public void onReceive(final Context context, Intent intent) {
+            String action = intent.getAction();
+            if (UsbManager.ACTION_USB_DEVICE_ATTACHED.equals(action)) {
+                final UsbDevice deviceFound = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        mAvailableDrivers = UsbSerialProber.getDefaultProber().findAllDrivers(mUsbManager);
+                        List<String> devicesName = new ArrayList<>();
+                        for (UsbSerialDriver driver :
+                                mAvailableDrivers) {
+                            devicesName.add(driver.getDevice().getDeviceName());
+                        }
+                        int selectedPosition = devicesName.indexOf(deviceFound.getDeviceName());
+                        mSpnSelectDevice.setAdapter(new ArrayAdapter(
+                                context,
+                                android.R.layout.simple_spinner_dropdown_item,
+                                devicesName));
+                        mSpnSelectDevice.setSelection(selectedPosition, true);
+                    }
+                });
+
+//                Message message = Message.obtain();
+//                message.what = MSG_USB_INSERTED;
+//                message.obj = deviceFound.toString();
+//                handler.sendMessage(message);
+            } else if (UsbManager.ACTION_USB_DEVICE_DETACHED.equals(action)) {
+                closeDevice();
+                //UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+//                Message message = Message.obtain();
+//                message.what = MSG_USB_EXIT;
+//                message.obj = device.toString();
+//                handler.sendMessage(message);
+//				Toast.makeText(MainActivity.this,
+//						"ACTION_USB_DEVICE_DETACHED: \n" + device.toString(),
+//						Toast.LENGTH_LONG).show();
+//				handler.sendEmptyMessage(MSG_USB_EXIT);
+            } else if (ACTION_USB_PERMISSION.equals(action)) {
                 //UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                     openDeviceAndSetParameter();
@@ -211,9 +248,10 @@ public class UsbDebugActivity
 
     private IntentFilter makeUsbDeviceIntentFilter() {
         IntentFilter intentFilter = new IntentFilter();
-        //intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        //intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         intentFilter.addAction(ACTION_USB_PERMISSION);
+
         return intentFilter;
     }
 

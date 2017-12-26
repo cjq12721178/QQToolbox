@@ -42,7 +42,9 @@ public class UdpDebugActivity
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mUdpKit.close();
+        if (mUdpKit != null) {
+            mUdpKit.close();
+        }
         SyncDataReceiver.shutdown();
     }
 

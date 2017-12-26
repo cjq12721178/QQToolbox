@@ -94,6 +94,66 @@ public class ScoutUdpSensorProtocol implements Constant {
         }
     }
 
+    public int analyzeMultiplePackages(byte[] udpData, int offset, int length, OnFrameAnalyzedListener listener) {
+        if (listener == null) {
+            throw new NullPointerException("it is no meaning that listener is null");
+        }
+        if (udpData == null
+                || offset < 0
+                || offset + length > udpData.length) {
+            return 0;
+        }
+
+        int start = offset;
+        for (int end = offset + length,
+             realDataZoneLength,
+             realDataLength;
+             start < end;
+             start += realDataLength) {
+            //查找起始字符位置
+            while (start < end) {
+                while (udpData[start++] != START_CHARACTER[0] && start < end);
+                if (start >= end) {
+                    break;
+                }
+                if (udpData[start++] == START_CHARACTER[1]) {
+                    start -= START_CHARACTER.length;
+                    break;
+                }
+            }
+            if (start >= end) {
+                break;
+            }
+            //判断数据长度是否大于最小数据长度
+            if (start + MIN_FRAME_LENGTH < end) {
+                break;
+            }
+            //记录实际数据域长度（除去命令码长度之后的长度）
+            realDataZoneLength = NumericConverter.int8ToUInt16(udpData[start + START_CHARACTER.length + BASE_STATION_ADDRESS_LENGTH]) - COMMAND_CODE_LENGTH;
+            //计算实际数据长度
+            realDataLength = MIN_FRAME_LENGTH + realDataZoneLength;
+            //检查结束符
+            if (udpData[start + realDataLength - 2] != END_CHARACTER[0]
+                    || udpData[start + realDataLength - 1] != END_CHARACTER[1]) {
+                continue;
+            }
+            //计算CRC16并校验
+            if (!Crc.isCorrect16(udpData,
+                    start + START_CHARACTER.length,
+                    BASE_STATION_ADDRESS_LENGTH
+                            + DATA_ZONE_LENGTH_LENGTH
+                            + COMMAND_CODE_LENGTH
+                            + realDataZoneLength,
+                    true,
+                    false)) {
+                continue;
+            }
+
+            analyzeDataZone(udpData, start + DATA_ZONE_POSITION, realDataZoneLength, listener);
+        }
+        return start - offset;
+    }
+
     private void onDataAnalyzed(byte[] data,
                                 int realDataZoneStart,
                                 int realDataZoneLength,
