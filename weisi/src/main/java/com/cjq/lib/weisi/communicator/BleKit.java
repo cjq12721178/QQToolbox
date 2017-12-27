@@ -54,13 +54,17 @@ public class BleKit {
         return true;
     }
 
+    public boolean isLaunch() {
+        return mBluetoothAdapter != null;
+    }
+
     //intervalTime = 0，不间断扫描，此时durationTime无意义
     //intervalTime > 0，间隔intervalTime时间段扫描，持续durationTime时间段
     //intervalTime < 0，进行单次扫描
     public boolean startScan(BluetoothAdapter.LeScanCallback leScanCallback,
                           long intervalTime,
                           long durationTime) {
-        stopScan();
+        //stopScan();
         if (leScanCallback != null &&
                 mBluetoothAdapter != null &&
                 !mScanning &&
