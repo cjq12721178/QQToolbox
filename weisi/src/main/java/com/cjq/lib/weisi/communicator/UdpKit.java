@@ -78,8 +78,24 @@ public class UdpKit implements Communicator {
     }
 
     public void setSendParameter(InetAddress ip, int port, byte[] data) {
+        setSendIp(ip);
+        setSendPort(port);
+        setSendData(data);
+    }
+
+    public void setSendIp(InetAddress ip) {
         mSendPacket.setAddress(ip);
+    }
+
+    public void setSendIp(String ip) throws UnknownHostException {
+        setSendIp(InetAddress.getByName(ip));
+    }
+
+    public void setSendPort(int port) {
         mSendPacket.setPort(port);
+    }
+
+    public void setSendData(byte[] data) {
         mSendPacket.setData(data);
     }
 //    //以circulateTime为时间间隔循环发送数据
