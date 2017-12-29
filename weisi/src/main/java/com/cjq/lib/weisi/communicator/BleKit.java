@@ -7,6 +7,8 @@ import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothGattCharacteristic;
 import android.bluetooth.BluetoothGattService;
 import android.bluetooth.BluetoothManager;
+import android.bluetooth.le.ScanCallback;
+import android.bluetooth.le.ScanResult;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Handler;
@@ -24,7 +26,7 @@ public class BleKit {
 
     private long mIntervalTime = -1;
     private long mDurationTime = 10000;
-    private boolean mScanning = false;
+    private volatile boolean mScanning = false;
     private Handler mHandler = new Handler();
     private BluetoothAdapter.LeScanCallback mLeScanCallback;
     private BluetoothAdapter mBluetoothAdapter;
@@ -46,7 +48,7 @@ public class BleKit {
                 return false;
             }
 
-            if (!mBluetoothAdapter.enable()) {
+            if (!mBluetoothAdapter.isEnabled()) {
                 mBluetoothAdapter = null;
                 return false;
             }
@@ -80,16 +82,22 @@ public class BleKit {
     private Runnable mOnStartScan = new Runnable() {
         @Override
         public void run() {
-            mScanning = true;
-            if (!mBluetoothAdapter.isEnabled()) {
-                mBluetoothAdapter.enable();
-            }
-            if (mBluetoothAdapter.startLeScan(mLeScanCallback)) {
-                if (mIntervalTime != 0) {
-                    mHandler.postDelayed(mOnStopScan, mDurationTime);
+            if (mScanning = mBluetoothAdapter.isEnabled()) {
+                int state = mBluetoothAdapter.getState();
+                if (state == BluetoothAdapter.STATE_ON) {
+                    if (mBluetoothAdapter.startLeScan(mLeScanCallback)) {
+                        if (mIntervalTime != 0) {
+                            mHandler.postDelayed(mOnStopScan, mDurationTime);
+                        }
+                    } else {
+                        mScanning = false;
+                    }
+                } else if (state == BluetoothAdapter.STATE_TURNING_ON) {
+                    mScanning = false;
+                    mHandler.postDelayed(mOnStartScan, 20);
+                } else {
+                    mScanning = false;
                 }
-            } else {
-                mScanning = false;
             }
         }
     };

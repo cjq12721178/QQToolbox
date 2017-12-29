@@ -31,6 +31,8 @@
         </activity>
         <activity android:name=".activity.UdpDebugActivity">
         </activity>
+        <activity android:name=".activity.BleDebugActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -320,6 +320,9 @@ public class MainActivity
             case R.id.btn_open_udp_activity:
                 startActivity(new Intent(this, UdpDebugActivity.class));
                 break;
+            case R.id.btn_open_ble_activity:
+                startActivity(new Intent(this, BleDebugActivity.class));
+                break;
         }
     }
 

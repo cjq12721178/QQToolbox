@@ -274,5 +274,10 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. 为BleKit类新增方法isLaunch()
 2. 修改BleKit类startScan方法，不再包含stopScan
 
-20171227-3.3.0(74):
+20171227-3.2.2(74):
 1. 为UdpKit新增一系列发送参数设置，方便使用
+
+20171229-3.2.3(75):
+1. 修改BleKit类mOnStartScan.Run方法，保证在BLE已启动状态下搜搜设备
+2. 将compileSdkVersion从25升至27
+3. 将targetSdkVersion从18升至27
