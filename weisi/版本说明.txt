@@ -281,3 +281,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. 修改BleKit类mOnStartScan.Run方法，保证在BLE已启动状态下搜搜设备
 2. 将compileSdkVersion从25升至27
 3. 将targetSdkVersion从18升至27
+
+20180108-3.2.4(76):
+1. 拓展UsbKit启动方法，目前有三种，根据vendorId和productId，根据移动设备自行检测到的UsbDevice，以及对所以支持的已插入USB设备进行启动

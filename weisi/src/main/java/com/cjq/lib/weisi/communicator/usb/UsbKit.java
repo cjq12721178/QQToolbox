@@ -33,9 +33,9 @@ public class UsbKit {
                 close(device);
             } else if (ACTION_USB_PERMISSION.equals(action)) {
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                    open(device);
+                    open(null, device);
                 } else {
-                    open(null);
+                    open(null,null);
                 }
             }
         }
@@ -63,9 +63,24 @@ public class UsbKit {
         usbManager = null;
     }
 
+    public static boolean launch(Context context) {
+        return launch(context, 0, 0);
+    }
+
     public static boolean launch(Context context, int vendorId, int productId) {
-        return launch(context,
-                findDeviceByVendorIdAndProductId(vendorId, productId));
+        if (vendorId == 0 && productId == 0) {
+            UsbSerialProber prober = UsbSerialProber.getDefaultProber();
+            for (UsbSerialDriver driver :
+                    prober.findAllDrivers(usbManager)) {
+                if (!launch(context, prober, driver.getDevice())) {
+                    return false;
+                }
+            }
+            return true;
+        } else {
+            return launch(context,
+                    findDeviceByVendorIdAndProductId(vendorId, productId));
+        }
     }
 
     private static UsbDevice findDeviceByVendorIdAndProductId(int vendorId, int productId) {
@@ -82,11 +97,15 @@ public class UsbKit {
     }
 
     public static boolean launch(Context context, UsbDevice device) {
+        return launch(context, null, device);
+    }
+
+    private static boolean launch(Context context, UsbSerialProber prober, UsbDevice device) {
         if (usbManager == null || context == null || device == null) {
             return false;
         }
         if (usbManager.hasPermission(device)) {
-            return open(device);
+            return open(prober, device);
         } else {
             usbManager.requestPermission(device,
                     PendingIntent.getBroadcast(context, 0, new Intent(ACTION_USB_PERMISSION), 0));
@@ -94,8 +113,11 @@ public class UsbKit {
         return true;
     }
 
-    private static boolean open(UsbDevice device) {
-        UsbSerialDriver driver = UsbSerialProber.getDefaultProber().probeDevice(device);
+    private static boolean open(UsbSerialProber prober, UsbDevice device) {
+        if (device == null) {
+            return false;
+        }
+        UsbSerialDriver driver = (prober != null ? prober : UsbSerialProber.getDefaultProber()).probeDevice(device);
         if (driver != null) {
             UsbDeviceConnection connection = usbManager.openDevice(device);
             UsbSerialPort port = driver.getPorts().get(0);

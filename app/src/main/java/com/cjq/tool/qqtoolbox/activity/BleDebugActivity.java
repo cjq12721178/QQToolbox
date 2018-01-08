@@ -3,10 +3,10 @@ package com.cjq.tool.qqtoolbox.activity;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothManager;
 import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.annotation.Size;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -167,4 +167,46 @@ public class BleDebugActivity
 
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+//    private static abstract class PermissionsRequester implements EasyPermissions.PermissionCallbacks {
+//
+//        private OnRequestResultListener mListener;
+//        private final int REQUEST_CODE;
+//        private final String[] PERMISSIONS;
+//
+//        protected PermissionsRequester(int request_code,
+//                                       String[] permissions) {
+//            REQUEST_CODE = request_code;
+//            PERMISSIONS = permissions;
+//        }
+//
+//        public void requestPermissions(OnRequestResultListener listener) {
+//            if (listener == null) {
+//                throw new NullPointerException("listener may not be null");
+//            }
+//            mListener = listener;
+//            if (hasPermissions()) {
+//                mListener.onPermissionsGranted(mContext);
+//            } else {
+//                onRequestPermissions();
+//            }
+//        }
+//
+//        protected boolean hasPermissions() {
+//            return EasyPermissions.hasPermissions(mContext, PERMISSIONS);
+//        }
+//
+//        protected abstract void onRequestPermissions();
+//
+//        @Override
+//        public void onPermissionsGranted(int requestCode, @NonNull List<String> perms) {
+//            if (requestCode == REQUEST_CODE) {
+//
+//            }
+//        }
+//
+//        public interface OnRequestResultListener {
+//            void onPermissionsGranted(Context context);
+//        }
+//    }
 }
