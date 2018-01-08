@@ -48,8 +48,13 @@ public class UsbKit {
         if (listener == null) {
             throw new NullPointerException("listener may not be null");
         }
+        if (onUsbSerialPortStateChangeListener != listener) {
+            onUsbSerialPortStateChangeListener = listener;
+        }
+        if (isRegistered()) {
+            return;
+        }
         usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
-        onUsbSerialPortStateChangeListener = listener;
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
@@ -57,10 +62,16 @@ public class UsbKit {
         context.registerReceiver(deviceReceiver, intentFilter);
     }
 
+    public static boolean isRegistered() {
+        return usbManager != null;
+    }
+
     public static void unregister(Context context) {
-        context.unregisterReceiver(deviceReceiver);
-        onUsbSerialPortStateChangeListener = null;
-        usbManager = null;
+        if (isRegistered()) {
+            context.unregisterReceiver(deviceReceiver);
+            onUsbSerialPortStateChangeListener = null;
+            usbManager = null;
+        }
     }
 
     public static boolean launch(Context context) {
