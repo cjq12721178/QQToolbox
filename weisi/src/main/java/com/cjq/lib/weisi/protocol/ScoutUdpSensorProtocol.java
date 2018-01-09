@@ -16,8 +16,8 @@ public class ScoutUdpSensorProtocol implements Constant {
 
     public static final byte COMMAND_CODE_REQUEST_DATA = 0x35;
     public static final byte COMMAND_CODE_TIME_SYNCHRONIZATION = 0x42;
-    private static final byte DEFAULT_BASE_STATION_ADDRESS_UP_BIT = 0x00;
-    private static final byte DEFAULT_BASE_STATION_ADDRESS_DOWN_BIT = 0x00;
+    private static final byte DEFAULT_BASE_STATION_ADDRESS_HIGH = 0x00;
+    private static final byte DEFAULT_BASE_STATION_ADDRESS_LOW = 0x00;
     private static final int BASE_STATION_ADDRESS_LENGTH = 2;
     protected static final int DATA_ZONE_LENGTH_LENGTH = 1;
     private static final int COMMAND_CODE_LENGTH = 1;
@@ -204,30 +204,42 @@ public class ScoutUdpSensorProtocol implements Constant {
                 data[++position]);
     }
 
-    public byte[] makeGeneralCommandFrame(@NonNull FrameBuilder builder, byte commandCode) {
-        return builder.makeFrame(commandCode);
+    public byte[] makeGeneralCommandFrame(@NonNull FrameBuilder builder) {
+        return builder.build();
     }
 
     public byte[] makeDataRequestFrame() {
-        return makeGeneralCommandFrame(new EmptyDataZoneFrameBuilder(), COMMAND_CODE_REQUEST_DATA);
+        return makeGeneralCommandFrame(new EmptyDataZoneFrameBuilder(COMMAND_CODE_REQUEST_DATA));
     }
 
     public byte[] makeTimeSynchronizationFrame() {
-        return makeGeneralCommandFrame(new TimeSynchronizationFrameBuilder(), COMMAND_CODE_TIME_SYNCHRONIZATION);
+        return makeGeneralCommandFrame(new TimeSynchronizationFrameBuilder());
     }
 
     public static abstract class FrameBuilder {
 
-        public byte[] makeFrame(byte commandCode) {
+        private final byte mCommandCode;
+        private byte mBaseStationAddressHigh;
+        private byte mBaseStationAddressLow;
+
+        protected FrameBuilder(byte commandCode) {
+            mCommandCode = commandCode;
+            mBaseStationAddressHigh = DEFAULT_BASE_STATION_ADDRESS_HIGH;
+            mBaseStationAddressLow = DEFAULT_BASE_STATION_ADDRESS_LOW;
+        }
+
+        public byte[] build() {
             int dataZoneLength = getDataZoneLength();
             byte[] frame = new byte[MIN_FRAME_LENGTH + dataZoneLength];
             int offset = 0;
             frame[offset] = START_CHARACTER[0];
             frame[++offset] = START_CHARACTER[1];
-            frame[++offset] = DEFAULT_BASE_STATION_ADDRESS_UP_BIT;
-            frame[++offset] = DEFAULT_BASE_STATION_ADDRESS_DOWN_BIT;
+            frame[++offset] = mBaseStationAddressHigh;
+            frame[++offset] = mBaseStationAddressLow;
+            //frame[++offset] = DEFAULT_BASE_STATION_ADDRESS_HIGH;
+            //frame[++offset] = DEFAULT_BASE_STATION_ADDRESS_LOW;
             frame[++offset] = (byte) (dataZoneLength + COMMAND_CODE_LENGTH);
-            frame[++offset] = commandCode;
+            frame[++offset] = mCommandCode;
             fillDataZone(frame, ++offset);
             offset += dataZoneLength;
             int crc16 = Crc.calc16ByMsb(frame, START_CHARACTER.length, offset - START_CHARACTER.length);
@@ -238,13 +250,23 @@ public class ScoutUdpSensorProtocol implements Constant {
             return frame;
         }
 
+        public FrameBuilder setBaseStationAddress(byte high, byte low) {
+            mBaseStationAddressHigh = high;
+            mBaseStationAddressLow = low;
+            return this;
+        }
+
         //返回除命令码之外的数据域长度
         protected abstract int getDataZoneLength();
 
         protected abstract void fillDataZone(byte[] frame, int offset);
     }
 
-    private static class EmptyDataZoneFrameBuilder extends FrameBuilder {
+    public static class EmptyDataZoneFrameBuilder extends FrameBuilder {
+
+        public EmptyDataZoneFrameBuilder(byte commandCode) {
+            super(commandCode);
+        }
 
         @Override
         protected int getDataZoneLength() {
@@ -256,7 +278,11 @@ public class ScoutUdpSensorProtocol implements Constant {
         }
     }
 
-    private static class TimeSynchronizationFrameBuilder extends FrameBuilder {
+    public static class TimeSynchronizationFrameBuilder extends FrameBuilder {
+
+        public TimeSynchronizationFrameBuilder() {
+            super(COMMAND_CODE_TIME_SYNCHRONIZATION);
+        }
 
         @Override
         protected int getDataZoneLength() {

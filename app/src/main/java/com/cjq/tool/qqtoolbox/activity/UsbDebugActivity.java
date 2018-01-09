@@ -22,6 +22,7 @@ import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialDriver;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialPort;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialProber;
+import com.cjq.lib.weisi.protocol.ScoutUdpSensorProtocol;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qbox.util.ExceptionLog;
 import com.cjq.tool.qbox.util.NumericConverter;
@@ -92,9 +93,9 @@ public class UsbDebugActivity
 //						Toast.LENGTH_LONG).show();
 //				handler.sendEmptyMessage(MSG_USB_EXIT);
             } else if (ACTION_USB_PERMISSION.equals(action)) {
-                //UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                UsbDevice device = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                    openDeviceAndSetParameter();
+                    openDeviceAndSetParameter(device);
                 } else {
                     SimpleCustomizeToast.show(context, "用户不允许访问USB设备！");
                 }
@@ -152,14 +153,16 @@ public class UsbDebugActivity
         mUsbSerialDriver = mAvailableDrivers.get(position);
         UsbDevice device = mUsbSerialDriver.getDevice();
         if (mUsbManager.hasPermission(device)) {
-            openDeviceAndSetParameter();
+            openDeviceAndSetParameter(device);
         } else {
             mUsbManager.requestPermission(device,
                     PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0));
         }
     }
 
-    private void openDeviceAndSetParameter() {
+    private void openDeviceAndSetParameter(UsbDevice device) {
+        //mUsbSerialDriver = UsbSerialProber.getDefaultProber().probeDevice(device);
+
         UsbDeviceConnection connection = mUsbManager.openDevice(mUsbSerialDriver.getDevice());
         mUsbSerialPort = mUsbSerialDriver.getPorts().get(0);
         try {
@@ -261,7 +264,9 @@ public class UsbDebugActivity
             case R.id.btn_send:
                 if (mUsbSerialPort != null) {
                     try {
-                        mUsbSerialPort.write(NumericConverter.hexDataStringToBytes(mEtSend.getText().toString()), 5000);
+                        //mUsbSerialPort.write(NumericConverter.hexDataStringToBytes(mEtSend.getText().toString()), 5000);
+                        byte[] commandFrame = new ScoutUdpSensorProtocol.EmptyDataZoneFrameBuilder(ScoutUdpSensorProtocol.COMMAND_CODE_REQUEST_DATA).setBaseStationAddress((byte) 0xFF, (byte) 0xFF).build();
+                        mUsbSerialPort.write(commandFrame, 5000);
                         //mUsbSerialPort.write(new byte[] { 0x12, (byte) 0xAA, (byte) 0xAA, (byte) 0xFF, (byte) 0xFF, 0x01, 0x6C, (byte) 0x9E, 0x1B, 0x55, 0x55 }, 1, 10, 5000);
                     } catch (IOException e) {
                         SimpleCustomizeToast.show(this, e.getMessage());
@@ -274,7 +279,7 @@ public class UsbDebugActivity
                     mUsbSerialDriver = mAvailableDrivers.get(position);
                     UsbDevice device = mUsbSerialDriver.getDevice();
                     if (mUsbManager.hasPermission(device)) {
-                        openDeviceAndSetParameter();
+                        openDeviceAndSetParameter(device);
                     } else {
                         mUsbManager.requestPermission(device,
                                 PendingIntent.getBroadcast(this, 0, new Intent(ACTION_USB_PERMISSION), 0));
