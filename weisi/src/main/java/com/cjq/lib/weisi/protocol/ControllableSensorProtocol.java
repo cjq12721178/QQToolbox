@@ -121,7 +121,7 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
                 break;
             }
             //判断数据长度是否大于最小数据长度
-            if (start + MIN_FRAME_LENGTH < end) {
+            if (start + MIN_FRAME_LENGTH > end) {
                 break;
             }
             //记录实际数据域长度（除去命令码长度之后的长度）
