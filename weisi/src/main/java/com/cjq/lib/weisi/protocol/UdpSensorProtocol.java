@@ -25,12 +25,12 @@ public class UdpSensorProtocol extends ControllableSensorProtocol<EsbAnalyzer> {
     }
 
     @Override
-    protected byte getDataRequestCommandCode() {
+    public byte getDataRequestCommandCode() {
         return COMMAND_CODE_REQUEST_DATA;
     }
 
     @Override
-    protected byte getTimeSynchronizationCommandCode() {
+    public byte getTimeSynchronizationCommandCode() {
         return COMMAND_CODE_TIME_SYNCHRONIZATION;
     }
 

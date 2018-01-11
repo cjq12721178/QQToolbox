@@ -18,7 +18,7 @@ public class BleOnUsbSensorProtocol extends UsbSensorProtocol<BleAnalyzer> {
     }
 
     @Override
-    protected byte getDataRequestCommandCode() {
+    public byte getDataRequestCommandCode() {
         return COMMAND_CODE_REQUEST_DATA;
     }
 

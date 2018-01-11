@@ -318,3 +318,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20180111-3.3.4(84)：
 1. 修复ControllableSensorProtocol多帧解析错误的问题
+
+20180111-3.3.5(85)：
+1. 将ControllableSensorProtocol类的getDataRequestCommandCode和getTimeSynchronizationCommandCode方法变为public

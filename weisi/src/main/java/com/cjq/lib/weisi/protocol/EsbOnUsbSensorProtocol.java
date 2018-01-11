@@ -21,7 +21,7 @@ public class EsbOnUsbSensorProtocol extends UsbSensorProtocol<EsbAnalyzer> {
     }
 
     @Override
-    protected byte getDataRequestCommandCode() {
+    public byte getDataRequestCommandCode() {
         return COMMAND_CODE_REQUEST_DATA;
     }
 

@@ -18,7 +18,7 @@ public abstract class UsbSensorProtocol<A extends Analyzable> extends Controllab
     }
 
     @Override
-    protected byte getTimeSynchronizationCommandCode() {
+    public byte getTimeSynchronizationCommandCode() {
         return COMMAND_CODE_TIME_SYNCHRONIZATION;
     }
 

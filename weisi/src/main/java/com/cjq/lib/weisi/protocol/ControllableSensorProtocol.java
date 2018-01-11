@@ -86,9 +86,9 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
         }
     }
 
-    protected abstract byte getDataRequestCommandCode();
+    public abstract byte getDataRequestCommandCode();
 
-    protected abstract byte getTimeSynchronizationCommandCode();
+    public abstract byte getTimeSynchronizationCommandCode();
 
     public int analyzeMultiplePackages(byte[] udpData, int offset, int length, OnFrameAnalyzedListener listener) {
         if (listener == null) {
