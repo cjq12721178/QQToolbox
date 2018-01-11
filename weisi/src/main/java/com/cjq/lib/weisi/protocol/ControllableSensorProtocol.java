@@ -53,7 +53,7 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
         if (udpData[offset] != START_CHARACTER[0]
                 || udpData[offset + 1] != START_CHARACTER[1]
                 || udpData[offset + realDataLength - 1] != END_CHARACTER[1]
-                || udpData[offset + realDataLength - 2] != END_CHARACTER[0]) {
+                /* || udpData[offset + realDataLength - 2] != END_CHARACTER[0] */) {
             return;
         }
 
@@ -129,8 +129,9 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
             //计算实际数据长度
             realDataLength = MIN_FRAME_LENGTH + realDataZoneLength;
             //检查结束符
-            if (udpData[start + realDataLength - 2] != END_CHARACTER[0]
-                    || udpData[start + realDataLength - 1] != END_CHARACTER[1]) {
+            //本来还应该检查udpData[start + realDataLength - 2] != END_CHARACTER[0]
+            //可惜部分硬件很坑爹，结束符前会多一个字节。。
+            if (udpData[start + realDataLength - 1] != END_CHARACTER[1]) {
                 continue;
             }
             //计算CRC16并校验
