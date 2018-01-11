@@ -8,7 +8,6 @@ import android.content.IntentFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
-import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -22,10 +21,10 @@ import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialDriver;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialPort;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialProber;
-import com.cjq.lib.weisi.protocol.ScoutUdpSensorProtocol;
+import com.cjq.lib.weisi.protocol.UdpSensorProtocol;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qbox.util.ExceptionLog;
-import com.cjq.tool.qbox.util.NumericConverter;
+import com.cjq.lib.weisi.util.NumericConverter;
 import com.cjq.tool.qqtoolbox.R;
 
 import java.io.IOException;
@@ -265,7 +264,7 @@ public class UsbDebugActivity
                 if (mUsbSerialPort != null) {
                     try {
                         //mUsbSerialPort.write(NumericConverter.hexDataStringToBytes(mEtSend.getText().toString()), 5000);
-                        byte[] commandFrame = new ScoutUdpSensorProtocol.EmptyDataZoneFrameBuilder(ScoutUdpSensorProtocol.COMMAND_CODE_REQUEST_DATA).setBaseStationAddress((byte) 0xFF, (byte) 0xFF).build();
+                        byte[] commandFrame = new UdpSensorProtocol().makeDataRequestFrame();
                         mUsbSerialPort.write(commandFrame, 5000);
                         //mUsbSerialPort.write(new byte[] { 0x12, (byte) 0xAA, (byte) 0xAA, (byte) 0xFF, (byte) 0xFF, 0x01, 0x6C, (byte) 0x9E, 0x1B, 0x55, 0x55 }, 1, 10, 5000);
                     } catch (IOException e) {

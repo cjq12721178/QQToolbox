@@ -287,3 +287,21 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20180108-3.2.5(77):
 1. 为UsbKit增加isRegestered方法，防止重复注册
+
+20180109-3.2.6(78):
+1. 优化UsbKit启动方法
+2. 修改ScoutUdpSensorProtocol中FrameBuilder的接口，开放其子类，使命令编写更容易
+
+20180109-3.2.7(79):
+1. 修改ScoutUdpSensorProtocol的analyze方法以适配部分USB基站
+
+20180111-3.3.0(80):
+1. 重构Protocol包，建立协议继承体系，具体关系描述如下：
+   (1)BaseSensorProtocol为协议类簇基类，主要定义通用常数，并持有一个解析器，解析器也有继承体系，主要根据通讯频率分为蓝牙（BleAnalyzer）和2.4G（EsbAnalyzer）
+   (2)BleSensorProtocol继承自BaseSensorProtocol，用于解析直接来自蓝牙的传感器数据，该协议只适用于被动接收数据
+   (3)ControllableSensorProtocol继承自BaseSensorProtocol，从该类派生的所有子类（一般根据通讯手段划分）均具有双向操作的能力，即既可以解析接收到的数据，也可以组装命令帧用于进行相应操作
+   (4)UdpSensorProtocol继承自ControllableSensorProtocol，携带的解析器为EsbAnalyzer，解析通过UDP接收的传感器数据，也可以组装通过相关命令对基站进行设置
+   (5)UsbSensorProtocol继承自ControllableSensorProtocol，解析通过USB接收的传感器数据，也可以组装通过相关命令对USB基站进行设置
+   (6)EsbOnUsbSensorProtocol继承自UsbSensorProtocol，携带的解析器为EsbAnalyzer，解析通过USB接收的传感器数据，也可以组装通过相关命令对USB基站进行设置
+   (7)BleOnUsbSensorProtocol继承自UsbSensorProtocol，携带的解析器为BleAnalyzer，解析通过USB接收的传感器数据，也可以组装通过相关命令对USB基站进行设置
+2. 解除对qbox.lib的依赖，将该模块下的ExpandCollections、ExpandComparator、NumericConverter功能类移至本模块（暂时）

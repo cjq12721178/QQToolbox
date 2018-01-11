@@ -17,7 +17,7 @@ import android.widget.Toast;
 
 import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.SerialPortKit;
-import com.cjq.lib.weisi.protocol.ScoutUdpSensorProtocol;
+import com.cjq.lib.weisi.protocol.UdpSensorProtocol;
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
@@ -28,7 +28,7 @@ import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView;
 import com.cjq.tool.qbox.util.ClosableLog;
 import com.cjq.tool.qbox.util.ExceptionLog;
-import com.cjq.tool.qbox.util.NumericConverter;
+import com.cjq.lib.weisi.util.NumericConverter;
 import com.cjq.tool.qqtoolbox.R;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleConstraintLayoutDialog;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleLinearLayoutDialog;
@@ -292,10 +292,10 @@ public class MainActivity
                 }
                 break;
             case R.id.btn_time_synchronization:
-                sendCommand(new ScoutUdpSensorProtocol().makeTimeSynchronizationFrame());
+                sendCommand(new UdpSensorProtocol().makeTimeSynchronizationFrame());
                 break;
             case R.id.btn_request_data:
-                sendCommand(new ScoutUdpSensorProtocol().makeDataRequestFrame());
+                sendCommand(new UdpSensorProtocol().makeDataRequestFrame());
                 break;
             case R.id.btn_serial_port_power:
                 Button btnSerialPortPower = (Button) v;

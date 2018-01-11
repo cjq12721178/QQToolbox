@@ -12,7 +12,7 @@ public class DataType {
     String mName;
     String mUnit = "";
     ValueInterpreter mInterpreter = DefaultInterpreter.getInstance();
-    ValueBuilder mBuilder;
+    //ValueBuilder mBuilder;
 
     public DataType(byte value) {
         mValue = value;
@@ -52,7 +52,7 @@ public class DataType {
                 mInterpreter.interpret(rawValue);
     }
 
-    public ValueBuilder getValueBuilder() {
-        return mBuilder;
-    }
+//    public ValueBuilder getValueBuilder() {
+//        return mBuilder;
+//    }
 }

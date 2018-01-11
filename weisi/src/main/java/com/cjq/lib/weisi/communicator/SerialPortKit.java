@@ -2,8 +2,6 @@ package com.cjq.lib.weisi.communicator;
 
 import android.util.Log;
 
-import com.cjq.tool.qbox.util.ExceptionLog;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;

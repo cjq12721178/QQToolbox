@@ -1,6 +1,7 @@
 package com.cjq.lib.weisi.sensor;
 
-import com.cjq.tool.qbox.util.NumericConverter;
+
+import com.cjq.lib.weisi.util.NumericConverter;
 
 /**
  * Created by CJQ on 2017/8/30.

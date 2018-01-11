@@ -177,3 +177,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20171229-0.15.4(53):
 1. 将compileSdkVersion从25升至27
 2. 将targetSdkVersion从18升至27
+
+20170111-1.0.0(54):
+1. 将本模块下的ExpandCollections、ExpandComparator、NumericConverter功能类移至weisi模块（暂时）

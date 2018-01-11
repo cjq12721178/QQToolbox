@@ -1,7 +1,8 @@
 package com.cjq.lib.weisi.sensor;
 
-import com.cjq.tool.qbox.util.ExpandCollections;
-import com.cjq.tool.qbox.util.ExpandComparator;
+
+import com.cjq.lib.weisi.util.ExpandCollections;
+import com.cjq.lib.weisi.util.ExpandComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -250,31 +251,30 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 
     public int addDynamicValue(byte dataTypeValue,
                                int dataTypeValueIndex,
-                               ValueBuildDelegator valueBuildDelegator) {
+                               long timestamp,
+                               float batteryVoltage,
+                               double rawValue) {
         //获取相应测量量
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
             return MAX_DYNAMIC_VALUE_SIZE;
         }
         //解析原始数据
-        valueBuildDelegator.setValueBuilder(measurement.getDataType().getValueBuilder());
-        long timestamp = correctTimestamp(valueBuildDelegator.getTimestamp());
-        float batteryVoltage = valueBuildDelegator.getBatteryVoltage();
-        double rawValue = valueBuildDelegator.getRawValue();
-        boolean canValueCaptured = measurement.mRealTimeValue.mTimestamp < timestamp
+        long correctedTimestamp = correctTimestamp(timestamp);
+        boolean canValueCaptured = measurement.mRealTimeValue.mTimestamp < correctedTimestamp
                 && onDynamicValueCaptureListener != null;
         //设置传感器实时数据
-        setRealTimeValue(timestamp, batteryVoltage);
+        setRealTimeValue(correctedTimestamp, batteryVoltage);
         //将传感器实时数据添加至实时数据缓存
-        int result = setDynamicValueContent(addDynamicValue(timestamp), batteryVoltage);
+        int result = setDynamicValueContent(addDynamicValue(correctedTimestamp), batteryVoltage);
         //为测量量添加动态数据（包括实时数据及其缓存）
-        measurement.addDynamicValue(mRawAddress, timestamp, rawValue);
+        measurement.addDynamicValue(mRawAddress, correctedTimestamp, rawValue);
         //传感器及其测量量实时数据捕获
         if (canValueCaptured) {
             onDynamicValueCaptureListener.onDynamicValueCapture(
                     mRawAddress,
                     dataTypeValue, dataTypeValueIndex,
-                    timestamp,
+                    correctedTimestamp,
                     batteryVoltage,
                     rawValue);
         }

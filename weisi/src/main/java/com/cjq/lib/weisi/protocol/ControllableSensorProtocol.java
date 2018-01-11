@@ -2,32 +2,22 @@ package com.cjq.lib.weisi.protocol;
 
 import android.support.annotation.NonNull;
 
-import com.cjq.lib.weisi.sensor.ValueBuildDelegator;
-import com.cjq.tool.qbox.util.NumericConverter;
+import com.cjq.lib.weisi.util.NumericConverter;
 
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 
 /**
- * Created by CJQ on 2017/8/30.
+ * Created by CJQ on 2018/1/9.
  */
 
-public class ScoutUdpSensorProtocol implements Constant {
+public abstract class ControllableSensorProtocol<A extends Analyzable>
+        extends BaseSensorProtocol<A> {
 
-    public static final byte COMMAND_CODE_REQUEST_DATA = 0x35;
-    public static final byte COMMAND_CODE_TIME_SYNCHRONIZATION = 0x42;
-    private static final byte DEFAULT_BASE_STATION_ADDRESS_HIGH = 0x00;
-    private static final byte DEFAULT_BASE_STATION_ADDRESS_LOW = 0x00;
+    private static final byte DEFAULT_BASE_STATION_ADDRESS_HIGH = (byte) 0xFF;
+    private static final byte DEFAULT_BASE_STATION_ADDRESS_LOW = (byte) 0xFF;
     private static final int BASE_STATION_ADDRESS_LENGTH = 2;
     protected static final int DATA_ZONE_LENGTH_LENGTH = 1;
     private static final int COMMAND_CODE_LENGTH = 1;
     private static final byte FIXED_DIFFERENCE_FROM_COMMAND_TO_RESPONSE = (byte)0x80;
-    private static final int SENSOR_DATA_LENGTH = 16;
-    private static final int SENSOR_DATA_RESERVE1_LENGTH = 3;
-    private static final int SENSOR_DATA_RESERVE2_LENGTH = 1;
-    private static final int SENSOR_VALUE_LENGTH = 2;
-    private static final int SENSOR_BATTERY_VOLTAGE_LENGTH = 1;
-    private static final int SENSOR_ADDRESS_LENGTH = 2;
     private static final byte[] START_CHARACTER = new byte[] { (byte)0xAA, (byte)0xAA };
     private static final byte[] END_CHARACTER = new byte[] { 0x55, 0x55 };
     private static final int DATA_ZONE_POSITION = START_CHARACTER.length
@@ -38,7 +28,9 @@ public class ScoutUdpSensorProtocol implements Constant {
             + CRC16_LENGTH
             + END_CHARACTER.length;
 
-    private final ValueBuildDelegator mValueBuildDelegator = new ValueBuildDelegator();
+    protected ControllableSensorProtocol(A analyzer) {
+        super(analyzer);
+    }
 
     public void analyze(byte[] udpData, OnFrameAnalyzedListener listener) {
         analyze(udpData, 0, udpData.length, listener);
@@ -60,8 +52,8 @@ public class ScoutUdpSensorProtocol implements Constant {
         //检查起始符和结束符
         if (udpData[offset] != START_CHARACTER[0]
                 || udpData[offset + 1] != START_CHARACTER[1]
-                || udpData[offset + realDataLength - 2] != END_CHARACTER[0]
-                || udpData[offset + realDataLength - 1] != END_CHARACTER[1]) {
+                || udpData[offset + realDataLength - 1] != END_CHARACTER[1]
+                || udpData[offset + realDataLength - 2] != END_CHARACTER[0]) {
             return;
         }
 
@@ -86,13 +78,17 @@ public class ScoutUdpSensorProtocol implements Constant {
                 FIXED_DIFFERENCE_FROM_COMMAND_TO_RESPONSE);
 
         //目前只需要这两个命令
-        if (commandCode == COMMAND_CODE_REQUEST_DATA) {
+        if (commandCode == getDataRequestCommandCode()) {
             //解析数据帧
             onDataAnalyzed(data, dataZoneStart + COMMAND_CODE_LENGTH, realDataZoneLength, listener);
-        } else if (commandCode == COMMAND_CODE_TIME_SYNCHRONIZATION) {
+        } else if (commandCode == getTimeSynchronizationCommandCode()) {
             onTimeSynchronizationAnalyzed(data, dataZoneStart + COMMAND_CODE_LENGTH, realDataZoneLength, listener);
         }
     }
+
+    protected abstract byte getDataRequestCommandCode();
+
+    protected abstract byte getTimeSynchronizationCommandCode();
 
     public int analyzeMultiplePackages(byte[] udpData, int offset, int length, OnFrameAnalyzedListener listener) {
         if (listener == null) {
@@ -154,67 +150,95 @@ public class ScoutUdpSensorProtocol implements Constant {
         return start - offset;
     }
 
-    private void onDataAnalyzed(byte[] data,
-                                int realDataZoneStart,
-                                int realDataZoneLength,
-                                OnFrameAnalyzedListener listener) {
-        mValueBuildDelegator.setData(data);
-        for (int start = realDataZoneStart,
-             end = realDataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH,
-             sensorValuePos,
-             calendarPos,
-             voltagePos;
-             start < end;
-             start += SENSOR_DATA_LENGTH) {
-            if (Crc.calc8(data, start, SENSOR_DATA_LENGTH - 1) != data[start + SENSOR_DATA_LENGTH - 1]) {
-                continue;
-            }
-            sensorValuePos = start +
-                    SENSOR_ADDRESS_LENGTH +
-                    DATA_TYPE_VALUE_LENGTH +
-                    SENSOR_DATA_RESERVE1_LENGTH;
-            voltagePos = sensorValuePos + SENSOR_VALUE_LENGTH;
-            calendarPos = voltagePos +
-                    SENSOR_BATTERY_VOLTAGE_LENGTH +
-                    SENSOR_DATA_RESERVE2_LENGTH;
-            listener.onDataAnalyzed(NumericConverter.int8ToUInt16(data[start], data[start + 1]),
-                    data[start + SENSOR_ADDRESS_LENGTH],
-                    0,
-                    mValueBuildDelegator
-                            .setTimestampIndex(calendarPos)
-                            .setRawValueIndex(sensorValuePos)
-                            .setBatteryVoltageIndex(voltagePos));
-        }
-    }
+    protected abstract void onDataAnalyzed(byte[] data,
+                                           int realDataZoneStart,
+                                           int realDataZoneLength,
+                                           OnFrameAnalyzedListener listener);
 
-    private void onTimeSynchronizationAnalyzed(byte[] data,
-                                               int realDataZoneStart,
-                                               int realDataZoneLength,
-                                               OnFrameAnalyzedListener listener) {
-        //暂时，若之后有更多命令需要解析，则建立像FrameBuilder一样的FrameAnalyser
-        if (realDataZoneLength != 6) {
-            return;
-        }
-        int position = realDataZoneStart;
-        listener.onTimeSynchronizationFinished(data[position],
-                data[++position] + 2000,
-                data[++position],
-                data[++position],
-                data[++position],
-                data[++position]);
-    }
+//    private void onSensorInfoAnalyzed(byte[] data,
+//                                int realDataZoneStart,
+//                                int realDataZoneLength,
+//                                OnFrameAnalyzedListener listener) {
+//        mValueBuildDelegator.setData(data);
+//        for (int start = realDataZoneStart,
+//             end = realDataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH,
+//             sensorValuePos,
+//             calendarPos,
+//             voltagePos;
+//             start < end;
+//             start += SENSOR_DATA_LENGTH) {
+//            if (Crc.calc8(data, start, SENSOR_DATA_LENGTH - 1) != data[start + SENSOR_DATA_LENGTH - 1]) {
+//                continue;
+//            }
+//            sensorValuePos = start +
+//                    SENSOR_ADDRESS_LENGTH +
+//                    DATA_TYPE_VALUE_LENGTH +
+//                    SENSOR_DATA_RESERVE1_LENGTH;
+//            voltagePos = sensorValuePos + SENSOR_VALUE_LENGTH;
+//            calendarPos = voltagePos +
+//                    SENSOR_BATTERY_VOLTAGE_LENGTH +
+//                    SENSOR_DATA_RESERVE2_LENGTH;
+//            listener.onSensorInfoAnalyzed(NumericConverter.int8ToUInt16(data[start], data[start + 1]),
+//                    data[start + SENSOR_ADDRESS_LENGTH],
+//                    0,
+//                    mValueBuildDelegator
+//                            .setTimestampIndex(calendarPos)
+//                            .setRawValueIndex(sensorValuePos)
+//                            .setBatteryVoltageIndex(voltagePos));
+//        }
+//    }
+
+    protected abstract void onTimeSynchronizationAnalyzed(byte[] data,
+                                                          int realDataZoneStart,
+                                                          int realDataZoneLength,
+                                                          OnFrameAnalyzedListener listener);
+
+//    //BLE电压
+//    protected float analyzeBatteryVoltage(byte voltage) {
+//        return voltage < 0
+//                ? voltage
+//                : voltage * BATTERY_VOLTAGE_COEFFICIENT;
+//    }
+//
+//    //ESB电压
+//    protected float analyzeBatteryVoltage(byte voltage, int sensorAddress) {
+//        return sensorAddress < VOLTAGE_DIVIDE_VALUE
+//                ? voltage * BATTERY_VOLTAGE_COEFFICIENT
+//                : (voltage != 0
+//                ? VOLTAGE_UP_CONVERSION_VALUE / voltage
+//                : 0f);
+//    }
+
+//    private void onTimeSynchronizationAnalyzed(byte[] data,
+//                                               int realDataZoneStart,
+//                                               int realDataZoneLength,
+//                                               OnFrameAnalyzedListener listener) {
+//        //暂时，若之后有更多命令需要解析，则建立像FrameBuilder一样的FrameAnalyser
+//        if (realDataZoneLength != 6) {
+//            return;
+//        }
+//        int position = realDataZoneStart;
+//        listener.onTimeSynchronizationAnalyzed(data[position],
+//                data[++position] + 2000,
+//                data[++position],
+//                data[++position],
+//                data[++position],
+//                data[++position]);
+//    }
 
     public byte[] makeGeneralCommandFrame(@NonNull FrameBuilder builder) {
         return builder.build();
     }
 
     public byte[] makeDataRequestFrame() {
-        return makeGeneralCommandFrame(new EmptyDataZoneFrameBuilder(COMMAND_CODE_REQUEST_DATA));
+        return makeGeneralCommandFrame(new EmptyDataZoneFrameBuilder(getDataRequestCommandCode()));
     }
 
     public byte[] makeTimeSynchronizationFrame() {
-        return makeGeneralCommandFrame(new TimeSynchronizationFrameBuilder());
+        return makeGeneralCommandFrame(getTimeSynchronizationFrameBuilder());
     }
+
+    protected abstract TimeSynchronizationFrameBuilder getTimeSynchronizationFrameBuilder();
 
     public static abstract class FrameBuilder {
 
@@ -278,26 +302,11 @@ public class ScoutUdpSensorProtocol implements Constant {
         }
     }
 
-    public static class TimeSynchronizationFrameBuilder extends FrameBuilder {
+    public static abstract class TimeSynchronizationFrameBuilder extends FrameBuilder {
 
-        public TimeSynchronizationFrameBuilder() {
-            super(COMMAND_CODE_TIME_SYNCHRONIZATION);
-        }
-
-        @Override
-        protected int getDataZoneLength() {
-            return 6;
-        }
-
-        @Override
-        protected void fillDataZone(byte[] frame, int offset) {
-            GregorianCalendar calendar = new GregorianCalendar();
-            frame[offset] = (byte) (calendar.get(Calendar.YEAR) % 100);
-            frame[++offset] = (byte) (calendar.get(Calendar.MONTH) + 1);
-            frame[++offset] = (byte) calendar.get(Calendar.DAY_OF_MONTH);
-            frame[++offset] = (byte) calendar.get(Calendar.HOUR);
-            frame[++offset] = (byte) calendar.get(Calendar.MINUTE);
-            frame[++offset] = (byte) calendar.get(Calendar.SECOND);
+        protected TimeSynchronizationFrameBuilder(byte commandCode) {
+            super(commandCode);
         }
     }
+
 }

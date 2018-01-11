@@ -1,17 +1,19 @@
 package com.cjq.lib.weisi.protocol;
 
-import com.cjq.tool.qbox.util.NumericConverter;
+
+import com.cjq.lib.weisi.util.NumericConverter;
 
 /**
  * Created by CJQ on 2017/7/10.
  */
 
-public class RatchetWheelStateMonitorProtocol implements Constant {
+public class RatchetWheelStateMonitorProtocol {
 
     private static final int CONTROL_ZONE_LENGTH = 2;
     private static final int TIME_LENGTH = 4;
     private static final int ADDRESS_LENGTH = 4;
     private static final int TIMESTAMP_LENGTH = 4;
+    private static final int RAW_VALUE_LENGTH = 4;
     private static final int FUNCTION_CODE_QUERY_REAL_TIME_DATA = 0x10 << 3;
     private static final int FUNCTION_CODE_QUERY_HISTORY_DATA = 0x11 << 3;
     private static final int DIRECTION_UP = 0 << 2;
@@ -19,6 +21,8 @@ public class RatchetWheelStateMonitorProtocol implements Constant {
     private static final int FIRST_FRAME = 1 << 1;
     private static final int FINAL_FRAME = 1;
     private static final int MAX_FRAME_SERIAL_NUMBER = 7 << 5;
+    private static final int CRC16_LENGTH = Crc.CRC16_LENGTH;
+    private static final int DATA_TYPE_VALUE_LENGTH = 1;
 
     private final byte[] mQueryRealTimeDataFrame;
     private final byte[] mQueryHistoryDataFrame;

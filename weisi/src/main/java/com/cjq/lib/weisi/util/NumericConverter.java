@@ -1,4 +1,4 @@
-package com.cjq.tool.qbox.util;
+package com.cjq.lib.weisi.util;
 
 
 import android.text.TextUtils;

@@ -1,7 +1,6 @@
 package com.cjq.lib.weisi.protocol;
 
-import com.cjq.lib.weisi.sensor.ValueBuildDelegator;
-import com.cjq.tool.qbox.util.NumericConverter;
+import com.cjq.lib.weisi.util.NumericConverter;
 
 import java.util.Arrays;
 
@@ -9,15 +8,16 @@ import java.util.Arrays;
  * Created by CJQ on 2017/7/13.
  */
 
-public class ScoutBleSensorProtocol implements Constant {
+public class BleSensorProtocol extends BaseSensorProtocol<BleAnalyzer> {
 
     public static final int BROADCAST_ADDRESS_LENGTH = 6;
     private static final int DATA_ZONE_LENGTH_LENGTH = 1;
-    private static final int BATTERY_INFO_LENGTH = 1;
-    private static final int RSSI_LENGTH = 1;
+    private static final int SENSOR_VALUE_LENGTH = 4;
+
+    //private static final int BATTERY_INFO_LENGTH = 1;
     private static final int SENSOR_DATA_LENGTH = DATA_TYPE_VALUE_LENGTH
-            + RAW_VALUE_LENGTH;
-    private static final int MIN_DATA_ZONE_LENGTH = BATTERY_INFO_LENGTH
+            + SENSOR_VALUE_LENGTH;
+    private static final int MIN_DATA_ZONE_LENGTH = SENSOR_BATTERY_VOLTAGE_LENGTH
             + RSSI_LENGTH
             + SENSOR_DATA_LENGTH;
     private static final int MIN_FRAME_LENGTH = DATA_ZONE_LENGTH_LENGTH
@@ -26,9 +26,13 @@ public class ScoutBleSensorProtocol implements Constant {
 
     private final byte[] mDataTypeArray = new byte[255];
     private final byte[] mTmpBroadcastAddress = new byte[BROADCAST_ADDRESS_LENGTH];
-    private final ValueBuildDelegator mValueBuildDelegator = new ValueBuildDelegator();
 
-    public void analyze(String broadcastAddress, byte[] broadcastData, OnFrameAnalyzedListener listener) {
+    public BleSensorProtocol() {
+        super(new BleAnalyzer());
+    }
+    //private final ValueBuildDelegator mValueBuildDelegator = new ValueBuildDelegator();
+
+    public void analyze(String broadcastAddress, byte[] broadcastData, OnSensorInfoAnalyzeListener listener) {
         if (broadcastAddress == null
                 || broadcastData == null
                 || broadcastData.length < MIN_FRAME_LENGTH
@@ -51,25 +55,39 @@ public class ScoutBleSensorProtocol implements Constant {
             Arrays.fill(mDataTypeArray, (byte) 0);
         }
         int sensorAddress = broadcastAddressToRawAddress(mTmpBroadcastAddress);
-        mValueBuildDelegator
-                .setData(broadcastData)
-                .setBatteryVoltageIndex(broadcastData.length
-                        - CRC16_LENGTH
-                        - RSSI_LENGTH
-                        - BATTERY_INFO_LENGTH)
-                .setTimestampIndex(System.currentTimeMillis());
+        long timestamp = System.currentTimeMillis();
+        float voltage = mAnalyzer.analyzeBatteryVoltage(broadcastData[broadcastData.length
+                - CRC16_LENGTH
+                - RSSI_LENGTH
+                - SENSOR_BATTERY_VOLTAGE_LENGTH]);
+//        mValueBuildDelegator
+//                .setData(broadcastData)
+//                .setBatteryVoltageIndex(broadcastData.length
+//                        - CRC16_LENGTH
+//                        - RSSI_LENGTH
+//                        - SENSOR_BATTERY_VOLTAGE_LENGTH)
+//                .setTimestampIndex(System.currentTimeMillis());
         for (int start = DATA_ZONE_LENGTH_LENGTH,
              end = dataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
              start < end;
              start += SENSOR_DATA_LENGTH) {
-            listener.onDataAnalyzed(sensorAddress,
+            listener.onSensorInfoAnalyzed(sensorAddress,
                     broadcastData[start],
                     isArraySensor
                             ? mDataTypeArray[NumericConverter.int8ToUInt16(broadcastData[start])]++
                             : 0,
-                    mValueBuildDelegator.setRawValueIndex(start + DATA_TYPE_VALUE_LENGTH));
+                    timestamp,
+                    voltage,
+                    mAnalyzer.analyzeRawValue(broadcastData,
+                            start + DATA_TYPE_VALUE_LENGTH));
         }
     }
+
+//    private float analyzeBatteryVoltage(byte voltage) {
+//        return voltage < 0
+//                ? voltage
+//                : voltage * BATTERY_VOLTAGE_COEFFICIENT;
+//    }
 
     public byte[] broadcastAddressStringToBytes(String src) {
         byte[] dst = new byte[BROADCAST_ADDRESS_LENGTH];

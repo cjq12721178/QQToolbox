@@ -1,6 +1,6 @@
 package com.cjq.tool.qqtoolbox;
 
-import com.cjq.tool.qbox.util.NumericConverter;
+import com.cjq.lib.weisi.util.NumericConverter;
 
 import org.junit.Test;
 

@@ -1,7 +1,8 @@
 package com.cjq.lib.weisi.sensor;
 
-import com.cjq.tool.qbox.util.ExpandCollections;
-import com.cjq.tool.qbox.util.ExpandComparator;
+
+import com.cjq.lib.weisi.util.ExpandCollections;
+import com.cjq.lib.weisi.util.ExpandComparator;
 
 import java.util.ArrayList;
 import java.util.Calendar;

@@ -1,4 +1,4 @@
-package com.cjq.tool.qbox.util;
+package com.cjq.lib.weisi.util;
 
 /**
  * Created by CJQ on 2017/12/15.
