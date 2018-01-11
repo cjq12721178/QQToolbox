@@ -92,9 +92,6 @@ public class ConfigurationManager {
         DataType dataType = dataTypeMap.get(dataTypeValue);
         if (autoCreate && dataType == null) {
             dataType = new DataType(dataTypeValue);
-//            dataType.mBuilder = isBleSensor(address)
-//                    ? BleDataValueBuilder.getInstance()
-//                    : new UdpDataValueBuilder(0, true, 3);
             dataTypeMap.put(dataTypeValue, dataType);
         }
         return dataType;
@@ -234,14 +231,10 @@ public class ConfigurationManager {
                 case DATA_TYPE:
                     //根据mValueType为DataType配备不同的ValueBuilder
                     if (mValueType != -1) {
-                        //mDataType.mBuilder = new UdpDataValueBuilder(mValueType, mSigned, mCoefficient);
                         EsbAnalyzer.setValueBuilder(mDataType.mValue, mValueType, mSigned, mCoefficient);
                         mValueType = -1;
                         mCoefficient = 1;
                     }
-//                    else {
-//                        mDataType.mBuilder = BleDataValueBuilder.getInstance();
-//                    }
                     mDataTypeMap.put(mDataType.mValue, mDataType);
                     break;
                 case "SensorName":
@@ -266,14 +259,6 @@ public class ConfigurationManager {
                         mDataType = new DataType(mDataTypeValue);
                         mDataTypeMap.put(mDataTypeValue, mDataType);
                     }
-//                    //若为Ethernet，则为DataType额外生成ValueBuilder
-//                    if (mValueType != -1) {
-//                        mDataType.mBuilder = new UdpDataValueBuilder(mValueType, mSigned, mCoefficient);
-//                        mValueType = -1;
-//                        mCoefficient = 1;
-//                    } else {
-//                        mDataType.mBuilder = BleDataValueBuilder.getInstance();
-//                    }
                     //生成测量参数
                     mMeasureParameter = new Configuration.MeasureParameter(mDataType,
                             mDataTypeCustomName != null

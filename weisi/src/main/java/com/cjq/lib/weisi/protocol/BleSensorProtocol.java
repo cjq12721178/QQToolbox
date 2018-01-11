@@ -30,7 +30,6 @@ public class BleSensorProtocol extends BaseSensorProtocol<BleAnalyzer> {
     public BleSensorProtocol() {
         super(new BleAnalyzer());
     }
-    //private final ValueBuildDelegator mValueBuildDelegator = new ValueBuildDelegator();
 
     public void analyze(String broadcastAddress, byte[] broadcastData, OnSensorInfoAnalyzeListener listener) {
         if (broadcastAddress == null

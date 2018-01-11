@@ -13,7 +13,7 @@ public class BleOnUsbSensorProtocol extends UsbSensorProtocol<BleAnalyzer> {
     private static final int NODE_STATE_LENGTH = 1;
     private static final int SENSOR_VALUE_LENGTH = 4;
 
-    protected BleOnUsbSensorProtocol() {
+    public BleOnUsbSensorProtocol() {
         super(new BleAnalyzer());
     }
 
