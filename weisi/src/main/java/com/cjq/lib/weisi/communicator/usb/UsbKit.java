@@ -54,12 +54,13 @@ public class UsbKit {
         if (isRegistered()) {
             return;
         }
-        usbManager = (UsbManager) context.getSystemService(Context.USB_SERVICE);
+        Context applicationContext = context.getApplicationContext();
+        usbManager = (UsbManager) applicationContext.getSystemService(Context.USB_SERVICE);
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
         intentFilter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
         intentFilter.addAction(ACTION_USB_PERMISSION);
-        context.registerReceiver(deviceReceiver, intentFilter);
+        applicationContext.registerReceiver(deviceReceiver, intentFilter);
     }
 
     public static boolean isRegistered() {
@@ -68,7 +69,7 @@ public class UsbKit {
 
     public static void unregister(Context context) {
         if (isRegistered()) {
-            context.unregisterReceiver(deviceReceiver);
+            context.getApplicationContext().unregisterReceiver(deviceReceiver);
             onUsbSerialPortStateChangeListener = null;
             usbManager = null;
         }

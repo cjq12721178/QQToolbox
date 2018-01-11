@@ -306,6 +306,9 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
    (7)BleOnUsbSensorProtocol继承自UsbSensorProtocol，携带的解析器为BleAnalyzer，解析通过USB接收的传感器数据，也可以组装通过相关命令对USB基站进行设置
 2. 解除对qbox.lib的依赖，将该模块下的ExpandCollections、ExpandComparator、NumericConverter功能类移至本模块（暂时）
 
-20180112-3.3.1(81)：
+20180111-3.3.1(81)：
 1. 删除ValueBuilder、UdpSensorValueBuilder、BleSensorValueBuilder、ValueBuilderDelegate等无用类
 2. 修复BleOnUsbSensorProtocol无法实例化的问题
+
+20180111-3.3.2(82):
+1. 修复UsbKit中unregisterReceiver失败的问题
