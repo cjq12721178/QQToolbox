@@ -43,13 +43,11 @@ public class BleSensorProtocol extends BaseSensorProtocol<BleAnalyzer> {
         }
         int dataZoneLength = NumericConverter.int8ToUInt16(broadcastData[0]) - CRC16_LENGTH;
         if (dataZoneLength < MIN_DATA_ZONE_LENGTH
-                || getCrc()
-                .isCorrect16WithCrcAppended(
+                || !getCrc().isCorrect16WithCrcAppended(
                         broadcastData,
                         0,
                         DATA_ZONE_LENGTH_LENGTH + dataZoneLength,
-                        getCrc()
-                                .calc16ByLsb(mTmpBroadcastAddress),
+                        getCrc().calc16ByLsb(mTmpBroadcastAddress),
                         true,
                         isCrcMsb())
                 /* || CrcClass.calc16CcittByMsb(CrcClass.calc16CcittByLSB(mTmpBroadcastAddress), broadcastData, 0, DATA_ZONE_LENGTH_LENGTH + dataZoneLength) !=
