@@ -459,6 +459,11 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         public float getBatteryVoltage() {
             return mBatteryVoltage;
         }
+
+//        public String getSignificantBatteryVoltage() {
+//            return mBatteryVoltage < 0
+//                    ? String.format("")
+//        }
     }
 
 }

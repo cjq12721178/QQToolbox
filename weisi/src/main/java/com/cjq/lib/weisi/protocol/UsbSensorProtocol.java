@@ -43,7 +43,7 @@ public abstract class UsbSensorProtocol<A extends Analyzable> extends Controllab
         return new TimeSynchronizationFrameBuilderImp();
     }
 
-    public static class TimeSynchronizationFrameBuilderImp extends TimeSynchronizationFrameBuilder {
+    public class TimeSynchronizationFrameBuilderImp extends TimeSynchronizationFrameBuilder {
 
         private static final int TIME_ZONE_LENGTH = 4;
 
@@ -64,5 +64,15 @@ public abstract class UsbSensorProtocol<A extends Analyzable> extends Controllab
             frame[++offset] = (byte) ((time >> 8) & 0xff);
             frame[++offset] = (byte) (time & 0xff);
         }
+    }
+
+    @Override
+    public Crc getCrc() {
+        return Crc.getCcitt();
+    }
+
+    @Override
+    public boolean isCrcMsb() {
+        return true;
     }
 }

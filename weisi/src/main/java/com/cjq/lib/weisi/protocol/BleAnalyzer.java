@@ -17,7 +17,7 @@ public class BleAnalyzer implements Analyzable {
 
     public float analyzeBatteryVoltage(byte voltage) {
         return voltage < 0
-                ? voltage
+                ? -(voltage & 0x7F)
                 : voltage * BATTERY_VOLTAGE_COEFFICIENT;
     }
 

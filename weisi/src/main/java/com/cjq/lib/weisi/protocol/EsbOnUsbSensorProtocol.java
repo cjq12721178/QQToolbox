@@ -36,9 +36,17 @@ public class EsbOnUsbSensorProtocol extends UsbSensorProtocol<EsbAnalyzer> {
              address;
              start < end;
              start += SENSOR_DATA_LENGTH) {
-            if (!Crc.isCorrect16(data, start, SENSOR_DATA_LENGTH - 1, true, true)) {
+            if (!getCrc().isCorrect16WithCrcAppended(
+                    data,
+                    start,
+                    SENSOR_DATA_LENGTH - CRC16_LENGTH,
+                    true,
+                    isCrcMsb())) {
                 continue;
             }
+//            if (!CrcClass.isCorrect16(data, start, SENSOR_DATA_LENGTH - 1, true, true)) {
+//                continue;
+//            }
             address = NumericConverter.int8ToUInt16(data[start + SENSOR_ADDRESS_RESERVE_LENGTH], data[start + SENSOR_ADDRESS_RESERVE_LENGTH + 1]);
             dataTypeValue = data[start + SENSOR_ADDRESS_LENGTH];
             sensorValuePos = start

@@ -48,9 +48,13 @@ public class UdpSensorProtocol extends ControllableSensorProtocol<EsbAnalyzer> {
              voltagePos;
              start < end;
              start += SENSOR_DATA_LENGTH) {
-            if (Crc.calc8(data, start, SENSOR_DATA_LENGTH - 1) != data[start + SENSOR_DATA_LENGTH - 1]) {
+            if (getCrc().calc8(data, start, SENSOR_DATA_LENGTH - 1)
+                    != data[start + SENSOR_DATA_LENGTH - 1]) {
                 continue;
             }
+//            if (CrcClass.calc8(data, start, SENSOR_DATA_LENGTH - 1) != data[start + SENSOR_DATA_LENGTH - 1]) {
+//                continue;
+//            }
             address = NumericConverter.int8ToUInt16(data[start], data[start + 1]);
             dataTypeValue = data[start + SENSOR_ADDRESS_LENGTH];
             sensorValuePos = start +
@@ -92,7 +96,17 @@ public class UdpSensorProtocol extends ControllableSensorProtocol<EsbAnalyzer> {
         return new TimeSynchronizationFrameBuilderImp();
     }
 
-    public static class TimeSynchronizationFrameBuilderImp extends TimeSynchronizationFrameBuilder {
+    @Override
+    public Crc getCrc() {
+        return Crc.getWeisi();
+    }
+
+    @Override
+    public boolean isCrcMsb() {
+        return false;
+    }
+
+    public class TimeSynchronizationFrameBuilderImp extends TimeSynchronizationFrameBuilder {
 
         private static final int TIME_ZONE_LENGTH = 6;
 

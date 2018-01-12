@@ -32,44 +32,55 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
         super(analyzer);
     }
 
-    public void analyze(byte[] udpData, OnFrameAnalyzedListener listener) {
-        analyze(udpData, 0, udpData.length, listener);
+    public void analyze(byte[] data, OnFrameAnalyzedListener listener) {
+        analyze(data, 0, data.length, listener);
     }
 
-    public void analyze(byte[] udpData, int offset, int length, OnFrameAnalyzedListener listener) {
+    public void analyze(byte[] data, int offset, int length, OnFrameAnalyzedListener listener) {
         //判断数据是否为空，以及数据长度是否大于最小数据长度
         if (listener == null
                 || offset < 0
-                || offset + length > udpData.length
+                || offset + length > data.length
                 || length < MIN_FRAME_LENGTH) {
             return;
         }
 
         //记录实际数据域长度（除去命令码长度之后的长度）
-        int realDataZoneLength = NumericConverter.int8ToUInt16(udpData[offset + START_CHARACTER.length + BASE_STATION_ADDRESS_LENGTH]) - COMMAND_CODE_LENGTH;
+        int realDataZoneLength = NumericConverter.int8ToUInt16(data[offset + START_CHARACTER.length + BASE_STATION_ADDRESS_LENGTH]) - COMMAND_CODE_LENGTH;
         //计算实际数据长度
         int realDataLength = MIN_FRAME_LENGTH + realDataZoneLength;
         //检查起始符和结束符
-        if (udpData[offset] != START_CHARACTER[0]
-                || udpData[offset + 1] != START_CHARACTER[1]
-                || udpData[offset + realDataLength - 1] != END_CHARACTER[1]
-                /* || udpData[offset + realDataLength - 2] != END_CHARACTER[0] */) {
+        if (data[offset] != START_CHARACTER[0]
+                || data[offset + 1] != START_CHARACTER[1]
+                || data[offset + realDataLength - 1] != END_CHARACTER[1]
+                /* || data[offset + realDataLength - 2] != END_CHARACTER[0] */) {
             return;
         }
 
         //计算CRC16并校验
-        if (!Crc.isCorrect16(udpData,
+        if (!getCrc().isCorrect16WithCrcAppended(
+                data,
                 offset + START_CHARACTER.length,
                 BASE_STATION_ADDRESS_LENGTH
                         + DATA_ZONE_LENGTH_LENGTH
                         + COMMAND_CODE_LENGTH
                         + realDataZoneLength,
                 true,
-                false)) {
+                isCrcMsb())) {
             return;
         }
+//        if (!CrcClass.isCorrect16(data,
+//                offset + START_CHARACTER.length,
+//                BASE_STATION_ADDRESS_LENGTH
+//                        + DATA_ZONE_LENGTH_LENGTH
+//                        + COMMAND_CODE_LENGTH
+//                        + realDataZoneLength,
+//                true,
+//                false)) {
+//            return;
+//        }
 
-        analyzeDataZone(udpData, offset + DATA_ZONE_POSITION, realDataZoneLength, listener);
+        analyzeDataZone(data, offset + DATA_ZONE_POSITION, realDataZoneLength, listener);
     }
 
     private void analyzeDataZone(byte[] data, int dataZoneStart, int realDataZoneLength, OnFrameAnalyzedListener listener) {
@@ -90,13 +101,13 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
 
     public abstract byte getTimeSynchronizationCommandCode();
 
-    public int analyzeMultiplePackages(byte[] udpData, int offset, int length, OnFrameAnalyzedListener listener) {
+    public int analyzeMultiplePackages(byte[] data, int offset, int length, OnFrameAnalyzedListener listener) {
         if (listener == null) {
             throw new NullPointerException("it is no meaning that listener is null");
         }
-        if (udpData == null
+        if (data == null
                 || offset < 0
-                || offset + length > udpData.length) {
+                || offset + length > data.length) {
             return 0;
         }
 
@@ -108,11 +119,11 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
              start += realDataLength) {
             //查找起始字符位置
             while (start < end) {
-                while (udpData[start++] != START_CHARACTER[0] && start < end);
+                while (data[start++] != START_CHARACTER[0] && start < end);
                 if (start >= end) {
                     break;
                 }
-                if (udpData[start++] == START_CHARACTER[1]) {
+                if (data[start++] == START_CHARACTER[1]) {
                     start -= START_CHARACTER.length;
                     break;
                 }
@@ -125,28 +136,39 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
                 break;
             }
             //记录实际数据域长度（除去命令码长度之后的长度）
-            realDataZoneLength = NumericConverter.int8ToUInt16(udpData[start + START_CHARACTER.length + BASE_STATION_ADDRESS_LENGTH]) - COMMAND_CODE_LENGTH;
+            realDataZoneLength = NumericConverter.int8ToUInt16(data[start + START_CHARACTER.length + BASE_STATION_ADDRESS_LENGTH]) - COMMAND_CODE_LENGTH;
             //计算实际数据长度
             realDataLength = MIN_FRAME_LENGTH + realDataZoneLength;
             //检查结束符
             //本来还应该检查udpData[start + realDataLength - 2] != END_CHARACTER[0]
             //可惜部分硬件很坑爹，结束符前会多一个字节。。
-            if (udpData[start + realDataLength - 1] != END_CHARACTER[1]) {
+            if (data[start + realDataLength - 1] != END_CHARACTER[1]) {
                 continue;
             }
             //计算CRC16并校验
-            if (!Crc.isCorrect16(udpData,
+            if (!getCrc().isCorrect16WithCrcAppended(
+                    data,
                     start + START_CHARACTER.length,
                     BASE_STATION_ADDRESS_LENGTH
                             + DATA_ZONE_LENGTH_LENGTH
                             + COMMAND_CODE_LENGTH
                             + realDataZoneLength,
                     true,
-                    false)) {
+                    isCrcMsb())) {
                 continue;
             }
+//            if (!CrcClass.isCorrect16(data,
+//                    start + START_CHARACTER.length,
+//                    BASE_STATION_ADDRESS_LENGTH
+//                            + DATA_ZONE_LENGTH_LENGTH
+//                            + COMMAND_CODE_LENGTH
+//                            + realDataZoneLength,
+//                    true,
+//                    false)) {
+//                continue;
+//            }
 
-            analyzeDataZone(udpData, start + DATA_ZONE_POSITION, realDataZoneLength, listener);
+            analyzeDataZone(data, start + DATA_ZONE_POSITION, realDataZoneLength, listener);
         }
         return start - offset;
     }
@@ -168,7 +190,7 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
 //             voltagePos;
 //             start < end;
 //             start += SENSOR_DATA_LENGTH) {
-//            if (Crc.calc8(data, start, SENSOR_DATA_LENGTH - 1) != data[start + SENSOR_DATA_LENGTH - 1]) {
+//            if (CrcClass.calc8(data, start, SENSOR_DATA_LENGTH - 1) != data[start + SENSOR_DATA_LENGTH - 1]) {
 //                continue;
 //            }
 //            sensorValuePos = start +
@@ -232,16 +254,20 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
     }
 
     public byte[] makeDataRequestFrame() {
-        return makeGeneralCommandFrame(new EmptyDataZoneFrameBuilder(getDataRequestCommandCode()));
+        return makeGeneralCommandFrame(getEmptyDataZoneFrameBuilder(getDataRequestCommandCode()));
+    }
+
+    public EmptyDataZoneFrameBuilder getEmptyDataZoneFrameBuilder(byte commandCode) {
+        return new EmptyDataZoneFrameBuilder(commandCode);
     }
 
     public byte[] makeTimeSynchronizationFrame() {
         return makeGeneralCommandFrame(getTimeSynchronizationFrameBuilder());
     }
 
-    protected abstract TimeSynchronizationFrameBuilder getTimeSynchronizationFrameBuilder();
+    public abstract TimeSynchronizationFrameBuilder getTimeSynchronizationFrameBuilder();
 
-    public static abstract class FrameBuilder {
+    public abstract class FrameBuilder {
 
         private final byte mCommandCode;
         private byte mBaseStationAddressHigh;
@@ -267,9 +293,15 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
             frame[++offset] = mCommandCode;
             fillDataZone(frame, ++offset);
             offset += dataZoneLength;
-            int crc16 = Crc.calc16ByMsb(frame, START_CHARACTER.length, offset - START_CHARACTER.length);
-            frame[offset] = (byte)(crc16 & 0xff);
-            frame[++offset] = (byte) (crc16 >> 8);
+            int crc16 = getCrc().calc16ByMsb(frame, START_CHARACTER.length, offset - START_CHARACTER.length);
+            //int crc16 = CrcClass.calc16WeisiByMsb(frame, START_CHARACTER.length, offset - START_CHARACTER.length);
+            if (isCrcMsb()) {
+                frame[offset] = (byte) (crc16 >> 8);
+                frame[++offset] = (byte) (crc16 & 0xff);
+            } else {
+                frame[offset] = (byte) (crc16 & 0xff);
+                frame[++offset] = (byte) (crc16 >> 8);
+            }
             frame[++offset] = END_CHARACTER[0];
             frame[++offset] = END_CHARACTER[1];
             return frame;
@@ -287,7 +319,7 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
         protected abstract void fillDataZone(byte[] frame, int offset);
     }
 
-    public static class EmptyDataZoneFrameBuilder extends FrameBuilder {
+    public class EmptyDataZoneFrameBuilder extends FrameBuilder {
 
         public EmptyDataZoneFrameBuilder(byte commandCode) {
             super(commandCode);
@@ -303,7 +335,7 @@ public abstract class ControllableSensorProtocol<A extends Analyzable>
         }
     }
 
-    public static abstract class TimeSynchronizationFrameBuilder extends FrameBuilder {
+    public abstract class TimeSynchronizationFrameBuilder extends FrameBuilder {
 
         protected TimeSynchronizationFrameBuilder(byte commandCode) {
             super(commandCode);

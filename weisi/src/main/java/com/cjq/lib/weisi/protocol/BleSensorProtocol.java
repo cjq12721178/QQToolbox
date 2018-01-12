@@ -43,9 +43,18 @@ public class BleSensorProtocol extends BaseSensorProtocol<BleAnalyzer> {
         }
         int dataZoneLength = NumericConverter.int8ToUInt16(broadcastData[0]) - CRC16_LENGTH;
         if (dataZoneLength < MIN_DATA_ZONE_LENGTH
-                || Crc.calc16AbnormalByMsb(Crc.calc16AbnormalByLSB(mTmpBroadcastAddress), broadcastData, 0, DATA_ZONE_LENGTH_LENGTH + dataZoneLength) !=
+                || getCrc()
+                .isCorrect16WithCrcAppended(
+                        broadcastData,
+                        0,
+                        DATA_ZONE_LENGTH_LENGTH + dataZoneLength,
+                        getCrc()
+                                .calc16ByLsb(mTmpBroadcastAddress),
+                        true,
+                        isCrcMsb())
+                /* || CrcClass.calc16CcittByMsb(CrcClass.calc16CcittByLSB(mTmpBroadcastAddress), broadcastData, 0, DATA_ZONE_LENGTH_LENGTH + dataZoneLength) !=
                 NumericConverter.int8ToUInt16(broadcastData[DATA_ZONE_LENGTH_LENGTH + dataZoneLength],
-                        broadcastData[DATA_ZONE_LENGTH_LENGTH + dataZoneLength + 1])) {
+                        broadcastData[DATA_ZONE_LENGTH_LENGTH + dataZoneLength + 1]) */) {
             return;
         }
         //是否为阵列传感器
@@ -125,5 +134,15 @@ public class BleSensorProtocol extends BaseSensorProtocol<BleAnalyzer> {
                 broadcastAddress[1],
                 broadcastAddress[2],
                 broadcastAddress[3]);
+    }
+
+    @Override
+    public Crc getCrc() {
+        return Crc.getCcitt();
+    }
+
+    @Override
+    public boolean isCrcMsb() {
+        return true;
     }
 }

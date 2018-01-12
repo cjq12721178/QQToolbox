@@ -16,4 +16,8 @@ public abstract class BaseSensorProtocol<A extends Analyzable> {
     protected BaseSensorProtocol(A analyzer) {
         mAnalyzer = analyzer;
     }
+
+    public abstract Crc getCrc();
+
+    public abstract boolean isCrcMsb();
 }

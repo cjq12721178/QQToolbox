@@ -31,9 +31,17 @@ public class BleOnUsbSensorProtocol extends UsbSensorProtocol<BleAnalyzer> {
              voltagePos;
              start < end;
              start += SENSOR_DATA_LENGTH) {
-            if (!Crc.isCorrect16(data, start, SENSOR_DATA_LENGTH - 1, true, true)) {
+            if (!getCrc().isCorrect16WithCrcAppended(
+                    data,
+                    start,
+                    SENSOR_DATA_LENGTH - CRC16_LENGTH,
+                    true,
+                    true)) {
                 continue;
             }
+//            if (!CrcClass.isCorrect16(data, start, SENSOR_DATA_LENGTH - 1, true, true)) {
+//                continue;
+//            }
             sensorValuePos = start
                     + SENSOR_ADDRESS_LENGTH
                     + NODE_STATE_LENGTH
