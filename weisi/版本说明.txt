@@ -328,3 +328,10 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 表正序，算法逆序）
 2. 修复Ccitt的isCorrect16WithCrcAppended(byte[] buf, int pos, int len, int startCrc, boolean isBufMsb, boolean isCrcMsb)方法参数设置错误的问题
 3. 修复EsbOnUsbSensorProtocol和BleOnUsbSensorProtocol计算数据域CRC16错误的问题
+
+20180112-3.4.1(87):
+1. 修复BaseSensorProtocol中CRC验证正确，逻辑判断错误的问题
+
+20188116-3.4.2(88):
+1. 去掉AndroidManifest.xml中application:lable属性，以免引用该module的项目出现merge error
+2. 修复DataReceiver的stopListen方法在监听结束后，再次尝试关闭监听导致状态错误的问题

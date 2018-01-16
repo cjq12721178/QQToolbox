@@ -84,8 +84,10 @@ public class DataReceiver {
     }
 
     public synchronized void stopListen() {
-        mState = State.STOPPING;
-        onStopListen(mCommunicator);
+        if (isListening()) {
+            mState = State.STOPPING;
+            onStopListen(mCommunicator);
+        }
     }
 
     protected void onStopListen(Communicator communicator) {
