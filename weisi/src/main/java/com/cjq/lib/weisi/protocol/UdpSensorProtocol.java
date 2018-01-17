@@ -17,7 +17,7 @@ public class UdpSensorProtocol extends ControllableSensorProtocol<EsbAnalyzer> {
     private static final int SENSOR_DATA_LENGTH = 16;
     private static final int SENSOR_DATA_RESERVE1_LENGTH = 3;
     private static final int SENSOR_DATA_RESERVE2_LENGTH = 1;
-    private static final int SENSOR_ADDRESS_LENGTH = 4;
+    private static final int SENSOR_ADDRESS_LENGTH = 2;
     private static final int SENSOR_VALUE_LENGTH = 2;
 
     public UdpSensorProtocol() {

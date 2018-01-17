@@ -335,3 +335,9 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 20188116-3.4.2(88):
 1. 去掉AndroidManifest.xml中application:lable属性，以免引用该module的项目出现merge error
 2. 修复DataReceiver的stopListen方法在监听结束后，再次尝试关闭监听导致状态错误的问题
+
+20180117-3.4.3(89):
+1. 修复UdpSensorProtocol传感器地址长度设置错误的问题
+2. 修改传感器电源信息解析
+3. 将判断传感器协议族的方法从ConfigurationManager类移回Sensor类，并将名称isBleSensor改为isBleProtocolFamily
+4. 修改ConfigurationManager部分方法名称，将importEthernetConfiguration改为importEsbConfiguration

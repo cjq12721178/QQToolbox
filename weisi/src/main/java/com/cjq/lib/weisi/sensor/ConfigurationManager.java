@@ -27,11 +27,10 @@ import javax.xml.parsers.SAXParserFactory;
 
 public class ConfigurationManager {
 
-    private static final int BLE_ADDRESS_LENGTH = 6;
     private static final Map<Byte, DataType> BLE_DATA_TYPES = new HashMap<>();
-    private static final Map<Byte, DataType> ETHERNET_DATA_TYPES = new HashMap<>();
+    private static final Map<Byte, DataType> ESB_DATA_TYPES = new HashMap<>();
     private static final List<Configuration> BLE_CONFIGURATIONS = new ArrayList<>();
-    private static final List<Configuration> ETHERNET_CONFIGURATIONS = new ArrayList<>();
+    private static final List<Configuration> ESB_CONFIGURATIONS = new ArrayList<>();
 
     public static boolean importBleConfiguration(Context context) {
         return importConfiguration(BLE_DATA_TYPES,
@@ -40,11 +39,11 @@ public class ConfigurationManager {
                 "BleSensorConfiguration.xml");
     }
 
-    public static boolean importEthernetConfiguration(Context context) {
-        return importConfiguration(ETHERNET_DATA_TYPES,
-                ETHERNET_CONFIGURATIONS,
+    public static boolean importEsbConfiguration(Context context) {
+        return importConfiguration(ESB_DATA_TYPES,
+                ESB_CONFIGURATIONS,
                 context,
-                "EthernetSensorConfiguration.xml");
+                "EsbSensorConfiguration.xml");
     }
 
     private static boolean importConfiguration(Map<Byte, DataType> dataTypes,
@@ -70,21 +69,6 @@ public class ConfigurationManager {
                 address,
                 CONFIGURATION_SEARCH_COMPARATOR);
         return position >= 0 ? configurations.get(position) : null;
-//        synchronized (CONFIGURATION_SEARCHER) {
-//            CONFIGURATION_SEARCHER.mStartAddress = address;
-//            int index = Collections.binarySearch(configurations,
-//                    CONFIGURATION_SEARCHER,
-//                    CONFIGURATION_SEARCH_COMPARATOR);
-//            return index >= 0 ? configurations.get(index) : null;
-//        }
-    }
-
-    public static boolean isBleSensor(int address) {
-        return (address & 0xff0000) != 0;
-    }
-
-    public static boolean isBleSensor(String address) {
-        return address.length() == BLE_ADDRESS_LENGTH;
     }
 
     public static DataType getDataType(int address, byte dataTypeValue, boolean autoCreate) {
@@ -96,20 +80,6 @@ public class ConfigurationManager {
         }
         return dataType;
     }
-
-//    private static final Configuration CONFIGURATION_SEARCHER = new Configuration();
-//    private static final Comparator<Configuration> CONFIGURATION_SEARCH_COMPARATOR = new Comparator<Configuration>() {
-//        @Override
-//        public int compare(Configuration c1, Configuration c2) {
-//            if (c1.mEndAddress < c2.mStartAddress) {
-//                return -1;
-//            }
-//            if (c1.mStartAddress > c2.mStartAddress) {
-//                return 1;
-//            }
-//            return 0;
-//        }
-//    };
 
     private static final ExpandComparator<Configuration, Integer> CONFIGURATION_SEARCH_COMPARATOR = new ExpandComparator<Configuration, Integer>() {
         @Override
@@ -125,11 +95,11 @@ public class ConfigurationManager {
     };
 
     private static List<Configuration> getConfigurations(int address) {
-        return isBleSensor(address) ? BLE_CONFIGURATIONS : ETHERNET_CONFIGURATIONS;
+        return Sensor.isBleProtocolFamily(address) ? BLE_CONFIGURATIONS : ESB_CONFIGURATIONS;
     }
 
     private static Map<Byte, DataType> getDataTypes(int address) {
-        return isBleSensor(address) ? BLE_DATA_TYPES : ETHERNET_DATA_TYPES;
+        return Sensor.isBleProtocolFamily(address) ? BLE_DATA_TYPES : ESB_DATA_TYPES;
     }
 
     private static ConfigurationImporter getConfigurationImporter(Context context, String fileName) {

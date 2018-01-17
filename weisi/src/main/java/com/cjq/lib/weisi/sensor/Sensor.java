@@ -6,7 +6,6 @@ import com.cjq.lib.weisi.util.ExpandComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +17,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
     private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
+    private static final int BLE_PROTOCOL_FAMILY_SENSOR_ADDRESS_LENGTH = 6;
     private static OnDynamicValueCaptureListener onDynamicValueCaptureListener;
 
     private boolean mUnknown;
@@ -33,7 +33,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         super(maxDynamicValueSize);
         //设置地址
         mRawAddress = address & 0xffffff;
-        mFormatAddress = ConfigurationManager.isBleSensor(address)
+        mFormatAddress = isBleProtocolFamily(address)
                 ? String.format("%06X", mRawAddress)
                 : String.format("%04X", mRawAddress);
         //根据配置生成测量参数列表
@@ -57,6 +57,18 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 
     public static void setOnDynamicValueCaptureListener(OnDynamicValueCaptureListener listener) {
         onDynamicValueCaptureListener = listener;
+    }
+
+    public static boolean isBleProtocolFamily(int address) {
+        return (address & 0xff0000) != 0;
+    }
+
+    public static boolean isBleProtocolFamily(String address) {
+        return address.length() == BLE_PROTOCOL_FAMILY_SENSOR_ADDRESS_LENGTH;
+    }
+
+    public boolean isBleProtocolFamily() {
+        return isBleProtocolFamily(mRawAddress);
     }
 
     private void generateMeasurementCollections() {
@@ -456,14 +468,15 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
             mBatteryVoltage = batteryVoltage;
         }
 
-        public float getBatteryVoltage() {
+        public float getRawBatteryVoltage() {
             return mBatteryVoltage;
         }
 
-//        public String getSignificantBatteryVoltage() {
-//            return mBatteryVoltage < 0
-//                    ? String.format("")
-//        }
+        public String getFormattedBatteryVoltage() {
+            return mBatteryVoltage < 0
+                    ? String.format("%d\\%", (int) mBatteryVoltage)
+                    : String.format("%.2fV", mBatteryVoltage);
+        }
     }
 
 }

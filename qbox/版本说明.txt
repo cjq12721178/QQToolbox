@@ -180,3 +180,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20170111-1.0.0(54):
 1. 将本模块下的ExpandCollections、ExpandComparator、NumericConverter功能类移至weisi模块（暂时）
+
+20170116-1.0.1(55):
+1. 去掉AndroidManifest.xml中application:lable属性，以免引用该module的项目出现merge error

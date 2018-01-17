@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- edited with XMLSpy v2013 (http://www.altova.com) by  () -->
-<!-- 本文件适用于ble -->
+<!-- 本文件适用于BLE协议族 -->
 <!-- 数值解释方式目前为止有5种-->
 <!-- 保留若干小数位浮点型，使用decimal标签设置保留小数位数 -->
 <!-- 开关型， 使用status标签设置on和off时的名称 -->
