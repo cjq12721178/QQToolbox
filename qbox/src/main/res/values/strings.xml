@@ -8,4 +8,5 @@
     <string name="qbox_ascend">升序</string>
     <string name="qbox_descend">降序</string>
     <string name="qbox_no_limit">不限</string>
+    <string name="qbox_all">全部</string>
 </resources>

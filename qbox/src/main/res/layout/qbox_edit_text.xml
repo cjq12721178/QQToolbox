@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/qbox_selector_edit_text"
-    android:padding="@dimen/qbox_padding_edit_text"
+    android:padding="@dimen/qbox_padding"
     android:textSize="@dimen/qbox_size_text_dialog_view"
     android:textColorHint="#AAAAAA"
     android:inputType="textMultiLine"

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="qbox_padding_edit_text">7dp</dimen>
+    <dimen name="qbox_padding">7dp</dimen>
     <dimen name="qbox_padding_dialog_base">15dp</dimen>
     <dimen name="qbox_size_text_dialog_view">21sp</dimen>
     <dimen name="qbox_size_text_dialog_title">27sp</dimen>

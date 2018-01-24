@@ -178,8 +178,11 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 1. 将compileSdkVersion从25升至27
 2. 将targetSdkVersion从18升至27
 
-20170111-1.0.0(54):
+20180111-1.0.0(54):
 1. 将本模块下的ExpandCollections、ExpandComparator、NumericConverter功能类移至weisi模块（暂时）
 
-20170116-1.0.1(55):
+20180116-1.0.1(55):
 1. 去掉AndroidManifest.xml中application:lable属性，以免引用该module的项目出现merge error
+
+20180124-1.1.0(56):
+1. 新增FilterDialog，简单好用的筛选对话框

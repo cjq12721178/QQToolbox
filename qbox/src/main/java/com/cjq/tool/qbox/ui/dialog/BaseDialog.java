@@ -464,8 +464,6 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                     childView.setLayoutParams(params);
                 }
             }
-//            View contentView = rootView != null ? rootView : baseView;
-//            onSetContentView(contentView, decorator, savedInstanceState);
         }
     }
 
@@ -488,8 +486,9 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             }
             int titleSizeRes = decorator.getTitleTextSize();
             if (titleSizeRes != 0) {
-                tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                        getResources().getDimensionPixelSize(titleSizeRes));
+                setTextViewSize(tvTitle, titleSizeRes);
+//                tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+//                        getResources().getDimensionPixelSize(titleSizeRes));
             }
             tvTitle.setText(title);
             inflateSeparationLine(baseView, attachView, decorator, false);
@@ -569,8 +568,9 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         btn.setOnClickListener(this);
         int textSizeRes = decorator.getExitButtonTextSize();
         if (textSizeRes != 0) {
-            btn.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-                    getResources().getDimensionPixelSize(textSizeRes));
+            setTextViewSize(btn, textSizeRes);
+//            btn.setTextSize(TypedValue.COMPLEX_UNIT_PX,
+//                    getResources().getDimensionPixelSize(textSizeRes));
         }
         int textColorRes = decorator.getExitButtonTextColor();
         if (textColorRes != 0) {
@@ -580,6 +580,10 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         if (backgroundRes != 0) {
             btn.setBackgroundResource(backgroundRes);
         }
+    }
+
+    protected void setTextViewSize(TextView view, @DimenRes int textSizeRes) {
+        view.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(textSizeRes));
     }
 
     protected int getExitType() {

@@ -5,6 +5,7 @@ import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
@@ -21,6 +22,7 @@ import com.cjq.lib.weisi.protocol.UdpSensorProtocol;
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
+import com.cjq.tool.qbox.ui.dialog.FilterDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
 import com.cjq.tool.qbox.ui.dialog.SortDialog;
 import com.cjq.tool.qbox.ui.manager.SwitchableFragmentManager;
@@ -41,11 +43,13 @@ import com.cjq.tool.qqtoolbox.util.CrashHandler;
 import com.cjq.tool.qqtoolbox.util.DebugTag;
 
 import java.io.IOException;
+import java.util.List;
 
 public class MainActivity
         extends AppCompatActivity
         implements View.OnClickListener,
         SortDialog.OnSortTypeChangedListener,
+        FilterDialog.OnFilterChangeListener,
         CompoundButton.OnCheckedChangeListener,
         TextView.OnEditorActionListener,
         DataReceiver.Listener {
@@ -65,12 +69,16 @@ public class MainActivity
     private TextView mTvEmission;
     private String mEmissionTextCopy;
     private String mReceptionTextCopy;
+    private FilterDialog mFilterDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        if (savedInstanceState != null) {
+            mFilterDialog = (FilterDialog) getSupportFragmentManager().findFragmentByTag("test_filter_dialog");
+        }
         ExceptionLog.initialize(this, "QQToolBox");
         ClosableLog.setEnablePrint(true);
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(this));
@@ -326,6 +334,15 @@ public class MainActivity
             case R.id.btn_open_ble_activity:
                 startActivity(new Intent(this, BleDebugActivity.class));
                 break;
+            case R.id.btn_filter_dialog:
+                if (mFilterDialog == null) {
+                    mFilterDialog = new FilterDialog();
+                    mFilterDialog.addFilterType("协议", new String[] { "BLE", "ESB" });
+                    mFilterDialog.addFilterType("类型", new String[] { "温度传感器", "重力加速度", "智能避雷器", "液位传感器" });
+                    mFilterDialog.addFilterType("项目", new String[] { "水厂", "铝厂", "尼乐园南站", "WEISI", "测试", "ABCDEFG", "HIJKLMN", "OPQ", "RST", "UVW", "XYZ", "其他"});
+                }
+                mFilterDialog.show(getSupportFragmentManager(), "test_filter_dialog", "Filter Dialog");
+                break;
         }
     }
 
@@ -471,5 +488,29 @@ public class MainActivity
                 e.printStackTrace();
             }
         }
+    }
+
+    @Override
+    public void onFilterChange(boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues) {
+        Log.d(DebugTag.GENERAL_LOG_TAG, generateFilterChangeMsg(hasFilters, checkedFilterEntryValues));
+    }
+
+    private String generateFilterChangeMsg(boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0, size = hasFilters.length;i < size;++i) {
+            builder.append("hasFilters: ")
+                    .append(hasFilters[i])
+                    .append(", checkedFilterEntryValues: ");
+            if (hasFilters[i]) {
+                for (Integer entryValue
+                        : checkedFilterEntryValues[i]) {
+                    builder.append(entryValue).append(',');
+                }
+                builder.replace(builder.length() - 1, builder.length(), "\n");
+            } else {
+                builder.append("\n");
+            }
+        }
+        return builder.toString();
     }
 }

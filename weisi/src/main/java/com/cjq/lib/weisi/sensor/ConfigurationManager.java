@@ -94,6 +94,14 @@ public class ConfigurationManager {
         }
     };
 
+    public static List<Configuration> getBleConfigurations() {
+        return Collections.unmodifiableList(BLE_CONFIGURATIONS);
+    }
+
+    public static List<Configuration> getEsbConfigurations() {
+        return Collections.unmodifiableList(ESB_CONFIGURATIONS);
+    }
+
     private static List<Configuration> getConfigurations(int address) {
         return Sensor.isBleProtocolFamily(address) ? BLE_CONFIGURATIONS : ESB_CONFIGURATIONS;
     }
