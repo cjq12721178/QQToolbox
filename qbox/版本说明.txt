@@ -186,3 +186,7 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20180124-1.1.0(56):
 1. 新增FilterDialog，简单好用的筛选对话框
+
+20180125-1.1.1(57):
+1. 修改FilterDialog.OnFilterChangeListener接口
+2. 为dimens.xml补充在large、normal、small、xlarge下的适配尺寸

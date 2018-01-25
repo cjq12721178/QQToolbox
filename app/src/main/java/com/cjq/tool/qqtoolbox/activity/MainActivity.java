@@ -491,7 +491,7 @@ public class MainActivity
     }
 
     @Override
-    public void onFilterChange(boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues) {
+    public void onFilterChange(FilterDialog dialog, boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues) {
         Log.d(DebugTag.GENERAL_LOG_TAG, generateFilterChangeMsg(hasFilters, checkedFilterEntryValues));
     }
 

@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="qbox_padding">5dp</dimen>
-    <dimen name="qbox_padding_dialog_base">11dp</dimen>
-    <dimen name="qbox_size_text_dialog_view">16sp</dimen>
-    <dimen name="qbox_size_text_dialog_title">21sp</dimen>
+    <dimen name="qbox_padding">6dp</dimen>
+    <dimen name="qbox_padding_toast">9dp</dimen>
+    <dimen name="qbox_padding_dialog_base">12dp</dimen>
+    <dimen name="qbox_size_text_dialog_view">15sp</dimen>
+    <dimen name="qbox_size_text_dialog_title">20sp</dimen>
     <dimen name="qbox_list_item_interval_vertical">10dp</dimen>
     <dimen name="qbox_dialog_separation_line_width_fixed">2dp</dimen>
     <dimen name="qbox_dialog_view_interval_vertical">15dp</dimen>
+    <dimen name="qbox_dialog_filter_label_width">70dp</dimen>
+    <dimen name="qbox_dialog_filter_tag_margin">6dp</dimen>
+    <dimen name="qbox_dialog_filter_tag_padding">6dp</dimen>
+    <dimen name="qbox_dialog_filter_tag_radius">18dp</dimen>
+    <dimen name="qbox_dialog_filter_label_text_size">17sp</dimen>
 </resources>

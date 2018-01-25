@@ -315,7 +315,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                 }
                 checkedFilterEntryValues[filterNo] = selectedTagEntryValues;
             }
-            listener.onFilterChange(hasFilters, checkedFilterEntryValues);
+            listener.onFilterChange(this, hasFilters, checkedFilterEntryValues);
         }
         return true;
     }
@@ -1143,6 +1143,6 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         //一维数组与FilterType[]一一对应，二维数组与Tag一一对应
         //当选中某个tag时，hasFilter=True，
         // 当所有tag均未选中或均选中时，hasFilter=False
-        void onFilterChange(boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues);
+        void onFilterChange(FilterDialog dialog, boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues);
     }
 }
