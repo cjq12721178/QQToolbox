@@ -1,7 +1,6 @@
 package com.cjq.tool.qqtoolbox.activity;
 
 import android.content.Intent;
-import android.os.PersistableBundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -131,7 +130,7 @@ public class MainActivity
             case R.id.btn_confirm_custom_decorator:
                 ConfirmDialog dialog2 = new ConfirmDialog();
                 ConfirmDialog.Decorator decorator1 = dialog2.getCustomDecorator();
-                decorator1.setTitleLayout(R.layout.group_dialog_title);
+                decorator1.setTitleLayoutRes(R.layout.group_dialog_title);
                 decorator1.setTitleId(R.id.tv_custom_title);
                 decorator1.setTitleTextSize(R.dimen.size_text_activity);
                 decorator1.setOkCancelLayout(R.layout.group_ok_cancel_custom);
@@ -166,7 +165,7 @@ public class MainActivity
             case R.id.btn_edit_use_custom_decorator:
                 EditDialog editDialog2 = new EditDialog();
                 EditDialog.Decorator decorator3 = editDialog2.getCustomDecorator();
-                decorator3.setContentLayout(R.layout.et_custom);
+                decorator3.setContentLayoutRes(R.layout.et_custom);
                 decorator3.setEditId(R.id.et_custom);
                 editDialog2.setTitle("use custom decorator");
                 editDialog2.setContent("yaya");

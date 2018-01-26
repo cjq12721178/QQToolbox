@@ -3,11 +3,8 @@ package com.cjq.tool.qbox.ui.dialog;
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
 import android.support.annotation.IdRes;
-import android.support.annotation.LayoutRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.util.TypedValue;
 import android.view.View;
 import android.widget.EditText;
@@ -31,36 +28,36 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
     public static class Decorator extends BaseDialog.Decorator {
 
         @Override
-        public void reset() {
-            super.reset();
-            setEditId(R.id.il_text);
-        }
-
-        @Override
-        protected int onSetContentLayout() {
+        protected int getDefaultContentLayoutRes() {
             return R.layout.qbox_dialog_content_edit;
         }
 
-        @Override
-        public void setContentLayout(@LayoutRes int layoutRes) {
-            super.setContentLayout(layoutRes);
+//        @Override
+//        public void setContentLayoutRes(@LayoutRes int layoutRes) {
+//            super.setContentLayoutRes(layoutRes);
+//        }
+
+        final public @IdRes int getEditId() {
+            return mParameters.getInt("dp_edit_id", getDefaultEditId());
         }
 
-        @IdRes
-        public int getEditId() {
-            return mParameters.getInt("dp_edit_id");
+        public @IdRes int getDefaultEditId() {
+            return R.id.il_text;
         }
 
-        public void setEditId(@IdRes int editId) {
+        final public void setEditId(@IdRes int editId) {
             mParameters.putInt("dp_edit_id", editId);
         }
 
-        @DimenRes
-        public int getEditTextSize() {
+        final public @DimenRes int getEditTextSizeDimenRes() {
             return mParameters.getInt("dp_edit_text_size");
         }
 
-        public void setEditTextSize(@DimenRes int textSizeRes) {
+        public @DimenRes int getDefaultEditTextSizeDimenRes() {
+            return 0;
+        }
+
+        final public void setEditTextSize(@DimenRes int textSizeRes) {
             mParameters.putInt("dp_edit_text_size", textSizeRes);
         }
     }
@@ -69,9 +66,9 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
     protected void onSetContentView(View contentView,
                                     Decorator decorator,
                                     @Nullable Bundle savedInstanceState) {
-        mEtText = (EditText) contentView.findViewById(decorator.getEditId());
+        mEtText = contentView.findViewById(decorator.getEditId());
         mEtText.setText(getContent());
-        int textSizeRes = decorator.getEditTextSize();
+        int textSizeRes = decorator.getEditTextSizeDimenRes();
         if (textSizeRes != 0) {
             mEtText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
                     getResources().getDimensionPixelSize(textSizeRes));

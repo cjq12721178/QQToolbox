@@ -42,11 +42,9 @@ import java.util.List;
 
 public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
 
-    //private static final String ARGUMENT_KEY_CHECK_STATES = "in_filter_states";
     private static final String ARGUMENT_KEY_FILTER_TYPES = "in_filter_types";
 
     //存放选中的FilterType.Tag序号
-    //private ArrayList<ArrayList<Integer>> mSelectedFilterTypeTags;
     private ArrayList<FilterType> mFilterTypes;
 
     public FilterDialog() {
@@ -84,16 +82,9 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
             throw new IllegalArgumentException("entry,value and state may have same size");
         }
         FilterType.Tag[] tags = new FilterType.Tag[size];
-//        if (mSelectedFilterTypeTags == null) {
-//            mSelectedFilterTypeTags = new ArrayList<>();
-//        }
-//        mSelectedFilterTypeTags.add(new ArrayList<Integer>());
         if (entryDefaultStates != null) {
             for (int i = 0;i < size;++i) {
                 tags[i] = new FilterType.Tag(entries[i], entryValues[i], entryDefaultStates[i]);
-//                if (entryDefaultStates[i]) {
-//                    mSelectedFilterTypeTags.get(mSelectedFilterTypeTags.size() - 1).add(i);
-//                }
             }
         } else {
             for (int i = 0;i < size;++i) {
@@ -111,45 +102,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         return mFilterTypes;
     }
 
-
-//    public FilterDialog addFilterType(String label, FilterType.Tag... tags) {
-//        return addFilterType(new FilterType(label, tags));
-//        //return addFilterType(label, tags, true);
-//    }
-//
-//    public FilterDialog addFilterType(String label, List<FilterType.Tag> tags) {
-//        FilterType.Tag[] copy = new FilterType.Tag[tags.size()];
-//        return addFilterType(new FilterType(label, copy));
-////        if (tags == null) {
-////            return this;
-////        }
-////        FilterType.Tag[] copy = new FilterType.Tag[tags.size()];
-////        return addFilterType(label, tags.toArray(copy), false);
-//    }
-//
-//    public FilterDialog addFilterType(FilterType type) {
-//        if (mFilterTypes == null) {
-//            mFilterTypes = new ArrayList<>();
-//        }
-//        mFilterTypes.add(type);
-//        return this;
-//    }
-
-//    private FilterDialog addFilterType(String label, FilterType.Tag[] tags, boolean needClone) {
-//        checkLabel(label);
-//        checkTags(tags);
-//        ArrayList<FilterType> filterTypes = getArguments().getParcelableArrayList(ARGUMENT_KEY_FILTER_TYPES);
-//        if (filterTypes == null) {
-//            filterTypes = new ArrayList<>();
-//            getArguments().putParcelableArrayList(ARGUMENT_KEY_FILTER_TYPES, filterTypes);
-//        }
-//        filterTypes.add(new FilterType(label, needClone ? tags.clone() : tags));
-//        return this;
-//    }
-
     public FilterDialog clearFilterTypes() {
-        //getArguments().putParcelableArrayList(ARGUMENT_KEY_FILTER_TYPES, null);
-        //mSelectedFilterTypeTags.clear();
         mFilterTypes.clear();
         return this;
     }
@@ -158,7 +111,6 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
     protected void onSetContentView(View contentView, Decorator decorator, @Nullable Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             mFilterTypes = savedInstanceState.getParcelableArrayList(ARGUMENT_KEY_FILTER_TYPES);
-            //mSelectedFilterTypeTags = getCheckStates(savedInstanceState);
         }
         ViewPager vpFilter = contentView.findViewById(R.id.vp_filter);
         PagerTabStrip ptsFilter = vpFilter.findViewById(R.id.pts_filter);
@@ -175,98 +127,12 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
             vpFilter.setLayoutParams(params);
         }
         vpFilter.setAdapter(new FilterPageAdapter(mFilterTypes, decorator));
-//        ConstraintLayout clFilter = contentView.findViewById(R.id.vp_filter);
-//        Bundle arguments = getArguments();
-//        if (filterTypes != null) {
-//            Context context = getContext();
-//            Resources resources = context.getResources();
-//            ConstraintSet constraintSet = new ConstraintSet();
-//            constraintSet.clone(clFilter);
-//            float textSize = resources.getDimensionPixelSize(decorator.getFilterTypeTextSize());
-//            int labelWidth = resources.getDimensionPixelSize(decorator.getFilterLabelWidth());
-//            int tagMargin = resources.getDimensionPixelSize(decorator.getFilterTagMargin());
-//            Drawable tagBackground = ContextCompat.getDrawable(context, decorator.getFilterTagBackground());
-//            int currTvLabelId, prevTvLabelId = 0, currViewId, prevViewId = 0;
-//            clFilter.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
-//                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//            final int maxWidth = clFilter.getMeasuredWidth();
-//            int headWidth = 0, noLimitTagWidth = 0;
-//            boolean hasFilter;
-//            for (int i = 0;i < filterTypes.size();++i) {
-//                FilterType filterType = filterTypes.get(i);
-//                //添加label view
-//                TextView tvLabel = new TextView(context);
-//                currTvLabelId = View.generateViewId();
-//                tvLabel.setId(currTvLabelId);
-//                tvLabel.setText(filterType.getEntry());
-//                tvLabel.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
-//                tvLabel.setLines(1);
-//                tvLabel.setEllipsize(TextUtils.TruncateAt.MARQUEE);
-//                clFilter.addView(tvLabel);
-//                constraintSet.constrainWidth(currTvLabelId, labelWidth);
-//                constraintSet.constrainHeight(currTvLabelId, ConstraintSet.WRAP_CONTENT);
-//                constraintSet.setMargin(currTvLabelId,
-//                        ConstraintSet.START,
-//                        tagMargin);
-//                constraintSet.connect(currTvLabelId,
-//                        ConstraintSet.START,
-//                        ConstraintSet.PARENT_ID,
-//                        ConstraintSet.START);
-//                if (prevTvLabelId == 0) {
-//                    constraintSet.connect(currTvLabelId,
-//                            ConstraintSet.TOP,
-//                            ConstraintSet.PARENT_ID,
-//                            ConstraintSet.TOP);
-//                } else {
-//                    constraintSet.connect(currTvLabelId,
-//                            ConstraintSet.TOP,
-//                            prevTvLabelId,
-//                            ConstraintSet.BOTTOM);
-//                }
-//                prevTvLabelId = currTvLabelId;
-//                //添加“全部”按钮
-//                hasFilter = filterType.hasFilter();
-//                currViewId = View.generateViewId();
-//                Button btnNoLimit = new Button(context);
-//                btnNoLimit.setId(currViewId);
-//                btnNoLimit.setText(R.string.qbox_no_limit);
-//                btnNoLimit.setTextSize(textSize);
-//                btnNoLimit.setBackground(tagBackground);
-//                btnNoLimit.setSelected(!hasFilter);
-//                btnNoLimit.setLayoutParams(new ConstraintLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-//                if (noLimitTagWidth == 0) {
-//                    btnNoLimit.measure(0, 0);
-//                    noLimitTagWidth = btnNoLimit.getMeasuredWidth();
-//                }
-//                clFilter.addView(btnNoLimit);
-//                constraintSet.setMargin(currViewId,
-//                        ConstraintSet.START,
-//                        tagMargin);
-//                headWidth = labelWidth + noLimitTagWidth + tagMargin + tagMargin;
-//
-//            }
-//        }
     }
-
-//    private ArrayList<ArrayList<Integer>> getCheckStates(@NonNull Bundle savedInstanceState) {
-//        ArrayList<ArrayList<Integer>> checkStates = new ArrayList<>();
-//        ArrayList<Integer> childCheckStates;
-//        for (int i = 0;;++i) {
-//            childCheckStates = savedInstanceState.getIntegerArrayList(ARGUMENT_KEY_CHECK_STATES + i);
-//            if (childCheckStates != null) {
-//                checkStates.add(childCheckStates);
-//            } else {
-//                break;
-//            }
-//        }
-//        return checkStates;
-//    }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         if (outState != null) {
-            //putCheckStates(outState);
             outState.putParcelableArrayList(ARGUMENT_KEY_FILTER_TYPES, mFilterTypes);
         }
     }
@@ -275,21 +141,6 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
     protected int getDefaultTitleRes() {
         return R.string.qbox_filter;
     }
-
-    //    private void putCheckStates(Bundle outState) {
-//        int pos = 0;
-//        for (int size = mSelectedFilterTypeTags.size(); pos < size; ++pos) {
-//            outState.putIntegerArrayList(ARGUMENT_KEY_CHECK_STATES + pos, mSelectedFilterTypeTags.get(pos));
-//        }
-//        for (;;) {
-//            if (outState.getIntegerArrayList(ARGUMENT_KEY_CHECK_STATES + pos) != null) {
-//                outState.putIntegerArrayList(ARGUMENT_KEY_CHECK_STATES + pos, null);
-//            } else {
-//                break;
-//            }
-//        }
-//    }
-
 
     @Override
     protected boolean onCancel() {
@@ -335,206 +186,194 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
             }
         }
         return result;
-//        for (int filterNo = 0, filterSize = mSelectedFilterTypeTags.size(), tagSize;
-//             filterNo < filterSize; ++filterNo) {
-//            FilterType type = mFilterTypes.get(filterNo);
-//            List<Integer> selectedTagNos = mSelectedFilterTypeTags.get(filterNo);
-//            tagSize = selectedTagNos.size();
-//            if (type.mLastSelectedTagNos.size() != tagSize) {
-//                return true;
-//            }
-//            for (int tagNo = 0;tagNo < tagSize;++tagNo) {
-//                Integer selectedTagNo = selectedTagNos.get(tagNo);
-//                if (!type.mLastSelectedTagNos.contains(selectedTagNo)) {
-//                    return true;
-//                }
-//            }
-//        }
-//        return false;
     }
-
-//    private void changeSelectedFilterTypeTags() {
-//        for (int filterNo = 0, filterSize = mFilterTypes.size();
-//                filterNo < filterSize;++filterNo) {
-//            ArrayList<Integer> selectedTagNos = mSelectedFilterTypeTags.get(filterNo);
-//            selectedTagNos.clear();
-//            for (Integer selectedTagNo
-//                    : mFilterTypes.get(filterNo).mLastSelectedTagNos) {
-//                selectedTagNos.add(selectedTagNo);
-//            }
-//        }
-//    }
 
     public static class Decorator extends BaseDialog.Decorator {
 
         @Override
-        protected int onSetContentLayout() {
+        protected int getDefaultContentLayoutRes() {
             return R.layout.qbox_dialog_content_filter;
         }
 
-        @Override
-        public void reset() {
-            super.reset();
-            setFilterLabelTextSizeRes(R.dimen.qbox_dialog_filter_label_text_size);
-            setFilterLabelTextColorRes(R.color.qbox_background_check_box_checked);
-            setFilterLabelUnderlineColorRes(R.color.qbox_background_check_box_checked);
-            setDrawFilterLabelFullUnderline(false);
-            setFilterLabelFullBackgroundRes(0);
-            setFilterTagBackgroundRes(R.drawable.qbox_selector_background_check_box);
-            setFilterTagTextSizeRes(R.dimen.qbox_size_text_dialog_view);
-            setFilterTagTextColorStateListRes(R.color.qbox_selector_text_color_check_box);
-            setFilterTagTextColorRes(0);
-            setDisplayTagAll(true);
-            setTagAllLabelRes(R.string.qbox_all);
-            setFilterTagsPaddingDimenRes(R.dimen.qbox_padding);
-            setFilterTagsHorizontalIntervalDimenRes(R.dimen.qbox_dialog_filter_tag_margin);
-            setFilterTagsVerticalIntervalDimenRes(R.dimen.qbox_dialog_filter_tag_margin);
-            setFilterPaneHeightDimenRes(0);
-        }
-
-//        public void setFilterTypeTextSize(@DimenRes int textSizeRes) {
-//            mParameters.putInt("fdp_text_size", textSizeRes);
-//        }
-//
-//        public @DimenRes int getFilterTypeTextSize() {
-//            return mParameters.getInt("fdp_text_size");
-//        }
-
-        public void setFilterLabelTextSizeRes(@DimenRes int textSizeRes) {
+        final public void setFilterLabelTextSize(@DimenRes int textSizeRes) {
             mParameters.putInt("fdp_label_text_size", textSizeRes);
         }
 
-        public @DimenRes int getFilterLabelTextSizeRes() {
-            return mParameters.getInt("fdp_label_text_size");
+        final public @DimenRes int getFilterLabelTextSizeRes() {
+            return mParameters.getInt("fdp_label_text_size", getDefaultFilterLabelTextSizeRes());
         }
 
-        public void setFilterLabelTextColorRes(@ColorRes int colorRes) {
+        public @DimenRes int getDefaultFilterLabelTextSizeRes() {
+            return R.dimen.qbox_dialog_filter_label_text_size;
+        }
+
+        final public void setFilterLabelTextColor(@ColorRes int colorRes) {
             mParameters.putInt("fdp_label_text_color", colorRes);
         }
 
-        public @ColorRes int getFilterLabelTextColorRes() {
-            return mParameters.getInt("fdp_label_text_color");
+        final public @ColorRes int getFilterLabelTextColorRes() {
+            return mParameters.getInt("fdp_label_text_color", getDefaultFilterLabelTextColorRes());
         }
 
-        public void setFilterLabelUnderlineColorRes(@ColorRes int colorRes) {
+        public @ColorRes int getDefaultFilterLabelTextColorRes() {
+            return R.color.qbox_background_check_box_checked;
+        }
+
+        final public void setFilterLabelUnderlineColor(@ColorRes int colorRes) {
             mParameters.putInt("fdp_label_line_color", colorRes);
         }
 
-        public @ColorRes int getFilterLabelUnderlineColorRes() {
-            return mParameters.getInt("fdp_label_line_color");
+        final public @ColorRes int getFilterLabelUnderlineColorRes() {
+            return mParameters.getInt("fdp_label_line_color", getDefaultFilterLabelUnderlineColorRes());
         }
 
-        public void setDrawFilterLabelFullUnderline(boolean allowed) {
+        public @ColorRes int getDefaultFilterLabelUnderlineColorRes() {
+            return R.color.qbox_background_check_box_checked;
+        }
+
+        final public void setDrawFilterLabelFullUnderline(boolean allowed) {
             mParameters.putBoolean("fdp_full_line_enable", allowed);
         }
 
-        public boolean isDrawFilterLabelFullUnderline() {
-            return mParameters.getBoolean("fdp_full_line_enable");
+        final public boolean isDrawFilterLabelFullUnderline() {
+            return mParameters.getBoolean("fdp_full_line_enable", isDefaultDrawFilterLabelFullUnderline());
         }
 
-        public void setFilterLabelFullBackgroundRes(@DrawableRes int backgroundRes) {
+        public boolean isDefaultDrawFilterLabelFullUnderline() {
+            return false;
+        }
+
+        final public void setFilterLabelFullBackground(@DrawableRes int backgroundRes) {
             mParameters.putInt("fdp_label_bg", backgroundRes);
         }
 
-        public @DrawableRes int getFilterLabelFullBackgroundRes() {
-            return mParameters.getInt("fdp_label_bg");
+        final public @DrawableRes int getFilterLabelFullBackgroundRes() {
+            return mParameters.getInt("fdp_label_bg", getDefaultFilterLabelFullBackgroundRes());
         }
 
-//        public void setFilterLabelWidth(@DimenRes int widthRes) {
-//            mParameters.putInt("fdp_label_width", widthRes);
-//        }
-//
-//        public @DimenRes int getFilterLabelWidth() {
-//            return mParameters.getInt("fdp_label_width");
-//        }
+        public @DrawableRes int getDefaultFilterLabelFullBackgroundRes() {
+            return 0;
+        }
 
-        public void setFilterTagBackgroundRes(@DrawableRes int backgroundRes) {
+        final public void setFilterTagBackground(@DrawableRes int backgroundRes) {
             mParameters.putInt("fdp_tag_bg", backgroundRes);
         }
 
-        public @DrawableRes int getFilterTagBackgroundRes() {
-            return mParameters.getInt("fdp_tag_bg");
+        final public @DrawableRes int getFilterTagBackgroundRes() {
+            return mParameters.getInt("fdp_tag_bg", getDefaultFilterTagBackgroundRes());
         }
 
-        public void setFilterTagTextSizeRes(@DimenRes int textSizeRes) {
+        public @DrawableRes int getDefaultFilterTagBackgroundRes() {
+            return R.drawable.qbox_selector_background_check_box;
+        }
+
+        final public void setFilterTagTextSize(@DimenRes int textSizeRes) {
             mParameters.putInt("fdp_tag_text_size", textSizeRes);
         }
 
-        public @DimenRes int getFilterTagTextSizeRes() {
-            return mParameters.getInt("fdp_tag_text_size");
+        final public @DimenRes int getFilterTagTextSizeRes() {
+            return mParameters.getInt("fdp_tag_text_size", getDefaultFilterTagTextSizeRes());
         }
 
-        public void setFilterTagTextColorStateListRes(@ColorRes int colorRes) {
+        public @DimenRes int getDefaultFilterTagTextSizeRes() {
+            return R.dimen.qbox_size_text_dialog_view;
+        }
+
+        final public void setFilterTagTextColorStateList(@ColorRes int colorRes) {
             mParameters.putInt("fdp_tag_text_colors", colorRes);
         }
 
-        public @ColorRes int getFilterTagTextColorStateListRes() {
-            return mParameters.getInt("fdp_tag_text_colors");
+        final public @ColorRes int getFilterTagTextColorStateListRes() {
+            return mParameters.getInt("fdp_tag_text_colors", getDefaultFilterTagTextColorStateListRes());
         }
 
-        public void setFilterTagTextColorRes(@ColorRes int colorRes) {
+        public @ColorRes int getDefaultFilterTagTextColorStateListRes() {
+            return R.color.qbox_selector_text_color_check_box;
+        }
+
+        final public void setFilterTagTextColor(@ColorRes int colorRes) {
             mParameters.putInt("fdp_tag_text_color", colorRes);
         }
 
-        public @ColorRes int getFilterTagTextColorRes() {
-            return mParameters.getInt("fdp_tag_text_color");
+        final public @ColorRes int getFilterTagTextColorRes() {
+            return mParameters.getInt("fdp_tag_text_color", getDefaultFilterTagTextColorRes());
         }
 
-        public void setDisplayTagAll(boolean enable) {
+        public @ColorRes int getDefaultFilterTagTextColorRes() {
+            return 0;
+        }
+
+        final public void setDisplayTagAll(boolean enable) {
             mParameters.putBoolean("fdp_tag_all_enable", enable);
         }
 
-        public boolean isDisplayTagAll() {
-            return mParameters.getBoolean("fdp_tag_all_enable");
+        final public boolean isDisplayTagAll() {
+            return mParameters.getBoolean("fdp_tag_all_enable", isDefaultDisplayTagAll());
         }
 
-        public void setTagAllLabelRes(@StringRes int labelRes) {
+        public boolean isDefaultDisplayTagAll() {
+            return true;
+        }
+
+        final public void setTagAllLabel(@StringRes int labelRes) {
             mParameters.putInt("fdp_tag_all_label", labelRes);
         }
 
-        public @StringRes int getTagAllLabelRes() {
-            return mParameters.getInt("fdp_tag_all_label");
+        final public @StringRes int getTagAllLabelRes() {
+            return mParameters.getInt("fdp_tag_all_label", getDefaultTagAllLabelRes());
         }
 
-        public void setFilterTagsPaddingDimenRes(@DimenRes int dimenRes) {
+        public @StringRes int getDefaultTagAllLabelRes() {
+            return R.string.qbox_all;
+        }
+
+        final public void setFilterTagsPadding(@DimenRes int dimenRes) {
             mParameters.putInt("fdp_tags_padding", dimenRes);
         }
 
-        public @DimenRes int getFilterTagsPaddingDimenRes() {
-            return mParameters.getInt("fdp_tags_padding");
+        final public @DimenRes int getFilterTagsPaddingDimenRes() {
+            return mParameters.getInt("fdp_tags_padding", getDefaultFilterTagsPaddingDimenRes());
         }
 
-        public void setFilterTagsHorizontalIntervalDimenRes(@DimenRes int dimenRes) {
+        public @DimenRes int getDefaultFilterTagsPaddingDimenRes() {
+            return R.dimen.qbox_padding;
+        }
+
+        final public void setFilterTagsHorizontalInterval(@DimenRes int dimenRes) {
             mParameters.putInt("fdp_tags_hi", dimenRes);
         }
 
-        public @DimenRes int getFilterTagsHorizontalIntervalDimenRes() {
-            return mParameters.getInt("fdp_tags_hi");
+        final public @DimenRes int getFilterTagsHorizontalIntervalDimenRes() {
+            return mParameters.getInt("fdp_tags_hi", getDefaultFilterTagsHorizontalIntervalDimenRes());
         }
 
-        public void setFilterTagsVerticalIntervalDimenRes(@DimenRes int dimenRes) {
+        public @DimenRes int getDefaultFilterTagsHorizontalIntervalDimenRes() {
+            return R.dimen.qbox_dialog_filter_tag_margin;
+        }
+
+        final public void setFilterTagsVerticalInterval(@DimenRes int dimenRes) {
             mParameters.putInt("fdp_tags_vi", dimenRes);
         }
 
-        public @DimenRes int getFilterTagsVerticalIntervalDimenRes() {
-            return mParameters.getInt("fdp_tags_vi");
+        final public @DimenRes int getFilterTagsVerticalIntervalDimenRes() {
+            return mParameters.getInt("fdp_tags_vi", getDefaultFilterTagsVerticalIntervalDimenRes());
         }
 
-        public void setFilterPaneHeightDimenRes(@DimenRes int dimenRes) {
+        public @DimenRes int getDefaultFilterTagsVerticalIntervalDimenRes() {
+            return R.dimen.qbox_dialog_filter_tag_margin;
+        }
+
+        final public void setFilterPaneHeightDimenRes(@DimenRes int dimenRes) {
             mParameters.putInt("fdp_pane_height", dimenRes);
         }
 
-        public @DimenRes int getFilterPaneHeightDimenRes() {
-            return mParameters.getInt("fdp_pane_height");
+        final public @DimenRes int getFilterPaneHeightDimenRes() {
+            return mParameters.getInt("fdp_pane_height", getDefaultFilterPaneHeightDimenRes());
         }
 
-//        public void setFilterTagIntervalDimenRes(@DimenRes int marginRes) {
-//            mParameters.putInt("fdp_tag_margin", marginRes);
-//        }
-//
-//        public @DimenRes int getFilterTagIntervalDimenRes() {
-//            return mParameters.getInt("fdp_tag_margin");
-//        }
+        public @DimenRes int getDefaultFilterPaneHeightDimenRes() {
+            return 0;
+        }
     }
 
     private static class FilterType implements Parcelable {
@@ -790,18 +629,10 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
             if (tagNo == TagBuilder.TAG_ALL_NO) {
                 mChkAll.setEnabled(!isChecked);
                 if (!mType.isSelected() && isChecked) {
-//                    for (Integer selectedTagNo
-//                            : mType.mLastSelectedTagNos) {
-//                        CheckBox chkTag = mChkTags[selectedTagNo];
-//                        chkTag.setOnCheckedChangeListener(null);
-//                        chkTag.setChecked(false);
-//                        chkTag.setOnCheckedChangeListener(this);
-//                    }
                     mType.setSelected(isChecked, this);
                 }
             } else {
                 if (mType.isSelected() && isChecked) {
-                    //mType.setTagSelected(tagNo, isChecked);
                     mType.setTagSelected(tagNo, isChecked);
                     mChkAll.setChecked(false);
                 } else if (mType.mLastSelectedTagNos.size() == 1 && !isChecked) {
@@ -875,6 +706,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
             private final @DrawableRes int mTagBackgroundRes;
             private final ColorStateList mTagTextColorStateList;
             private final @ColorInt int mTagTextColorInt;
+            private final int mTagTextSize;
             private final int mTagsPadding;
             private final int mTagHorizontalInterval;
             private final int mTagVerticalInterval;
@@ -895,6 +727,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                         ? ContextCompat.getColor(context, decorator.getFilterTagTextColorRes())
                         : 0;
                 Resources resources = context.getResources();
+                mTagTextSize = resources.getDimensionPixelOffset(decorator.getFilterTagTextSizeRes());
                 mTagsPadding = resources.getDimensionPixelOffset(decorator.getFilterTagsPaddingDimenRes());
                 mTagHorizontalInterval = resources.getDimensionPixelOffset(decorator.getFilterTagsHorizontalIntervalDimenRes());
                 mTagVerticalInterval = resources.getDimensionPixelOffset(decorator.getFilterTagsVerticalIntervalDimenRes());
@@ -904,14 +737,6 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                         ? resources.getDimensionPixelOffset(decorator.getFilterPaneHeightDimenRes())
                         : 0;
             }
-
-//            public void measureMaxWidth(View tagsPaneParent, View tagsPane, boolean recalculate) {
-//                if (mPaneMaxWidth == 0 || recalculate) {
-//                    int specWidth = ViewGroup.getChildMeasureSpec(View.MeasureSpec.UNSPECIFIED, tagsPane.getPaddingLeft(), tagsPane.getLayoutParams().width);
-//                    mPaneMaxWidth = getMeasuredWidth(tagsPaneParent, specWidth);
-//                    //mPaneMaxWidth = getMeasuredWidth(tagsPane);
-//                }
-//            }
 
             public CheckBox build(Context context, Page page, int tagNo) {
                 CheckBox box = new CheckBox(context);
@@ -930,6 +755,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                 //设置参数
                 box.setId(View.generateViewId());
                 box.setTag(tagNo);
+                box.setTextSize(TypedValue.COMPLEX_UNIT_PX, mTagTextSize);
                 box.setButtonDrawable(mTagButtonFrame);
                 box.setBackgroundResource(mTagBackgroundRes);
                 if (mTagTextColorStateList != null) {
@@ -949,13 +775,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                         params.addRule(RelativeLayout.ALIGN_BASELINE, previousId);
                         params.leftMargin = mTagHorizontalInterval;
                     } else if (location == LOCATION_HEAD) {
-//                        if (box.getText().equals("OPQ")) {
-//                            params.addRule(RelativeLayout.BELOW, page.mChkTags[3].getId());
-//                        } else {
-//                            params.addRule(RelativeLayout.BELOW, previousId);
-//                        }
                         params.addRule(RelativeLayout.BELOW, mLastTagRowHeadId);
-                        //params.addRule(RelativeLayout.BELOW, previousId);
                         params.topMargin = mTagVerticalInterval;
                         mLastTagRowHeadId = box.getId();
                     }

@@ -11,8 +11,6 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -87,7 +85,7 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
         ArrayList<SortType> sortTypes = arguments.getParcelableArrayList(ARGUMENT_KEY_SORT_TYPES);
         int selectedId = getSelectedId(arguments);
         Bitmap emptyRadioButtonImage = null;
-        int textSizeRes = decorator.getSortTypeTextSize();
+        int textSizeRes = decorator.getSortTypeTextSizeRes();
         float textSize = textSizeRes != 0 ? getResources().getDimensionPixelSize(textSizeRes) : 0;
         for (SortType sortType :
                 sortTypes) {
@@ -165,24 +163,30 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
     public static class Decorator extends BaseDialog.Decorator {
 
         @Override
-        protected int onSetContentLayout() {
+        protected int getDefaultContentLayoutRes() {
             return R.layout.qbox_dialog_content_sort;
         }
 
         @Override
-        public void reset() {
-            super.reset();
-            setOkLabel(R.string.qbox_ascend);
-            setCancelLabel(R.string.qbox_descend);
-            setSortTypeTextSize(R.dimen.qbox_size_text_dialog_view);
+        public int getDefaultOkLabelRes() {
+            return R.string.qbox_ascend;
         }
 
-        public void setSortTypeTextSize(@DimenRes int textSizeRes) {
+        @Override
+        public int getDefaultCancelLabelRes() {
+            return R.string.qbox_descend;
+        }
+
+        final public void setSortTypeTextSize(@DimenRes int textSizeRes) {
             mParameters.putInt("sdp_text_size", textSizeRes);
         }
 
-        public int getSortTypeTextSize() {
-            return mParameters.getInt("sdp_text_size");
+        public @DimenRes int getSortTypeTextSizeRes() {
+            return mParameters.getInt("sdp_text_size", getDefaultSortTypeTextSizeRes());
+        }
+
+        public @DimenRes int getDefaultSortTypeTextSizeRes() {
+            return R.dimen.qbox_size_text_dialog_view;
         }
     }
 

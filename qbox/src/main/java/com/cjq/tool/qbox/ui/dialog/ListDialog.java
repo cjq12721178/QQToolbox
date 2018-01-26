@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.support.annotation.DimenRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,11 +12,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.cjq.tool.qbox.R;
-import com.cjq.tool.qbox.ui.adapter.AdapterDelegate;
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
 import com.cjq.tool.qbox.ui.decoration.SpaceItemDecoration;
-
-import java.util.List;
 
 /**
  * Created by KAT on 2017/4/11.
@@ -35,32 +29,31 @@ public class ListDialog
     public static class Decorator extends BaseDialog.Decorator {
 
         @Override
-        public void reset() {
-            super.reset();
-            setListId(R.id.rv_items);
-            setItemVerticalInterval(R.dimen.qbox_list_item_interval_vertical);
-        }
-
-        @Override
-        protected int onSetContentLayout() {
+        protected int getDefaultContentLayoutRes() {
             return R.layout.qbox_dialog_content_list;
         }
 
-        @IdRes
-        public int getListId() {
-            return mParameters.getInt("dp_list_id");
+        final public @IdRes int getListId() {
+            return mParameters.getInt("dp_list_id", getDefaultListId());
         }
 
-        public void setListId(@IdRes int listId) {
+        public @IdRes int getDefaultListId() {
+            return R.id.rv_items;
+        }
+
+        final public void setListId(@IdRes int listId) {
             mParameters.putInt("dp_list_id", listId);
         }
 
-        @DimenRes
-        public int getItemVerticalInterval() {
-            return mParameters.getInt("dp_item_view_vertical_interval");
+        final public @DimenRes int getItemVerticalIntervalDimenRes() {
+            return mParameters.getInt("dp_item_view_vertical_interval", getDefaultItemVerticalIntervalDimenRes());
         }
 
-        public void setItemVerticalInterval(@DimenRes int intervalRes) {
+        public @DimenRes int getDefaultItemVerticalIntervalDimenRes() {
+            return R.dimen.qbox_list_item_interval_vertical;
+        }
+
+        final public void setItemVerticalInterval(@DimenRes int intervalRes) {
             mParameters.putInt("dp_item_view_vertical_interval", intervalRes);
         }
     }
@@ -70,7 +63,7 @@ public class ListDialog
         setCancelable(false);
         //setExitType(EXIT_TYPE_NULL);
         RecyclerView rvItems = (RecyclerView) contentView.findViewById(decorator.getListId());
-        int itemIntervalDimenRes = decorator.getItemVerticalInterval();
+        int itemIntervalDimenRes = decorator.getItemVerticalIntervalDimenRes();
         if (itemIntervalDimenRes != 0) {
             rvItems.addItemDecoration(new SpaceItemDecoration(getResources().
                     getDimensionPixelSize(itemIntervalDimenRes), true));

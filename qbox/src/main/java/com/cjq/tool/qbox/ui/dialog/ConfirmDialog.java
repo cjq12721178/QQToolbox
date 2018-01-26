@@ -15,7 +15,7 @@ public class ConfirmDialog extends BaseDialog<ConfirmDialog.Decorator> {
     public static class Decorator extends BaseDialog.Decorator {
 
         @Override
-        protected int onSetContentLayout() {
+        protected int getDefaultContentLayoutRes() {
             return 0;
         }
     }

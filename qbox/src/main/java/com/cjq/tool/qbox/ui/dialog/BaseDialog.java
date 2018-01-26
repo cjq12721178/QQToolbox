@@ -13,8 +13,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -123,26 +121,23 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         protected Bundle mParameters = new Bundle();
 
         protected Decorator() {
-            reset();
+            //reset();
         }
 
-        public void reset() {
+        public final void reset() {
             mParameters.clear();
-            setOkCancelLayout(R.layout.qbox_group_ok_cancel);
-            setOkLayout(R.layout.qbox_group_ok);
-            setOkId(R.id.btn_ok);
-            setCancelId(R.id.btn_cancel);
-            setBaseBackground(R.drawable.qbox_ic_dialog_background);
-            setBasePadding(R.dimen.qbox_padding_dialog_base);
-            setSeparationLineExists(true);
-            setSeparationLineBackground(R.color.qbox_background_dialog_separation_line);
-            setSeparationLineWidth(R.dimen.qbox_dialog_separation_line_width_fixed);
-            setViewVerticalInterval(R.dimen.qbox_dialog_view_interval_vertical);
-            setContentLayout(onSetContentLayout());
+            //setOkCancelLayout(R.layout.qbox_group_ok_cancel);
+            //setOkLayout(R.layout.qbox_group_ok);
+            //setOkId(R.id.btn_ok);
+            //setCancelId(R.id.btn_cancel);
+            //setBaseBackground(R.drawable.qbox_ic_dialog_background);
+            //setBasePadding(R.dimen.qbox_padding_dialog_base);
+            //setDrawSeparationLine(true);
+            //setSeparationLineBackground(R.color.qbox_background_dialog_separation_line);
+            //setSeparationLineWidth(R.dimen.qbox_dialog_separation_line_width_fixed);
+            //setViewVerticalInterval(R.dimen.qbox_dialog_view_interval_vertical);
+            //setContentLayoutRes(getDefaultContentLayoutRes());
         }
-
-        @LayoutRes
-        protected abstract int onSetContentLayout();
 
         void addParameters(Decorator baseDecorator) {
             if (baseDecorator != null) {
@@ -154,12 +149,13 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             mParameters.putAll(parameters);
         }
 
-        @LayoutRes
-        final public int getContentLayout() {
-            return mParameters.getInt("dp_content_layout");
+        final public @LayoutRes int getContentLayoutRes() {
+            return mParameters.getInt("dp_content_layout", getDefaultContentLayoutRes());
         }
 
-        protected void setContentLayout(@LayoutRes int layoutRes) {
+        protected abstract @LayoutRes int getDefaultContentLayoutRes();
+
+        final public void setContentLayoutRes(@LayoutRes int layoutRes) {
             if (getClass().getEnclosingClass() != BaseDialog.class) {
                 mParameters.putInt("dp_content_layout", layoutRes);
             }
@@ -167,208 +163,273 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
         //以下三个方法与标题设置有关
         //若要自定义title，需重载Decorator的getTitleLayout()和getTitleId()方法
-        @LayoutRes
-        public int getTitleLayout() {
-            return mParameters.getInt("dp_title_layout");
+        final public @LayoutRes int getTitleLayoutRes() {
+            return mParameters.getInt("dp_title_layout", getDefaultTitleLayoutRes());
         }
 
-        public void setTitleLayout(@LayoutRes int layoutRes) {
+        public @LayoutRes int getDefaultTitleLayoutRes() {
+            return 0;
+        }
+
+        final public void setTitleLayoutRes(@LayoutRes int layoutRes) {
             mParameters.putInt("dp_title_layout", layoutRes);
         }
 
-        @IdRes
-        public int getTitleId() {
-            return mParameters.getInt("dp_title_id");
+        final public @IdRes int getTitleId() {
+            return mParameters.getInt("dp_title_id", getDefaultTitleId());
         }
 
-        public void setTitleId(@IdRes int titleId) {
+        public @IdRes int getDefaultTitleId() {
+            return 0;
+        }
+
+        final public void setTitleId(@IdRes int titleId) {
             mParameters.putInt("dp_title_id", titleId);
         }
 
-        //返回0时，采用默认设置的字体大小，若要自定义字体大小，重载即可
-        @DimenRes
-        public int getTitleTextSize() {
-            return mParameters.getInt("dp_title_size");
+        //返回0时，采用默认设置的字体大小
+        final public @DimenRes int getTitleTextSizeDimenRes() {
+            return mParameters.getInt("dp_title_size", getDefaultTitleTextSizeDimenRes());
         }
 
-        public void setTitleTextSize(@DimenRes int textSizeRes) {
+        public @DimenRes int getDefaultTitleTextSizeDimenRes() {
+            return R.dimen.qbox_size_text_dialog_title;
+        }
+
+        final public void setTitleTextSize(@DimenRes int textSizeRes) {
             mParameters.putInt("dp_title_size", textSizeRes);
         }
 
-        //以下22个方法与确认/取消组键设置有关
-        @LayoutRes
-        public int getOkCancelLayout() {
-            return mParameters.getInt("dp_ok_cancel_layout");
+        //以下33个方法与确认/取消组键设置有关
+        final public @LayoutRes int getOkCancelLayoutRes() {
+            return mParameters.getInt("dp_ok_cancel_layout", getDefaultOkCancelLayoutRes());
         }
 
-        public void setOkCancelLayout(@LayoutRes int layoutRes) {
+        public @LayoutRes int getDefaultOkCancelLayoutRes() {
+            return R.layout.qbox_group_ok_cancel;
+        }
+
+        final public void setOkCancelLayout(@LayoutRes int layoutRes) {
             mParameters.putInt("dp_ok_cancel_layout", layoutRes);
         }
 
-        @LayoutRes
-        public int getOkLayout() {
-            return mParameters.getInt("dp_ok_layout");
+        final public @LayoutRes int getOkLayoutRes() {
+            return mParameters.getInt("dp_ok_layout", getDefaultOkLayoutRes());
         }
 
-        public void setOkLayout(@LayoutRes int layoutRes) {
+        public @LayoutRes int getDefaultOkLayoutRes() {
+            return R.layout.qbox_group_ok;
+        }
+
+        final public void setOkLayout(@LayoutRes int layoutRes) {
             mParameters.putInt("dp_ok_layout", layoutRes);
         }
 
-        @IdRes
-        public int getOkId() {
-            return mParameters.getInt("dp_ok_id");
+        final public @IdRes int getOkId() {
+            return mParameters.getInt("dp_ok_id", getDefaultOkId());
         }
 
-        public void setOkId(@IdRes int okId) {
+        public @IdRes int getDefaultOkId() {
+            return R.id.btn_ok;
+        }
+
+        final public void setOkId(@IdRes int okId) {
             mParameters.putInt("dp_ok_id", okId);
         }
 
-        @IdRes
-        public int getCancelId() {
-            return mParameters.getInt("dp_cancel_id");
+        final public @IdRes int getCancelId() {
+            return mParameters.getInt("dp_cancel_id", getDefaultCancelId());
         }
 
-        public void setCancelId(@IdRes int cancelId) {
+        public @IdRes int getDefaultCancelId() {
+            return R.id.btn_cancel;
+        }
+
+        final public void setCancelId(@IdRes int cancelId) {
             mParameters.putInt("dp_cancel_id", cancelId);
         }
 
-        @StringRes
-        public int getOkLabel() {
-            return mParameters.getInt("dp_ok_label");
+        final public @StringRes int getOkLabelRes() {
+            return mParameters.getInt("dp_ok_label", getDefaultOkLabelRes());
         }
 
-        public void setOkLabel(@StringRes int okLabelRes) {
+        public @StringRes int getDefaultOkLabelRes() {
+            return 0;
+        }
+
+        final public void setOkLabel(@StringRes int okLabelRes) {
             mParameters.putInt("dp_ok_label", okLabelRes);
         }
 
-        @StringRes
-        public int getCancelLabel() {
-            return mParameters.getInt("dp_cancel_label");
+        final public @StringRes int getCancelLabelRes() {
+            return mParameters.getInt("dp_cancel_label", getDefaultCancelLabelRes());
         }
 
-        public void setCancelLabel(@StringRes int cancelLabelRes) {
+        public @StringRes int getDefaultCancelLabelRes() {
+            return 0;
+        }
+
+        final public void setCancelLabel(@StringRes int cancelLabelRes) {
             mParameters.putInt("dp_cancel_label", cancelLabelRes);
         }
 
-        @DimenRes
-        public int getExitButtonTextSize() {
-            return mParameters.getInt("dp_exit_button_text_size");
+        final public @DimenRes int getExitButtonTextSizeDimenRes() {
+            return mParameters.getInt("dp_exit_button_text_size", getDefaultExitButtonTextSizeDimenRes());
         }
 
-        public void setExitButtonTextSize(@DimenRes int textSizeRes) {
+        public @DimenRes int getDefaultExitButtonTextSizeDimenRes() {
+            return 0;
+        }
+
+        final public void setExitButtonTextSize(@DimenRes int textSizeRes) {
             mParameters.putInt("dp_exit_button_text_size", textSizeRes);
         }
 
-        @DrawableRes
-        public int getExitButtonBackground() {
-            return mParameters.getInt("dp_exit_button_background");
+        final public @DrawableRes int getExitButtonBackgroundRes() {
+            return mParameters.getInt("dp_exit_button_background", getDefaultExitButtonBackgroundRes());
         }
 
-        public void setExitButtonBackground(@DrawableRes int backgroundRes) {
+        public @DrawableRes int getDefaultExitButtonBackgroundRes() {
+            return 0;
+        }
+
+        final public void setExitButtonBackground(@DrawableRes int backgroundRes) {
             mParameters.putInt("dp_exit_button_background", backgroundRes);
         }
 
-        @ColorRes
-        public int getExitButtonTextColor() {
-            return mParameters.getInt("dp_exit_button_text_color");
+        final public @ColorRes int getExitButtonTextColorRes() {
+            return mParameters.getInt("dp_exit_button_text_color", getDefaultExitButtonTextColorRes());
         }
 
-        public void setExitButtonTextColor(@ColorRes int colorRes) {
+        public @ColorRes int getDefaultExitButtonTextColorRes() {
+            return 0;
+        }
+
+        final public void setExitButtonTextColor(@ColorRes int colorRes) {
             mParameters.putInt("dp_exit_button_text_color", colorRes);
         }
 
-        @IdRes
-        final public int getExitButtonId(boolean okOrCancel) {
+        final public @IdRes int getExitButtonId(boolean okOrCancel) {
             return okOrCancel ? getOkId() : getCancelId();
         }
 
-        @StringRes
-        final public int getExitButtonLabel(boolean okOrCancel) {
-            return okOrCancel ? getOkLabel() : getCancelLabel();
+        final public @StringRes int getExitButtonLabelRes(boolean okOrCancel) {
+            return okOrCancel ? getOkLabelRes() : getCancelLabelRes();
         }
 
         //整体背景
-        @DrawableRes
-        public int getBaseBackground() {
-            return mParameters.getInt("dp_base_background");
+        final public @DrawableRes int getBaseBackgroundRes() {
+            return mParameters.getInt("dp_base_background", getDefaultBaseBackgroundRes());
         }
 
-        public void setBaseBackground(@DrawableRes int backgroundRes) {
+        public @DrawableRes int getDefaultBaseBackgroundRes() {
+            return R.drawable.qbox_ic_dialog_background;
+        }
+
+        final public void setBaseBackground(@DrawableRes int backgroundRes) {
             mParameters.putInt("dp_base_background", backgroundRes);
         }
 
-        @DimenRes
-        public int getBasePadding() {
-            return mParameters.getInt("dp_base_padding");
+        final public @DimenRes int getBasePaddingDimenRes() {
+            return mParameters.getInt("dp_base_padding", getDefaultBasePaddingDimenRes());
         }
 
-        public void setBasePadding(@DimenRes int paddingRes) {
+        public @DimenRes int getDefaultBasePaddingDimenRes() {
+            return R.dimen.qbox_padding_dialog_base;
+        }
+
+        final public void setBasePadding(@DimenRes int paddingRes) {
             mParameters.putInt("dp_base_padding", paddingRes);
         }
 
-        public void setBasePadding(@DimenRes int leftPaddingRes,
-                                   @DimenRes int topPaddingRes,
-                                   @DimenRes int rightPaddingRes,
-                                   @DimenRes int bottomPaddingRes) {
+        final public void setBasePadding(@DimenRes int leftPaddingRes,
+                                         @DimenRes int topPaddingRes,
+                                         @DimenRes int rightPaddingRes,
+                                         @DimenRes int bottomPaddingRes) {
             mParameters.putInt("dp_base_left_padding", leftPaddingRes);
             mParameters.putInt("dp_base_top_padding", topPaddingRes);
             mParameters.putInt("dp_base_right_padding", rightPaddingRes);
             mParameters.putInt("dp_base_bottom_padding", bottomPaddingRes);
         }
 
-        @DimenRes
-        public int getBaseTopPadding() {
-            return mParameters.getInt("dp_base_top_padding");
+        final public @DimenRes int getBaseTopPaddingDimenRes() {
+            return mParameters.getInt("dp_base_top_padding", getDefaultBaseTopPaddingDimenRes());
         }
 
-        @DimenRes
-        public int getBaseBottomPadding() {
-            return mParameters.getInt("dp_base_bottom_padding");
+        public @DimenRes int getDefaultBaseTopPaddingDimenRes() {
+            return 0;
         }
 
-        @DimenRes
-        public int getBaseLeftPadding() {
-            return mParameters.getInt("dp_base_left_padding");
+        final public @DimenRes int getBaseBottomPaddingDimenRes() {
+            return mParameters.getInt("dp_base_bottom_padding", getDefaultBaseBottomPaddingDimenRes());
         }
 
-        @DimenRes
-        public int getBaseRightPadding() {
-            return mParameters.getInt("dp_base_right_padding");
+        public @DimenRes int getDefaultBaseBottomPaddingDimenRes() {
+            return 0;
+        }
+
+        final public @DimenRes int getBaseLeftPaddingDimenRes() {
+            return mParameters.getInt("dp_base_left_padding", getDefaultBaseLeftPaddingDimenRes());
+        }
+
+        public @DimenRes int getDefaultBaseLeftPaddingDimenRes() {
+            return 0;
+        }
+
+        final public @DimenRes int getBaseRightPaddingDimenRes() {
+            return mParameters.getInt("dp_base_right_padding", getDefaultBaseRightPaddingDimenRes());
+        }
+
+        public @DimenRes int getDefaultBaseRightPaddingDimenRes() {
+            return 0;
         }
 
         //是否有分隔线
-        public boolean hasSeparationLine() {
-            return mParameters.getByte("dp_separation_line_exists") == 1;
+        final public boolean isDrawSeparationLine() {
+            return mParameters.getByte("dp_separation_line_exists", (byte) (isDefaultDrawSeparationLine() ? 1 : 0)) == 1;
         }
 
-        public void setSeparationLineExists(boolean exists) {
+        public boolean isDefaultDrawSeparationLine() {
+            return true;
+        }
+
+        final public void setDrawSeparationLine(boolean exists) {
             mParameters.putByte("dp_separation_line_exists", (byte)(exists ? 1 : 0));
         }
 
-        @DrawableRes
-        public int getSeparationLineBackground() {
-            return mParameters.getInt("dp_separation_line_background");
+        final public @DrawableRes int getSeparationLineBackgroundRes() {
+            return mParameters.getInt("dp_separation_line_background", getDefaultSeparationLineBackgroundRes());
         }
 
-        public void setSeparationLineBackground(@DrawableRes int backgroundRes) {
+        public @DrawableRes int getDefaultSeparationLineBackgroundRes() {
+            return R.color.qbox_background_dialog_separation_line;
+        }
+
+        final public void setSeparationLineBackground(@DrawableRes int backgroundRes) {
             mParameters.putInt("dp_separation_line_background", backgroundRes);
         }
 
-        @DimenRes
-        public int getSeparationLineWidth() {
-            return mParameters.getInt("dp_separation_line_width");
+        final public @DimenRes int getSeparationLineWidthDimenRes() {
+            return mParameters.getInt("dp_separation_line_width", getDefaultSeparationLineWidthDimenRes());
         }
 
-        public void setSeparationLineWidth(@DimenRes int widthRes) {
+        public @DimenRes int getDefaultSeparationLineWidthDimenRes() {
+            return R.dimen.qbox_dialog_separation_line_width_fixed;
+        }
+
+        final public void setSeparationLineWidth(@DimenRes int widthRes) {
             mParameters.putInt("dp_separation_line_width", widthRes);
         }
 
-        @DimenRes
-        public int getViewVerticalInterval() {
-            return mParameters.getInt("dp_view_vertical_interval");
+        final public @DimenRes int getViewVerticalIntervalDimenRes() {
+            return mParameters.getInt("dp_view_vertical_interval", getDefaultViewVerticalIntervalDimenRes());
         }
 
-        public void setViewVerticalInterval(@DimenRes int intervalRes) {
+        public @DimenRes int getDefaultViewVerticalIntervalDimenRes() {
+            return R.dimen.qbox_dialog_view_interval_vertical;
+        }
+
+        final public void setViewVerticalInterval(@DimenRes int intervalRes) {
             mParameters.putInt("dp_view_vertical_interval", intervalRes);
         }
     }
@@ -376,7 +437,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     private static class BaseDecorator extends Decorator {
 
         @Override
-        protected int onSetContentLayout() {
+        protected int getDefaultContentLayoutRes() {
             return 0;
         }
     }
@@ -411,15 +472,15 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     private LinearLayout inflateBaseView(LayoutInflater inflater,
                                          D decorator) {
         LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.qbox_dialog_base, null);
-        int background = decorator.getBaseBackground();
+        int background = decorator.getBaseBackgroundRes();
         if (background != 0) {
             layout.setBackgroundResource(background);
         }
         Resources resources = getResources();
-        int leftPaddingDimenRes = decorator.getBaseLeftPadding();
-        int topPaddingDimenRes = decorator.getBaseTopPadding();
-        int rightPaddingDimenRes = decorator.getBaseRightPadding();
-        int bottomPaddingDimenRes = decorator.getBaseBottomPadding();
+        int leftPaddingDimenRes = decorator.getBaseLeftPaddingDimenRes();
+        int topPaddingDimenRes = decorator.getBaseTopPaddingDimenRes();
+        int rightPaddingDimenRes = decorator.getBaseRightPaddingDimenRes();
+        int bottomPaddingDimenRes = decorator.getBaseBottomPaddingDimenRes();
         int leftPadding = leftPaddingDimenRes != 0 ?
                 resources.getDimensionPixelSize(leftPaddingDimenRes) :
                 0;
@@ -438,7 +499,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                 bottomPadding != 0) {
             layout.setPadding(leftPadding, topPadding, rightPadding, bottomPadding);
         } else {
-            int paddingDimenRes = decorator.getBasePadding();
+            int paddingDimenRes = decorator.getBasePaddingDimenRes();
             if (paddingDimenRes != 0) {
                 int padding = resources.getDimensionPixelOffset(paddingDimenRes);
                 layout.setPadding(padding, padding, padding, padding);
@@ -451,11 +512,11 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                                      LinearLayout baseView,
                                      D decorator,
                                      @Nullable Bundle savedInstanceState) {
-        int contentLayoutRes = decorator.getContentLayout();
+        int contentLayoutRes = decorator.getContentLayoutRes();
         if (contentLayoutRes != 0) {
             inflater.inflate(contentLayoutRes, baseView);
             onSetContentView(baseView, decorator, savedInstanceState);
-            int intervalRes = decorator.getViewVerticalInterval();
+            int intervalRes = decorator.getViewVerticalIntervalDimenRes();
             if (intervalRes != 0) {
                 int interval = getResources().getDimensionPixelSize(intervalRes);
                 for (int i = 2, n = baseView.getChildCount();i < n;++i) {
@@ -476,7 +537,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                 ViewStub vsTitle = baseView.findViewById(R.id.vs_title_dialog_base);
                 TextView tvTitle;
                 View attachView;
-                int titleLayoutRes = decorator.getTitleLayout();
+                int titleLayoutRes = decorator.getTitleLayoutRes();
                 int titleId = decorator.getTitleId();
                 if (titleLayoutRes != 0 && titleId != 0) {
                     vsTitle.setLayoutResource(titleLayoutRes);
@@ -486,7 +547,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                     tvTitle = (TextView) vsTitle.inflate();
                     attachView = tvTitle;
                 }
-                int titleSizeRes = decorator.getTitleTextSize();
+                int titleSizeRes = decorator.getTitleTextSizeDimenRes();
                 if (titleSizeRes != 0) {
                     setTextViewSize(tvTitle, titleSizeRes);
 //                tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,
@@ -507,7 +568,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
         //判断是否需要渲染分隔线
         boolean isSeparationLine = false;
-        if (decorator.hasSeparationLine() && position >= 0) {
+        if (decorator.isDrawSeparationLine() && position >= 0) {
             View aboveView = baseView.getChildAt(position - 1);
             //若上一个view即为分隔线，则无需再次添加
             if (aboveView == null || !FLAG_SEPARATION_LINE.equals(aboveView.getTag())) {
@@ -521,11 +582,11 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         TextView tvLine = new TextView(getActivity());
         tvLine.setTag(FLAG_SEPARATION_LINE);
         Resources resources = getResources();
-        int interval = resources.getDimensionPixelSize(decorator.getViewVerticalInterval());
-        int separationWidth = resources.getDimensionPixelSize(decorator.getSeparationLineWidth());
+        int interval = resources.getDimensionPixelSize(decorator.getViewVerticalIntervalDimenRes());
+        int separationWidth = resources.getDimensionPixelSize(decorator.getSeparationLineWidthDimenRes());
         LinearLayout.LayoutParams params;
         if (isSeparationLine && separationWidth > 0) {
-            tvLine.setBackgroundResource(decorator.getSeparationLineBackground());
+            tvLine.setBackgroundResource(decorator.getSeparationLineBackgroundRes());
             params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     separationWidth);
@@ -544,9 +605,9 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         int exitType = getExitType();
         View grpExit;
         if (exitType == EXIT_TYPE_OK_CANCEL) {
-            grpExit = inflater.inflate(decorator.getOkCancelLayout(), baseView, false);
+            grpExit = inflater.inflate(decorator.getOkCancelLayoutRes(), baseView, false);
         } else if (exitType == EXIT_TYPE_OK) {
-            grpExit = inflater.inflate(decorator.getOkLayout(), baseView, false);
+            grpExit = inflater.inflate(decorator.getOkLayoutRes(), baseView, false);
         } else {
             grpExit = null;
         }
@@ -564,22 +625,22 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                                D decorator,
                                boolean okOrCancel) {
         Button btn = (Button)group.findViewById(decorator.getExitButtonId(okOrCancel));
-        int buttonLabelRes = decorator.getExitButtonLabel(okOrCancel);
+        int buttonLabelRes = decorator.getExitButtonLabelRes(okOrCancel);
         if (buttonLabelRes != 0) {
             btn.setText(buttonLabelRes);
         }
         btn.setOnClickListener(this);
-        int textSizeRes = decorator.getExitButtonTextSize();
+        int textSizeRes = decorator.getExitButtonTextSizeDimenRes();
         if (textSizeRes != 0) {
             setTextViewSize(btn, textSizeRes);
 //            btn.setTextSize(TypedValue.COMPLEX_UNIT_PX,
 //                    getResources().getDimensionPixelSize(textSizeRes));
         }
-        int textColorRes = decorator.getExitButtonTextColor();
+        int textColorRes = decorator.getExitButtonTextColorRes();
         if (textColorRes != 0) {
             btn.setTextColor(ContextCompat.getColor(getActivity(), textColorRes));
         }
-        int backgroundRes = decorator.getExitButtonBackground();
+        int backgroundRes = decorator.getExitButtonBackgroundRes();
         if (backgroundRes != 0) {
             btn.setBackgroundResource(backgroundRes);
         }
