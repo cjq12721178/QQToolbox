@@ -104,23 +104,23 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
                 getArguments().getString(ARGUMENT_KEY_CONTENT_STRING);
     }
 
-    public void show(FragmentManager manager, String tag, String title, String content) {
-        setContent(content);
-        super.show(manager, tag, title);
-    }
-
-    public int show(FragmentTransaction transaction, String tag, String title, String content) {
-        setContent(content);
-        return super.show(transaction, tag, title);
-    }
-
-    public void show(FragmentManager manager, String tag, @StringRes int titleRes, @StringRes int contentRes) {
-        setContent(contentRes);
-        super.show(manager, tag, titleRes);
-    }
-
-    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, @StringRes int contentRes) {
-        setContent(contentRes);
-        return super.show(transaction, tag, titleRes);
-    }
+//    public void show(FragmentManager manager, String tag, String title, String content) {
+//        setContent(content);
+//        super.show(manager, tag, title);
+//    }
+//
+//    public int show(FragmentTransaction transaction, String tag, String title, String content) {
+//        setContent(content);
+//        return super.show(transaction, tag, title);
+//    }
+//
+//    public void show(FragmentManager manager, String tag, @StringRes int titleRes, @StringRes int contentRes) {
+//        setContent(contentRes);
+//        super.show(manager, tag, titleRes);
+//    }
+//
+//    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, @StringRes int contentRes) {
+//        setContent(contentRes);
+//        return super.show(transaction, tag, titleRes);
+//    }
 }

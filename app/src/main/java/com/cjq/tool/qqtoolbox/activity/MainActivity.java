@@ -1,6 +1,7 @@
 package com.cjq.tool.qqtoolbox.activity;
 
 import android.content.Intent;
+import android.os.PersistableBundle;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -76,9 +77,9 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        if (savedInstanceState != null) {
-            mFilterDialog = (FilterDialog) getSupportFragmentManager().findFragmentByTag("test_filter_dialog");
-        }
+//        if (savedInstanceState != null) {
+//            mFilterDialog = (FilterDialog) getSupportFragmentManager().findFragmentByTag("test_filter_dialog");
+//        }
         ExceptionLog.initialize(this, "QQToolBox");
         ClosableLog.setEnablePrint(true);
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(this));
@@ -110,10 +111,10 @@ public class MainActivity
         switch (v.getId()) {
             case R.id.btn_confirm_default_overall_decorator:
                 ConfirmDialog dialog = new ConfirmDialog();
+                dialog.setTitle("use default overall decorator");
+                dialog.setDrawCancelButton(false);
                 dialog.show(getSupportFragmentManager(),
-                        "test_confirm",
-                        "use default overall decorator",
-                        false);
+                        "test_confirm");
                 break;
             case R.id.btn_confirm_new_overall_decorator:
                 ConfirmDialog.Decorator decorator = ConfirmDialog.getOverallDecorator(ConfirmDialog.class);
@@ -123,9 +124,9 @@ public class MainActivity
                 decorator.setExitButtonTextColor(R.color.colorAccent);
                 decorator.setExitButtonTextSize(R.dimen.size_text_title_large);
                 ConfirmDialog dialog1 = new ConfirmDialog();
+                dialog1.setTitle("use new overall decorator");
                 dialog1.show(getSupportFragmentManager(),
-                        "test_confirm_new_overall",
-                        "use new overall decorator");
+                        "test_confirm_new_overall");
                 break;
             case R.id.btn_confirm_custom_decorator:
                 ConfirmDialog dialog2 = new ConfirmDialog();
@@ -140,16 +141,16 @@ public class MainActivity
                         R.dimen.dialog_base_padding_top,
                         0,
                         0);
+                dialog2.setTitle("use custom decorator");
                 dialog2.show(getSupportFragmentManager(),
-                        "test_confirm_custom_decorator",
-                        "use custom decorator");
+                        "test_confirm_custom_decorator");
                 break;
             case R.id.btn_edit_use_default_overall_decorator:
                 EditDialog editDialog = new EditDialog();
+                editDialog.setTitle("use default overall decorator");
+                editDialog.setContent("yaya");
                 editDialog.show(getSupportFragmentManager(),
-                        "test_edit_default_overall_decorator",
-                        "use default overall decorator",
-                        "yaya");
+                        "test_edit_default_overall_decorator");
                 break;
             case R.id.btn_edit_use_new_overall_decorator:
                 EditDialog.Decorator decorator2 = EditDialog.getOverallDecorator(EditDialog.class);
@@ -157,27 +158,27 @@ public class MainActivity
                 decorator2.setTitleTextSize(R.dimen.size_text_title_large);
                 decorator2.setEditTextSize(R.dimen.size_text_title_large);
                 EditDialog editDialog1 = new EditDialog();
+                editDialog1.setTitle("use new overall decorator");
+                editDialog1.setContent("yaya");
                 editDialog1.show(getSupportFragmentManager(),
-                        "test_edit_new_overall_decorator",
-                        "use new overall decorator",
-                        "yaya");
+                        "test_edit_new_overall_decorator");
                 break;
             case R.id.btn_edit_use_custom_decorator:
                 EditDialog editDialog2 = new EditDialog();
                 EditDialog.Decorator decorator3 = editDialog2.getCustomDecorator();
                 decorator3.setContentLayout(R.layout.et_custom);
                 decorator3.setEditId(R.id.et_custom);
+                editDialog2.setTitle("use custom decorator");
+                editDialog2.setContent("yaya");
                 editDialog2.show(getSupportFragmentManager(),
-                        "test_edit_custom_decorator",
-                        "use custom decorator",
-                        "yaya");
+                        "test_edit_custom_decorator");
                 break;
             case R.id.btn_list_dialog:
                 ListDialog listDialog = new ListDialog();
+                listDialog.setTitle("this is list dialog");
+                listDialog.setItems(new String[] { "item1", "item2" });
                 listDialog.show(getSupportFragmentManager(),
-                        "test_list",
-                        "this is list dialog",
-                        new String[] { "item1", "item2" });
+                        "test_list");
                 break;
             case R.id.btn_set_base_decoration:
                 BaseDialog.Decorator decorator4 = BaseDialog.getBaseOverallDecorator();
@@ -341,7 +342,7 @@ public class MainActivity
                     mFilterDialog.addFilterType("类型", new String[] { "温度传感器", "重力加速度", "智能避雷器", "液位传感器" });
                     mFilterDialog.addFilterType("项目", new String[] { "水厂", "铝厂", "尼乐园南站", "WEISI", "测试", "ABCDEFG", "HIJKLMN", "OPQ", "RST", "UVW", "XYZ", "其他"});
                 }
-                mFilterDialog.show(getSupportFragmentManager(), "test_filter_dialog", "Filter Dialog");
+                mFilterDialog.show(getSupportFragmentManager(), "test_filter_dialog");
                 break;
         }
     }

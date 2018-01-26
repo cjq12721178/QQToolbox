@@ -68,7 +68,7 @@ public class ListDialog
     @Override
     protected void onSetContentView(View contentView, Decorator decorator, @Nullable Bundle savedInstanceState) {
         setCancelable(false);
-        setExitType(EXIT_TYPE_NULL);
+        //setExitType(EXIT_TYPE_NULL);
         RecyclerView rvItems = (RecyclerView) contentView.findViewById(decorator.getListId());
         int itemIntervalDimenRes = decorator.getItemVerticalInterval();
         if (itemIntervalDimenRes != 0) {
@@ -82,29 +82,38 @@ public class ListDialog
         rvItems.setAdapter(mItemAdapter);
     }
 
+    @Override
+    protected int getDefaultExitType() {
+        return EXIT_TYPE_NULL;
+    }
+
+    @Override
+    public void setExitType(int type) {
+    }
+
     public void setItems(String[] items) {
         getArguments().putStringArray(ARGUMENT_KEY_ITEMS, items);
     }
 
-    public int show(FragmentTransaction transaction, String tag, String title, String[] items) {
-        setItems(items);
-        return super.show(transaction, tag, title);
-    }
-
-    public void show(FragmentManager manager, String tag, String title, String[] items) {
-        setItems(items);
-        super.show(manager, tag, title);
-    }
-
-    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, String[] items) {
-        setItems(items);
-        return super.show(transaction, tag, titleRes);
-    }
-
-    public void show(FragmentManager manager, String tag, @StringRes int titleRes, String[] items) {
-        setItems(items);
-        super.show(manager, tag, titleRes);
-    }
+//    public int show(FragmentTransaction transaction, String tag, String title, String[] items) {
+//        setItems(items);
+//        return super.show(transaction, tag, title);
+//    }
+//
+//    public void show(FragmentManager manager, String tag, String title, String[] items) {
+//        setItems(items);
+//        super.show(manager, tag, title);
+//    }
+//
+//    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, String[] items) {
+//        setItems(items);
+//        return super.show(transaction, tag, titleRes);
+//    }
+//
+//    public void show(FragmentManager manager, String tag, @StringRes int titleRes, String[] items) {
+//        setItems(items);
+//        super.show(manager, tag, titleRes);
+//    }
 
     @Override
     public void onItemClick(View item, int position) {

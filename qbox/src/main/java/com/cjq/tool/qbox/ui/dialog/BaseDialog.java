@@ -46,6 +46,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     protected static final int EXIT_TYPE_OK = 2;
     private static final String ARGUMENT_KEY_TITLE_STRING = "in_title_string";
     private static final String ARGUMENT_KEY_TITLE_RESOURCE = "in_title_resource";
+    private static final String ARGUMENT_KEY_DRAW_TITLE = "in_draw_title";
     private static final String ARGUMENT_KEY_EXIT_TYPE = "in_exit_type";
     private static final String ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS = "in_custom_decorator_paras";
     private static final String FLAG_SEPARATION_LINE = "line";
@@ -382,7 +383,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
     public BaseDialog() {
         setArguments(new Bundle());
-        setExitType(EXIT_TYPE_OK_CANCEL);
+        //setExitType(EXIT_TYPE_OK_CANCEL);
     }
 
     @Override
@@ -469,29 +470,31 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
     private void onCreateTitle(LinearLayout baseView,
                                D decorator) {
-        ViewStub vsTitle = (ViewStub) baseView.findViewById(R.id.vs_title_dialog_base);
-        String title = getTitle();
-        if (!TextUtils.isEmpty(title)) {
-            TextView tvTitle;
-            View attachView;
-            int titleLayoutRes = decorator.getTitleLayout();
-            int titleId = decorator.getTitleId();
-            if (titleLayoutRes != 0 && titleId != 0) {
-                vsTitle.setLayoutResource(titleLayoutRes);
-                attachView = vsTitle.inflate();
-                tvTitle = (TextView) attachView.findViewById(titleId);
-            } else {
-                tvTitle = (TextView) vsTitle.inflate();
-                attachView = tvTitle;
-            }
-            int titleSizeRes = decorator.getTitleTextSize();
-            if (titleSizeRes != 0) {
-                setTextViewSize(tvTitle, titleSizeRes);
+        if (isDrawTitle()) {
+            String title = getTitle();
+            if (!TextUtils.isEmpty(title)) {
+                ViewStub vsTitle = baseView.findViewById(R.id.vs_title_dialog_base);
+                TextView tvTitle;
+                View attachView;
+                int titleLayoutRes = decorator.getTitleLayout();
+                int titleId = decorator.getTitleId();
+                if (titleLayoutRes != 0 && titleId != 0) {
+                    vsTitle.setLayoutResource(titleLayoutRes);
+                    attachView = vsTitle.inflate();
+                    tvTitle = (TextView) attachView.findViewById(titleId);
+                } else {
+                    tvTitle = (TextView) vsTitle.inflate();
+                    attachView = tvTitle;
+                }
+                int titleSizeRes = decorator.getTitleTextSize();
+                if (titleSizeRes != 0) {
+                    setTextViewSize(tvTitle, titleSizeRes);
 //                tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,
 //                        getResources().getDimensionPixelSize(titleSizeRes));
+                }
+                tvTitle.setText(title);
+                inflateSeparationLine(baseView, attachView, decorator, false);
             }
-            tvTitle.setText(title);
-            inflateSeparationLine(baseView, attachView, decorator, false);
         }
     }
 
@@ -587,7 +590,11 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     }
 
     protected int getExitType() {
-        return getArguments().getInt(ARGUMENT_KEY_EXIT_TYPE);
+        return getArguments().getInt(ARGUMENT_KEY_EXIT_TYPE, getDefaultExitType());
+    }
+
+    protected int getDefaultExitType() {
+        return EXIT_TYPE_OK_CANCEL;
     }
 
     @Override
@@ -614,35 +621,35 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         }
     }
 
-    @Override
-    public void show(FragmentManager manager, String tag) {
-        throw new UnsupportedOperationException("use show(FragmentManager manager, String tag, String title) for instead");
-    }
-
-    @Override
-    public int show(FragmentTransaction transaction, String tag) {
-        throw new UnsupportedOperationException("use show(FragmentTransaction transaction, String tag, String title) for instead");
-    }
-
-    public void show(FragmentManager manager, String tag, String title) {
-        setTitle(title);
-        super.show(manager, tag);
-    }
-
-    public int show(FragmentTransaction transaction, String tag, String title) {
-        setTitle(title);
-        return super.show(transaction, tag);
-    }
-
-    public void show(FragmentManager manager, String tag, @StringRes int titleRes) {
-        setTitle(titleRes);
-        super.show(manager, tag);
-    }
-
-    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes) {
-        setTitle(titleRes);
-        return super.show(transaction, tag);
-    }
+//    @Override
+//    public void show(FragmentManager manager, String tag) {
+//        throw new UnsupportedOperationException("use show(FragmentManager manager, String tag, String title) for instead");
+//    }
+//
+//    @Override
+//    public int show(FragmentTransaction transaction, String tag) {
+//        throw new UnsupportedOperationException("use show(FragmentTransaction transaction, String tag, String title) for instead");
+//    }
+//
+//    public void show(FragmentManager manager, String tag, String title) {
+//        setTitle(title);
+//        super.show(manager, tag);
+//    }
+//
+//    public int show(FragmentTransaction transaction, String tag, String title) {
+//        setTitle(title);
+//        return super.show(transaction, tag);
+//    }
+//
+//    public void show(FragmentManager manager, String tag, @StringRes int titleRes) {
+//        setTitle(titleRes);
+//        super.show(manager, tag);
+//    }
+//
+//    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes) {
+//        setTitle(titleRes);
+//        return super.show(transaction, tag);
+//    }
 
     public void setTitle(String title) {
         getArguments().putString(ARGUMENT_KEY_TITLE_STRING, title);
@@ -654,9 +661,30 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
     private String getTitle() {
         int titleRes = getArguments().getInt(ARGUMENT_KEY_TITLE_RESOURCE);
-        return titleRes != 0 ?
-                getString(titleRes) :
-                getArguments().getString(ARGUMENT_KEY_TITLE_STRING);
+        if (titleRes != 0) {
+            return getString(titleRes);
+        }
+        String title = getArguments().getString(ARGUMENT_KEY_TITLE_STRING);
+        if (!TextUtils.isEmpty(title)) {
+            return title;
+        }
+        int defaultTitleRes = getDefaultTitleRes();
+        if (defaultTitleRes != 0) {
+            return getString(defaultTitleRes);
+        }
+        return null;
+    }
+
+    public void setDrawTitle(boolean drawTitle) {
+        getArguments().putBoolean(ARGUMENT_KEY_DRAW_TITLE, drawTitle);
+    }
+
+    public boolean isDrawTitle() {
+        return getArguments().getBoolean(ARGUMENT_KEY_DRAW_TITLE, true);
+    }
+
+    protected @StringRes int getDefaultTitleRes() {
+        return 0;
     }
 
     public void setExitType(int type) {

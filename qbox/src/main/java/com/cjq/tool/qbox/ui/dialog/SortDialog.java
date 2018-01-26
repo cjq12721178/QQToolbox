@@ -119,14 +119,20 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
         rgSort.setOnCheckedChangeListener(this);
     }
 
-    @Override
-    public int show(FragmentTransaction transaction, String tag) {
-        return super.show(transaction, tag, R.string.qbox_sort);
-    }
+//    @Override
+//    public int show(FragmentTransaction transaction, String tag) {
+//        return super.show(transaction, tag, R.string.qbox_sort);
+//    }
+//
+//    @Override
+//    public void show(FragmentManager manager, String tag) {
+//        super.show(manager, tag, R.string.qbox_sort);
+//    }
+
 
     @Override
-    public void show(FragmentManager manager, String tag) {
-        super.show(manager, tag, R.string.qbox_sort);
+    protected int getDefaultTitleRes() {
+        return R.string.qbox_sort;
     }
 
     @Override

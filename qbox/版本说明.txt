@@ -190,3 +190,7 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20180125-1.1.1(57):
 1. 修改FilterDialog.OnFilterChangeListener接口
 2. 为dimens.xml补充在large、normal、small、xlarge下的适配尺寸
+
+20180126-1.1.2(58):
+1. 调整dialog显示接口，将title等参数独立出来单独设置
+2. 为dialog增设部分默认参数设置

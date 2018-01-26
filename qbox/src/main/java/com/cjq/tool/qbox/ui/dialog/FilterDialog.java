@@ -271,7 +271,12 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         }
     }
 
-//    private void putCheckStates(Bundle outState) {
+    @Override
+    protected int getDefaultTitleRes() {
+        return R.string.qbox_filter;
+    }
+
+    //    private void putCheckStates(Bundle outState) {
 //        int pos = 0;
 //        for (int size = mSelectedFilterTypeTags.size(); pos < size; ++pos) {
 //            outState.putIntegerArrayList(ARGUMENT_KEY_CHECK_STATES + pos, mSelectedFilterTypeTags.get(pos));

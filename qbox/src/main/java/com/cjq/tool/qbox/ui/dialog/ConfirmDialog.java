@@ -25,51 +25,63 @@ public class ConfirmDialog extends BaseDialog<ConfirmDialog.Decorator> {
 
     }
 
-    public int show(FragmentTransaction transaction, String tag, String title, boolean hasCancelButton) {
-        if (!hasCancelButton) {
-            setExitType(EXIT_TYPE_OK);
-        }
-        return super.show(transaction, tag, title);
-    }
-
-    public void show(FragmentManager manager, String tag, String title, boolean hasCancelButton) {
-        if (!hasCancelButton) {
-            setExitType(EXIT_TYPE_OK);
-        }
-        super.show(manager, tag, title);
-    }
-
-    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, boolean hasCancelButton) {
-        if (!hasCancelButton) {
-            setExitType(EXIT_TYPE_OK);
-        }
-        return super.show(transaction, tag, titleRes);
-    }
-
-    public void show(FragmentManager manager, String tag, @StringRes int titleRes, boolean hasCancelButton) {
-        if (!hasCancelButton) {
-            setExitType(EXIT_TYPE_OK);
-        }
-        super.show(manager, tag, titleRes);
-    }
-
     @Override
-    public int show(FragmentTransaction transaction, String tag, String title) {
-        return show(transaction, tag, title, true);
+    public void setExitType(int type) {
+        if (type == EXIT_TYPE_NULL) {
+            return;
+        }
+        super.setExitType(type);
     }
 
-    @Override
-    public void show(FragmentManager manager, String tag, String title) {
-        show(manager, tag, title, true);
+    public void setDrawCancelButton(boolean drawCancelButton) {
+        setExitType(drawCancelButton ? EXIT_TYPE_OK_CANCEL : EXIT_TYPE_OK);
     }
 
-    @Override
-    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes) {
-        return show(transaction, tag, titleRes, true);
-    }
+//    public int show(FragmentTransaction transaction, String tag, String title, boolean hasCancelButton) {
+//        if (!hasCancelButton) {
+//            setExitType(EXIT_TYPE_OK);
+//        }
+//        return super.show(transaction, tag, title);
+//    }
+//
+//    public void show(FragmentManager manager, String tag, String title, boolean hasCancelButton) {
+//        if (!hasCancelButton) {
+//            setExitType(EXIT_TYPE_OK);
+//        }
+//        super.show(manager, tag, title);
+//    }
+//
+//    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, boolean hasCancelButton) {
+//        if (!hasCancelButton) {
+//            setExitType(EXIT_TYPE_OK);
+//        }
+//        return super.show(transaction, tag, titleRes);
+//    }
+//
+//    public void show(FragmentManager manager, String tag, @StringRes int titleRes, boolean hasCancelButton) {
+//        if (!hasCancelButton) {
+//            setExitType(EXIT_TYPE_OK);
+//        }
+//        super.show(manager, tag, titleRes);
+//    }
 
-    @Override
-    public void show(FragmentManager manager, String tag, @StringRes int titleRes) {
-        show(manager, tag, titleRes, true);
-    }
+//    @Override
+//    public int show(FragmentTransaction transaction, String tag, String title) {
+//        return show(transaction, tag, title, true);
+//    }
+//
+//    @Override
+//    public void show(FragmentManager manager, String tag, String title) {
+//        show(manager, tag, title, true);
+//    }
+//
+//    @Override
+//    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes) {
+//        return show(transaction, tag, titleRes, true);
+//    }
+//
+//    @Override
+//    public void show(FragmentManager manager, String tag, @StringRes int titleRes) {
+//        show(manager, tag, titleRes, true);
+//    }
 }

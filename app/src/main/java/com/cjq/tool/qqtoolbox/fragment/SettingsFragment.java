@@ -99,4 +99,9 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         }
         return true;
     }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+    }
 }
