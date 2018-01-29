@@ -340,6 +340,8 @@ public class MainActivity
                     mFilterDialog.addFilterType("协议", new String[] { "BLE", "ESB" });
                     mFilterDialog.addFilterType("类型", new String[] { "温度传感器", "重力加速度", "智能避雷器", "液位传感器" });
                     mFilterDialog.addFilterType("项目", new String[] { "水厂", "铝厂", "尼乐园南站", "WEISI", "测试", "ABCDEFG", "HIJKLMN", "OPQ", "RST", "UVW", "XYZ", "其他"});
+                    //FilterDialog.Decorator decorator5 = mFilterDialog.getCustomDecorator();
+                    //decorator5.setDisplayTagAll(false);
                 }
                 mFilterDialog.show(getSupportFragmentManager(), "test_filter_dialog");
                 break;

@@ -202,3 +202,10 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 1. 修复EditDialog.Decorator中getEditTextSizeDimenRes未设置默认属性的问题
 2. EditDialog新增方法setSummary，用于EditText的hint属性
 3. 为FilterDialog新增一个addFilterType方法
+
+20180127-1.1.5(61):
+1. 修复FilterDialog不显示“全部”标签时点击筛选Tag停止运行的问题
+
+20180127-1.1.6(62):
+1. 修复FilterDialog选择逻辑显示有误的问题
+2. 删除FilterDialog方法addFilterType中的无效参数labelValue

@@ -53,7 +53,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
     }
 
     public FilterDialog addFilterType(String label, String[] entries) {
-        return addFilterType(label, getFilterTypes().size(), entries, buildDefaultEntryValues(entries), null);
+        return addFilterType(label, entries, buildDefaultEntryValues(entries), null);
     }
 
     private int[] buildDefaultEntryValues(String[] entries) {
@@ -66,15 +66,15 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
     }
 
     public FilterDialog addFilterType(String label, String[] entries, boolean[] entryDefaultStates) {
-        return addFilterType(label, getFilterTypes().size(), entries, buildDefaultEntryValues(entries), entryDefaultStates);
+        return addFilterType(label, entries, buildDefaultEntryValues(entries), entryDefaultStates);
     }
 
-    //entryValues不能相同，labelValue不能相同
-    public FilterDialog addFilterType(String label, int labelValue, String[] entries, int[] entryValues) {
-        return addFilterType(label, labelValue, entries, entryValues, null);
+    //entryValues不能相同
+    public FilterDialog addFilterType(String label, String[] entries, int[] entryValues) {
+        return addFilterType(label, entries, entryValues, null);
     }
 
-    public FilterDialog addFilterType(String label, int labelValue, String[] entries, int[] entryValues, boolean[] entryDefaultStates) {
+    public FilterDialog addFilterType(String label, String[] entries, int[] entryValues, boolean[] entryDefaultStates) {
         if (entries == null || entryValues == null) {
             throw new NullPointerException("entry and value may not be null");
         }
@@ -95,7 +95,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                 tags[i] = new FilterType.Tag(entries[i], entryValues[i]);
             }
         }
-        getFilterTypes().add(new FilterType(label, labelValue, tags));
+        getFilterTypes().add(new FilterType(label, tags));
         return this;
     }
 
@@ -383,7 +383,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
     private static class FilterType implements Parcelable {
 
         private final String mEntry;
-        private final int mEntryValue;
+        //private final int mEntryValue;
         //根据用户操作实时更新选中状态
         private final Tag[] mTags;
         private int mSelectedTagCount;
@@ -392,12 +392,11 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         private final LinkedList<Integer> mLastSelectedTagNos;// = new LinkedList<>();
 
         public FilterType(String entry,
-                          int entryValue,
                           Tag[] tags) {
             Tag.checkEntry(entry);
             checkTags(tags);
             mEntry = entry;
-            mEntryValue = entryValue;
+            //mEntryValue = entryValue;
             mTags = tags;
             mLastSelectedTagNos = new LinkedList<>();
             updateLastSelectedTagNos();
@@ -447,7 +446,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
 
         protected FilterType(Parcel in) {
             mEntry = in.readString();
-            mEntryValue = in.readInt();
+            //mEntryValue = in.readInt();
             mTags = in.createTypedArray(Tag.CREATOR);
             mSelectedTagCount = in.readInt();
             mLastSelectedTagNos = new LinkedList<>(in.readArrayList(Integer.class.getClassLoader()));
@@ -461,7 +460,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         @Override
         public void writeToParcel(Parcel dest, int flags) {
             dest.writeString(mEntry);
-            dest.writeInt(mEntryValue);
+            //dest.writeInt(mEntryValue);
             dest.writeTypedArray(mTags, flags);
             dest.writeInt(mSelectedTagCount);
             dest.writeList(mLastSelectedTagNos);
@@ -506,9 +505,9 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
             return mEntry;
         }
 
-        public int getEntryValue() {
-            return mEntryValue;
-        }
+//        public int getEntryValue() {
+//            return mEntryValue;
+//        }
 
         public boolean setSelected(boolean selected, OnTagStateChangeListener listener) {
             if (!isSelected() && selected) {
@@ -638,10 +637,14 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
             } else {
                 if (mType.isSelected() && isChecked) {
                     mType.setTagSelected(tagNo, isChecked);
-                    mChkAll.setChecked(false);
-                } else if (mType.mLastSelectedTagNos.size() == 1 && !isChecked) {
+                    if (mChkAll != null) {
+                        mChkAll.setChecked(false);
+                    }
+                } else if (mType.mSelectedTagCount == 1 && !isChecked) {
                     mType.setTagSelected(tagNo, isChecked);
-                    mChkAll.setChecked(true);
+                    if (mChkAll != null) {
+                        mChkAll.setChecked(true);
+                    }
                 } else {
                     mType.setTagSelected(tagNo, isChecked);
                 }
