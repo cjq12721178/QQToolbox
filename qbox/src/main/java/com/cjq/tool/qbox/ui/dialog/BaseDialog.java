@@ -721,19 +721,39 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     }
 
     private String getTitle() {
-        int titleRes = getArguments().getInt(ARGUMENT_KEY_TITLE_RESOURCE);
-        if (titleRes != 0) {
-            return getString(titleRes);
+        return getString(ARGUMENT_KEY_TITLE_RESOURCE, ARGUMENT_KEY_TITLE_STRING, getDefaultTitleRes());
+//        int titleRes = getArguments().getInt(ARGUMENT_KEY_TITLE_RESOURCE);
+//        if (titleRes != 0) {
+//            return getString(titleRes);
+//        }
+//        String title = getArguments().getString(ARGUMENT_KEY_TITLE_STRING);
+//        if (!TextUtils.isEmpty(title)) {
+//            return title;
+//        }
+//        int defaultTitleRes = getDefaultTitleRes();
+//        if (defaultTitleRes != 0) {
+//            return getString(defaultTitleRes);
+//        }
+//        return null;
+    }
+
+    protected String getString(String strResKey, String strKey) {
+        return getString(strResKey, strKey, 0);
+    }
+
+    protected String getString(String strResKey, String strKey, @StringRes int defaultStrRes) {
+        int strRes = getArguments().getInt(strResKey);
+        if (strRes != 0) {
+            return getString(strRes);
         }
-        String title = getArguments().getString(ARGUMENT_KEY_TITLE_STRING);
-        if (!TextUtils.isEmpty(title)) {
-            return title;
+        String str = getArguments().getString(strKey);
+        if (!TextUtils.isEmpty(str)) {
+            return str;
         }
-        int defaultTitleRes = getDefaultTitleRes();
-        if (defaultTitleRes != 0) {
-            return getString(defaultTitleRes);
+        if (defaultStrRes != 0) {
+            return getString(defaultStrRes);
         }
-        return null;
+        return "";
     }
 
     public void setDrawTitle(boolean drawTitle) {

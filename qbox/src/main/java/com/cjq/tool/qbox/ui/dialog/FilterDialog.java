@@ -65,6 +65,10 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         return result;
     }
 
+    public FilterDialog addFilterType(String label, String[] entries, boolean[] entryDefaultStates) {
+        return addFilterType(label, getFilterTypes().size(), entries, buildDefaultEntryValues(entries), entryDefaultStates);
+    }
+
     //entryValues不能相同，labelValue不能相同
     public FilterDialog addFilterType(String label, int labelValue, String[] entries, int[] entryValues) {
         return addFilterType(label, labelValue, entries, entryValues, null);

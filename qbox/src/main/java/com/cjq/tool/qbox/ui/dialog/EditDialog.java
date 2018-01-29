@@ -21,8 +21,10 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
         boolean onReceive(EditDialog dialog, String oldValue, String newValue);
     }
 
-    private static final String ARGUMENT_KEY_CONTENT_STRING = "in_content_string";
-    private static final String ARGUMENT_KEY_CONTENT_RESOURCE = "in_content_resource";
+    private static final String ARGUMENT_KEY_CONTENT_STRING = "in_content_str";
+    private static final String ARGUMENT_KEY_CONTENT_RESOURCE = "in_content_res";
+    private static final String ARGUMENT_KEY_SUMMARY_STRING = "in_summary_str";
+    private static final String ARGUMENT_KEY_SUMMARY_RESOURCE = "in_summary_res";
     private EditText mEtText;
 
     public static class Decorator extends BaseDialog.Decorator {
@@ -31,11 +33,6 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
         protected int getDefaultContentLayoutRes() {
             return R.layout.qbox_dialog_content_edit;
         }
-
-//        @Override
-//        public void setContentLayoutRes(@LayoutRes int layoutRes) {
-//            super.setContentLayoutRes(layoutRes);
-//        }
 
         final public @IdRes int getEditId() {
             return mParameters.getInt("dp_edit_id", getDefaultEditId());
@@ -50,7 +47,7 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
         }
 
         final public @DimenRes int getEditTextSizeDimenRes() {
-            return mParameters.getInt("dp_edit_text_size");
+            return mParameters.getInt("dp_edit_text_size", getDefaultEditTextSizeDimenRes());
         }
 
         public @DimenRes int getDefaultEditTextSizeDimenRes() {
@@ -68,6 +65,7 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
                                     @Nullable Bundle savedInstanceState) {
         mEtText = contentView.findViewById(decorator.getEditId());
         mEtText.setText(getContent());
+        mEtText.setHint(getSummary());
         int textSizeRes = decorator.getEditTextSizeDimenRes();
         if (textSizeRes != 0) {
             mEtText.setTextSize(TypedValue.COMPLEX_UNIT_PX,
@@ -95,29 +93,22 @@ public class EditDialog extends BaseDialog<EditDialog.Decorator> {
     }
 
     private String getContent() {
-        int contentRes = getArguments().getInt(ARGUMENT_KEY_CONTENT_RESOURCE);
-        return contentRes != 0 ?
-                getString(contentRes) :
-                getArguments().getString(ARGUMENT_KEY_CONTENT_STRING);
+//        int contentRes = getArguments().getInt(ARGUMENT_KEY_CONTENT_RESOURCE);
+//        return contentRes != 0 ?
+//                getString(contentRes) :
+//                getArguments().getString(ARGUMENT_KEY_CONTENT_STRING);
+        return getString(ARGUMENT_KEY_CONTENT_RESOURCE, ARGUMENT_KEY_CONTENT_STRING);
     }
 
-//    public void show(FragmentManager manager, String tag, String title, String content) {
-//        setContent(content);
-//        super.show(manager, tag, title);
-//    }
-//
-//    public int show(FragmentTransaction transaction, String tag, String title, String content) {
-//        setContent(content);
-//        return super.show(transaction, tag, title);
-//    }
-//
-//    public void show(FragmentManager manager, String tag, @StringRes int titleRes, @StringRes int contentRes) {
-//        setContent(contentRes);
-//        super.show(manager, tag, titleRes);
-//    }
-//
-//    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, @StringRes int contentRes) {
-//        setContent(contentRes);
-//        return super.show(transaction, tag, titleRes);
-//    }
+    public void setSummary(String summary) {
+        getArguments().putString(ARGUMENT_KEY_SUMMARY_STRING, summary);
+    }
+
+    public void setSummary(@StringRes int summaryRes) {
+        getArguments().putInt(ARGUMENT_KEY_SUMMARY_RESOURCE, summaryRes);
+    }
+
+    private String getSummary() {
+        return getString(ARGUMENT_KEY_SUMMARY_RESOURCE, ARGUMENT_KEY_SUMMARY_STRING);
+    }
 }
