@@ -341,3 +341,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 2. 修改传感器电源信息解析
 3. 将判断传感器协议族的方法从ConfigurationManager类移回Sensor类，并将名称isBleSensor改为isBleProtocolFamily
 4. 修改ConfigurationManager部分方法名称，将importEthernetConfiguration改为importEsbConfiguration
+
+20180127-3.5.0(90):
+1. ConfigurationManager新增方法getBleConfigurations和getEsbConfigurations
