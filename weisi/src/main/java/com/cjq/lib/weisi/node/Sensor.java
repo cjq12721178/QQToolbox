@@ -1,5 +1,8 @@
-package com.cjq.lib.weisi.sensor;
+package com.cjq.lib.weisi.node;
 
+
+import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.cjq.lib.weisi.util.ExpandCollections;
 import com.cjq.lib.weisi.util.ExpandComparator;
@@ -13,44 +16,48 @@ import java.util.List;
  * Created by CJQ on 2017/6/16.
  */
 
-public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddressComparer {
+public class Sensor extends ValueContainer<Sensor.Value> {
 
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
     private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
     private static final int BLE_PROTOCOL_FAMILY_SENSOR_ADDRESS_LENGTH = 6;
     private static OnDynamicValueCaptureListener onDynamicValueCaptureListener;
 
-    private boolean mUnknown;
+    //private boolean mUnknown;
     private final int mRawAddress;
-    private final String mFormatAddress;
+    private final Type mType;
+    //private final String mFormatAddress;
     private final List<Measurement> mMeasurementKinds;
     private List<Measurement> mMeasurementCollections;
-    private SensorDecorator mDecorator;
+    private Decorator mDecorator;
     private long mFirstValueReceivedTimestamp;
     private long mNetInTimestamp;
 
-    Sensor(int address, SensorDecorator decorator, int maxDynamicValueSize) {
+    Sensor(int address, Decorator decorator, int maxDynamicValueSize) {
         super(maxDynamicValueSize);
         //设置地址
         mRawAddress = address & 0xffffff;
-        mFormatAddress = isBleProtocolFamily(address)
-                ? String.format("%06X", mRawAddress)
-                : String.format("%04X", mRawAddress);
+//        mFormatAddress = isBleProtocolFamily(address)
+//                ? String.format("%06X", mRawAddress)
+//                : String.format("%04X", mRawAddress);
         //根据配置生成测量参数列表
-        Configuration configuration = ConfigurationManager.findConfiguration(mRawAddress);
-        if (configuration != null) {
-            mUnknown = false;
-            mName = configuration.getSensorGeneralName();
-            mMeasurementKinds = new ArrayList<>(configuration.mMeasureParameters.length);
-            for (Configuration.MeasureParameter parameter :
-                    configuration.mMeasureParameters) {
+        Type type = SensorManager.findSensorType(mRawAddress);
+        if (type != null) {
+            //mUnknown = false;
+            //mName = type.getSensorGeneralName();
+            mMeasurementKinds = new ArrayList<>(type.mMeasureParameters.length);
+            for (Type.MeasureParameter parameter :
+                    type.mMeasureParameters) {
                 mMeasurementKinds.add(new Measurement(parameter, maxDynamicValueSize));
             }
         } else {
-            mUnknown = true;
-            mName = "未知传感器";
+            //mUnknown = true;
+            ///mName = "未知传感器";
+            type = UnknownType.SINGLETON;
             mMeasurementKinds = new ArrayList<>();
         }
+        mType = type;
+        //mName = type.getSensorGeneralName();
         generateMeasurementCollections();
         setDecorator(decorator);
     }
@@ -85,10 +92,10 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     public boolean isUnknown() {
-        return mUnknown;
+        return mType instanceof UnknownType;
     }
 
-    public void setDecorator(SensorDecorator decorator) {
+    public void setDecorator(Decorator decorator) {
         if (decorator == mDecorator) {
             return;
         }
@@ -102,7 +109,7 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
             } else {
                 Iterator<Measurement> measurementIterator = mMeasurementKinds.iterator();
                 Measurement measurement = measurementIterator.next();
-                MeasurementDecorator[] measurementDecorators = decorator.getMeasurementDecorators();
+                Measurement.Decorator[] measurementDecorators = decorator.getMeasurementDecorators();
                 for (int measurementDecoratorIndex = 0;
                      measurementDecoratorIndex < measurementDecorators.length
                              && measurement != null;) {
@@ -129,9 +136,9 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     //返回新添加的测量量
     private Measurement addMeasurement(int position,
                                        byte dataTypeValue,
-                                       MeasurementDecorator decorator) {
+                                       Measurement.Decorator decorator) {
         Measurement newMeasurement = new Measurement(
-                ConfigurationManager.getDataType(mRawAddress, dataTypeValue, true),
+                SensorManager.getDataType(mRawAddress, dataTypeValue, true),
                 decorator,
                 MAX_DYNAMIC_VALUE_SIZE);
         synchronized (mMeasurementKinds) {
@@ -154,16 +161,13 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
 
     //返回传感器名称（可以经过SensorDecorator修饰）
     public String getName() {
-        return mDecorator != null ? mDecorator.getName() : mName;
-    }
-
-    @Override
-    public int getRawAddress() {
-        return mRawAddress;
+        return mDecorator != null ? mDecorator.getName() : mType.mSensorGeneralName;
     }
 
     public String getFormatAddress() {
-        return mFormatAddress;
+        return isBleProtocolFamily(mRawAddress)
+                ? String.format("%06X", mRawAddress)
+                : String.format("%04X", mRawAddress);
     }
 
     public Measurement getMeasurementByDataTypeValue(byte dataTypeValue) {
@@ -350,10 +354,10 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
     }
 
     public int addHistoryValue(long measurementValueId, long timestamp, double rawValue) {
-        if (MeasurementIdentifier.getAddress(measurementValueId) == mRawAddress) {
+        if (Measurement.ID.getAddress(measurementValueId) == mRawAddress) {
             return addHistoryValue(
-                    MeasurementIdentifier.getDataTypeValue(measurementValueId),
-                    MeasurementIdentifier.getDataTypeValueIndex(measurementValueId),
+                    Measurement.ID.getDataTypeValue(measurementValueId),
+                    Measurement.ID.getDataTypeValueIndex(measurementValueId),
                     timestamp, rawValue);
         }
         throw new IllegalArgumentException("address not matched, value not belong to sensor");
@@ -479,4 +483,415 @@ public class Sensor extends ValueContainer<Sensor.Value> implements OnRawAddress
         }
     }
 
+    /**
+     * Created by CJQ on 2017/6/16.
+     */
+
+    public static class Type {
+
+        String mSensorGeneralName;
+        int mStartAddress;
+        int mEndAddress;
+        MeasureParameter[] mMeasureParameters;
+
+        Type() {
+        }
+
+        public static class MeasureParameter {
+
+            String mDataTypeAccurateName;
+            Measurement.DataType mInvolvedDataType;
+            MeasureParameter mNext;
+
+            public MeasureParameter(Measurement.DataType involvedDataType,
+                                    String dataTypeAccurateName) {
+                mDataTypeAccurateName = dataTypeAccurateName;
+                mInvolvedDataType = involvedDataType;
+            }
+
+            public MeasureParameter getLast() {
+                MeasureParameter result = this;
+                while (result.mNext != null) {
+                    result = result.mNext;
+                }
+                return result;
+            }
+        }
+
+        public String getSensorGeneralName() {
+            return mSensorGeneralName;
+        }
+
+        public int getStartAddress() {
+            return mStartAddress;
+        }
+
+        public int getEndAddress() {
+            return mEndAddress;
+        }
+
+        public MeasureParameter[] getMeasureParameters() {
+            return mMeasureParameters;
+        }
+    }
+
+    private static class UnknownType extends Type {
+
+        private static final UnknownType SINGLETON;
+        static {
+            SINGLETON = new UnknownType();
+            SINGLETON.mSensorGeneralName = "未知传感器";
+        }
+    }
+
+    /**
+     * Created by CJQ on 2017/9/13.
+     */
+
+    public static interface Filter {
+        boolean isMatch(Sensor sensor);
+    }
+
+    /**
+     * Created by CJQ on 2017/6/19.
+     */
+
+    public static class Measurement
+            extends ValueContainer<Measurement.Value> {
+
+        //private static boolean enableSaveRealTimeValue = false;
+
+        private final DataType mDataType;
+        private final String mName;
+        private Measurement mNextMeasurement;
+        private Decorator mDecorator;
+
+        //用于生成测量参数及其相同数据类型的阵列（根据配置静态生成）
+        Measurement(@NonNull Type.MeasureParameter parameter,
+                    int maxDynamicValueSize) {
+            super(maxDynamicValueSize);
+            if (parameter == null || parameter.mInvolvedDataType == null) {
+                throw new NullPointerException("measure parameter can not be null");
+            }
+            mDataType = parameter.mInvolvedDataType;
+            if (parameter.mDataTypeAccurateName != null) {
+                mName = parameter.mDataTypeAccurateName;
+            } else {
+                mName = parameter.mInvolvedDataType.getDefaultName();
+            }
+            Type.MeasureParameter nextParameter = parameter;
+            Measurement nextMeasurement = this;
+            while (nextParameter.mNext != null) {
+                nextMeasurement.mNextMeasurement = new Measurement(nextParameter.mNext, maxDynamicValueSize);
+                nextParameter = nextParameter.mNext;
+                nextMeasurement = nextMeasurement.mNextMeasurement;
+            }
+        }
+
+        //用于生成单个测量参数（动态添加）
+        Measurement(@NonNull DataType dataType,
+                    Decorator decorator,
+                    int maxValueSize) {
+            super(maxValueSize);
+            if (dataType == null) {
+                throw new NullPointerException("dataType can not be null");
+            }
+            mDataType = dataType;
+            mDecorator = decorator;
+            mName = dataType.getDefaultName();
+        }
+
+        public String getName() {
+            return mDecorator != null ? mDecorator.getName() : mName;
+        }
+
+        @Override
+        protected Value onCreateValue(long timestamp) {
+            return new Value(timestamp, 0);
+        }
+
+        public DataType getDataType() {
+            return mDataType;
+        }
+
+        public Measurement getNextSameDataTypeMeasurement() {
+            return mNextMeasurement;
+        }
+
+        public Measurement getSameDataTypeMeasurement(int index) {
+            Measurement result = this;
+            int i = 0;
+            for (;i <= index && result.mNextMeasurement != null;++i) {
+                result = result.mNextMeasurement;
+            }
+            return i < index ? null : result;
+        }
+
+        public Measurement getLastSameDataTypeMeasurement() {
+            Measurement result = this;
+            while (result.mNextMeasurement != null) {
+                result = result.mNextMeasurement;
+            }
+            return result;
+        }
+
+        Measurement setSameDataTypeMeasurement(Measurement next) {
+            mNextMeasurement = next;
+            return this;
+        }
+
+        void setRealTimeValue(long timestamp, double rawValue) {
+            if (mRealTimeValue.mTimestamp < timestamp) {
+                mRealTimeValue.mTimestamp = timestamp;
+                mRealTimeValue.mRawValue = rawValue;
+            }
+        }
+
+        public String getDecoratedRealTimeValue() {
+            return mRealTimeValue.mTimestamp != 0
+                    ? mDataType.getDecoratedValue(mRealTimeValue.mRawValue)
+                    : null;
+        }
+
+        public String getDecoratedRealTimeValueWithUnit() {
+            return mRealTimeValue.mTimestamp != 0
+                    ? mDataType.getDecoratedValueWithUnit(mRealTimeValue.mRawValue)
+                    : null;
+        }
+
+        int addDynamicValue(int address, long timestamp, double rawValue) {
+            setRealTimeValue(timestamp, rawValue);
+            return setDynamicValueContent(addDynamicValue(timestamp), rawValue);
+        }
+
+        int addHistoryValue(long timestamp, double rawValue) {
+            DailyHistoryValuePool<Value> pool = fastGetDailyHistoryValuePool(timestamp);
+            int position = pool.addValue(this, timestamp);
+            setValueContent(pool.getValue((position < 0
+                    ? -position - 1
+                    : position)), rawValue);
+            return position;
+            //return setHistoryValueContent(addHistoryValue(timestamp), rawValue);
+        }
+
+    //    private int setHistoryValueContent(int position, double rawValue) {
+    //        setValueContent(getHistoryValue(position < 0
+    //                ? -position - 1
+    //                : position), rawValue);
+    //        return position;
+    //    }
+
+        private int setDynamicValueContent(int position, double rawValue) {
+            if (position < 0) {
+                setValueContent(getDynamicValue(-position - 1), rawValue);
+            } else if (position < MAX_DYNAMIC_VALUE_SIZE) {
+                setValueContent(getDynamicValue(position), rawValue);
+            }
+            return position;
+        }
+
+        private void setValueContent(Value value, double rawValue) {
+            if (value != null) {
+                value.mRawValue = rawValue;
+            }
+        }
+
+        public void setDecorator(Decorator decorator) {
+            mDecorator = decorator;
+        }
+
+    //    @Override
+    //    public byte getDataTypeValue() {
+    //        return mDataType.mValue;
+    //    }
+
+        /**
+         * Created by CJQ on 2017/6/16.
+         */
+
+        public static class Value extends ValueContainer.Value {
+
+            double mRawValue;
+
+            public Value(long timeStamp, double rawValue) {
+                super(timeStamp);
+                mRawValue = rawValue;
+            }
+
+            public double getRawValue() {
+                return mRawValue;
+            }
+        }
+
+        /**
+         * Created by CJQ on 2017/6/16.
+         */
+
+        public static class DataType {
+
+            final byte mValue;
+            String mName;
+            String mUnit = "";
+            ValueInterpreter mInterpreter = DefaultInterpreter.getInstance();
+
+            public DataType(byte value) {
+                mValue = value;
+            }
+
+            public byte getValue() {
+                return mValue;
+            }
+
+            public String getName() {
+                return mName;
+            }
+
+            public String getDefaultName() {
+                return TextUtils.isEmpty(mName) ? String.valueOf(mValue) : mName;
+            }
+
+            public String getUnit() {
+                return mUnit;
+            }
+
+            public String getDecoratedValue(Value value) {
+                return value != null ? getDecoratedValue(value.mRawValue) : "";
+            }
+
+            public String getDecoratedValue(double rawValue) {
+                return mInterpreter.interpret(rawValue);
+            }
+
+            public String getDecoratedValueWithUnit(Value value) {
+                return value != null ? getDecoratedValueWithUnit(value.mRawValue) : "";
+            }
+
+            public String getDecoratedValueWithUnit(double rawValue) {
+                return mUnit != "" ?
+                        mInterpreter.interpret(rawValue) + mUnit :
+                        mInterpreter.interpret(rawValue);
+            }
+        }
+
+        /**
+         * Created by CJQ on 2017/11/29.
+         */
+
+        public static class ID {
+
+            private final long mId;
+
+            public ID(long id) {
+                mId = id;
+            }
+
+            public ID(int address, byte dataTypeValue, int dataTypeValueIndex) {
+                mId = getId(address, dataTypeValue, dataTypeValueIndex);
+            }
+
+            public static long getId(int address, byte dataTypeValue, int dataTypeValueIndex) {
+                return ((long) (address & 0xffffff) << 32)
+                        | ((long) (dataTypeValue & 0xff) << 24)
+                        | (dataTypeValueIndex & 0xffffff);
+            }
+
+            public long getId() {
+                return mId;
+            }
+
+            public int getAddress() {
+                return getAddress(mId);
+            }
+
+            public static int getAddress(long id) {
+                return (int) (id >> 32) & 0xffffff;
+            }
+
+            public byte getDataTypeValue() {
+                return getDataTypeValue(mId);
+            }
+
+            public static byte getDataTypeValue(long id) {
+                return (byte) (id >> 24);
+            }
+
+            public int getDataTypeValueIndex() {
+                return getDataTypeValueIndex(mId);
+            }
+
+            public static int getDataTypeValueIndex(long id) {
+                return (int) (id & 0xffffff);
+            }
+        }
+
+        /**
+         * Created by CJQ on 2017/8/9.
+         */
+
+        public static class Decorator {
+
+            private final byte mDataTypeValue;
+            private String mName;
+
+            public Decorator(byte dataTypeValue) {
+                mDataTypeValue = dataTypeValue;
+            }
+
+            public byte getDataTypeValue() {
+                return mDataTypeValue;
+            }
+
+            public String getName() {
+                return mName;
+            }
+
+            public void setName(String name) {
+                mName = name;
+            }
+        }
+    }
+
+    /**
+     * Created by CJQ on 2017/8/9.
+     */
+
+    public static class Decorator {
+
+        private final int mRawAddress;
+        private String mName;
+        private final Measurement.Decorator[] mMeasurementDecorators;
+
+        public Decorator(int rawAddress) {
+            if ((rawAddress & 0xff000000) != 0) {
+                throw new IllegalArgumentException("raw address error");
+            }
+            //根据配置生成测量参数修饰器列表
+            Type type = SensorManager.findSensorType(rawAddress);
+            if (type == null) {
+                throw new NullPointerException("current sensor address is not in type range");
+            }
+            mRawAddress = rawAddress;
+            List<Measurement.Decorator> measurementDecorators = new ArrayList<>();
+            for (Type.MeasureParameter parameter :
+                    type.getMeasureParameters()) {
+                do {
+                    measurementDecorators.add(new Measurement.Decorator(parameter.mInvolvedDataType.mValue));
+                } while ((parameter = parameter.mNext) != null);
+            }
+            mMeasurementDecorators = new Measurement.Decorator[measurementDecorators.size()];
+            measurementDecorators.toArray(mMeasurementDecorators);
+        }
+
+        public String getName() {
+            return mName;
+        }
+
+        public void setName(String name) {
+            mName = name;
+        }
+
+        public Measurement.Decorator[] getMeasurementDecorators() {
+            return mMeasurementDecorators;
+        }
+    }
 }

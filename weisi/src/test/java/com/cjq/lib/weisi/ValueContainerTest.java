@@ -1,6 +1,6 @@
 package com.cjq.lib.weisi;
 
-import com.cjq.lib.weisi.sensor.ValueContainer;
+import com.cjq.lib.weisi.node.ValueContainer;
 
 import org.junit.Test;
 

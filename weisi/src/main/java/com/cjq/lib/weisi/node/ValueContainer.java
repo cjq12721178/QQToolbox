@@ -1,4 +1,4 @@
-package com.cjq.lib.weisi.sensor;
+package com.cjq.lib.weisi.node;
 
 
 import com.cjq.lib.weisi.util.ExpandCollections;
@@ -37,7 +37,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     private final List<DailyHistoryValuePool<V>> mHistoryValues;
     private int mDynamicValueHead;
     private int mDynamicValueSum;
-    protected String mName;
+    //protected String mName;
     private DailyHistoryValuePool<V> mCurrentDailyHistoryValuePool;
 
     public ValueContainer(int maxDynamicValueSize) {
@@ -60,9 +60,9 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
     protected abstract V onCreateValue(long timestamp);
 
-    public String getGeneralName() {
-        return mName;
-    }
+//    public String getGeneralName() {
+//        return mName;
+//    }
 
     public void setIntraday(long dateTime) {
         if (mCurrentDailyHistoryValuePool == null || !mCurrentDailyHistoryValuePool.contains(dateTime)) {

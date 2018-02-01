@@ -344,3 +344,8 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20180127-3.5.0(90):
 1. ConfigurationManager新增方法getBleConfigurations和getEsbConfigurations
+
+20180201-4.0.0(91):
+1. 对sensor包做出重大调整，首先将其重命名为node包，其次调整类位置，将部分类移动为内部静态类，使其更符合实际意义，如Measurement移入Sensor，DataType移入Measurement
+2. 删除node包中一些未用到的接口
+3. 修改Sensor类的名称和地址及其部分相关方法

@@ -1,4 +1,4 @@
-package com.cjq.lib.weisi.sensor;
+package com.cjq.lib.weisi.node;
 
 import android.text.TextUtils;
 

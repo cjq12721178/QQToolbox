@@ -1,4 +1,4 @@
-package com.cjq.lib.weisi.sensor;
+package com.cjq.lib.weisi.node;
 
 /**
  * Created by CJQ on 2017/8/8.

@@ -1,11 +1,10 @@
-package com.cjq.lib.weisi.sensor;
+package com.cjq.lib.weisi.node;
 
 import android.content.Context;
 
 import com.cjq.lib.weisi.protocol.EsbAnalyzer;
 import com.cjq.lib.weisi.util.ExpandCollections;
 import com.cjq.lib.weisi.util.ExpandComparator;
-
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -22,32 +21,97 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
- * Created by CJQ mOn 2017/6/16.
+ * Created by CJQ on 2017/8/31.
  */
 
-public class ConfigurationManager {
+public class SensorManager {
 
-    private static final Map<Byte, DataType> BLE_DATA_TYPES = new HashMap<>();
-    private static final Map<Byte, DataType> ESB_DATA_TYPES = new HashMap<>();
-    private static final List<Configuration> BLE_CONFIGURATIONS = new ArrayList<>();
-    private static final List<Configuration> ESB_CONFIGURATIONS = new ArrayList<>();
+    private static final int DEFAULT_DYNAMIC_SENSOR_MAX_VALUE_SIZE = 50;
+    private static final Map<Integer, Sensor> SENSOR_MAP = new HashMap<>();
+    private static final Map<Byte, Sensor.Measurement.DataType> BLE_DATA_TYPES = new HashMap<>();
+    private static final Map<Byte, Sensor.Measurement.DataType> ESB_DATA_TYPES = new HashMap<>();
+    private static final List<Sensor.Type> BLE_SENSOR_TYPES = new ArrayList<>();
+    private static final List<Sensor.Type> ESB_SENSOR_TYPES = new ArrayList<>();
+    private static final ExpandComparator<Sensor.Type, Integer> SENSOR_TYPE_SEARCH_COMPARATOR = new ExpandComparator<Sensor.Type, Integer>() {
+        @Override
+        public int compare(Sensor.Type type, Integer targetAddress) {
+            if (type.mEndAddress < targetAddress) {
+                return -1;
+            }
+            if (type.mStartAddress > targetAddress) {
+                return 1;
+            }
+            return 0;
+        }
+    };
+
+    private SensorManager() {
+    }
+
+    public static Sensor getSensor(int address, boolean autoCreate) {
+        return getSensor(address, null, autoCreate);
+    }
+
+    public static Sensor createSensor(int address, Sensor.Decorator decorator) {
+        return getSensor(address, decorator, true);
+    }
+
+    private static synchronized Sensor getSensor(int address, Sensor.Decorator decorator, boolean autoCreate) {
+        Sensor sensor = SENSOR_MAP.get(address);
+        if (autoCreate) {
+            if (sensor == null) {
+                sensor = new Sensor(address, decorator, DEFAULT_DYNAMIC_SENSOR_MAX_VALUE_SIZE);
+                SENSOR_MAP.put(address, sensor);
+            } else {
+                sensor.setDecorator(decorator);
+            }
+        }
+        return sensor;
+    }
+
+    public static synchronized void getSensors(List<Sensor> sensorCarrier, Sensor.Filter filter) {
+        if (sensorCarrier == null) {
+            return;
+        }
+        if (filter == null) {
+            sensorCarrier.addAll(SENSOR_MAP.values());
+        } else {
+            for (Sensor sensor :
+                    SENSOR_MAP.values()) {
+                if (filter.isMatch(sensor)) {
+                    sensorCarrier.add(sensor);
+                }
+            }
+        }
+    }
+
+    public static synchronized int getSensorWithHistoryValuesCount() {
+        int count = 0;
+        for (Sensor sensor :
+                SENSOR_MAP.values()) {
+            if (sensor.hasHistoryValue()) {
+                ++count;
+            }
+        }
+        return count;
+    }
 
     public static boolean importBleConfiguration(Context context) {
         return importConfiguration(BLE_DATA_TYPES,
-                BLE_CONFIGURATIONS,
+                BLE_SENSOR_TYPES,
                 context,
                 "BleSensorConfiguration.xml");
     }
 
     public static boolean importEsbConfiguration(Context context) {
         return importConfiguration(ESB_DATA_TYPES,
-                ESB_CONFIGURATIONS,
+                ESB_SENSOR_TYPES,
                 context,
                 "EsbSensorConfiguration.xml");
     }
 
-    private static boolean importConfiguration(Map<Byte, DataType> dataTypes,
-                                               List<Configuration> configurations,
+    private static boolean importConfiguration(Map<Byte, Sensor.Measurement.DataType> dataTypes,
+                                               List<Sensor.Type> types,
                                                Context context,
                                                String configFileName) {
         ConfigurationImporter importer = getConfigurationImporter(context, configFileName);
@@ -55,58 +119,45 @@ public class ConfigurationManager {
             return false;
         }
         dataTypes.clear();
-        configurations.clear();
+        types.clear();
         dataTypes.putAll(importer.getDataTypeMap());
-        configurations.addAll(importer.getConfigurations());
+        types.addAll(importer.getTypes());
         return true;
     }
 
-    public static Configuration findConfiguration(int address) {
-        List<Configuration> configurations = getConfigurations(address);
-        if (configurations == null)
+    public static Sensor.Type findSensorType(int address) {
+        List<Sensor.Type> types = getSensorTypes(address);
+        if (types == null)
             return null;
-        int position = ExpandCollections.binarySearch(configurations,
+        int position = ExpandCollections.binarySearch(types,
                 address,
-                CONFIGURATION_SEARCH_COMPARATOR);
-        return position >= 0 ? configurations.get(position) : null;
+                SENSOR_TYPE_SEARCH_COMPARATOR);
+        return position >= 0 ? types.get(position) : null;
     }
 
-    public static DataType getDataType(int address, byte dataTypeValue, boolean autoCreate) {
-        Map<Byte, DataType> dataTypeMap = getDataTypes(address);
-        DataType dataType = dataTypeMap.get(dataTypeValue);
+    public static Sensor.Measurement.DataType getDataType(int address, byte dataTypeValue, boolean autoCreate) {
+        Map<Byte, Sensor.Measurement.DataType> dataTypeMap = getDataTypes(address);
+        Sensor.Measurement.DataType dataType = dataTypeMap.get(dataTypeValue);
         if (autoCreate && dataType == null) {
-            dataType = new DataType(dataTypeValue);
+            dataType = new Sensor.Measurement.DataType(dataTypeValue);
             dataTypeMap.put(dataTypeValue, dataType);
         }
         return dataType;
     }
 
-    private static final ExpandComparator<Configuration, Integer> CONFIGURATION_SEARCH_COMPARATOR = new ExpandComparator<Configuration, Integer>() {
-        @Override
-        public int compare(Configuration configuration, Integer targetAddress) {
-            if (configuration.mEndAddress < targetAddress) {
-                return -1;
-            }
-            if (configuration.mStartAddress > targetAddress) {
-                return 1;
-            }
-            return 0;
-        }
-    };
-
-    public static List<Configuration> getBleConfigurations() {
-        return Collections.unmodifiableList(BLE_CONFIGURATIONS);
+    public static List<Sensor.Type> getBleSensorTypes() {
+        return Collections.unmodifiableList(BLE_SENSOR_TYPES);
     }
 
-    public static List<Configuration> getEsbConfigurations() {
-        return Collections.unmodifiableList(ESB_CONFIGURATIONS);
+    public static List<Sensor.Type> getEsbSensorTypes() {
+        return Collections.unmodifiableList(ESB_SENSOR_TYPES);
     }
 
-    private static List<Configuration> getConfigurations(int address) {
-        return Sensor.isBleProtocolFamily(address) ? BLE_CONFIGURATIONS : ESB_CONFIGURATIONS;
+    private static List<Sensor.Type> getSensorTypes(int address) {
+        return Sensor.isBleProtocolFamily(address) ? BLE_SENSOR_TYPES : ESB_SENSOR_TYPES;
     }
 
-    private static Map<Byte, DataType> getDataTypes(int address) {
+    private static Map<Byte, Sensor.Measurement.DataType> getDataTypes(int address) {
         return Sensor.isBleProtocolFamily(address) ? BLE_DATA_TYPES : ESB_DATA_TYPES;
     }
 
@@ -126,21 +177,21 @@ public class ConfigurationManager {
 
         private static final String DATA_TYPE = "DataType";
         private static final String PARAPHRASES = "paraphrases";
-        private static final String CONFIGURATION = "configuration";
+        private static final String SENSOR_TYPE = "SensorType";
         private static final String DATA_TYPE_CUSTOM_NAME = "DataTypeCustomName";
 
-        private Map<Byte, DataType> mDataTypeMap;
-        private DataType mDataType;
+        private Map<Byte, Sensor.Measurement.DataType> mDataTypeMap;
+        private Sensor.Measurement.DataType mDataType;
         private StringBuilder mBuilder;
         private Map<Double, String> mParaphrases;
         private Double mNumber;
         private String mText;
         private String mOn;
         private String mOff;
-        private List<Configuration> mConfigurations;
-        private Configuration mConfiguration;
-        private List<Configuration.MeasureParameter> mMeasureParameters;
-        private Configuration.MeasureParameter mMeasureParameter;
+        private List<Sensor.Type> mTypes;
+        private Sensor.Type mType;
+        private List<Sensor.Type.MeasureParameter> mMeasureParameters;
+        private Sensor.Type.MeasureParameter mMeasureParameter;
         private int mIndex;
         private byte mDataTypeValue;
         private String mDataTypeCustomName;
@@ -149,26 +200,26 @@ public class ConfigurationManager {
         private boolean mSigned;
         private double mCoefficient;
 
-        public Map<Byte, DataType> getDataTypeMap() {
+        public Map<Byte, Sensor.Measurement.DataType> getDataTypeMap() {
             return mDataTypeMap;
         }
 
-        public List<Configuration> getConfigurations() {
-            return mConfigurations;
+        public List<Sensor.Type> getTypes() {
+            return mTypes;
         }
 
         @Override
         public void startDocument() throws SAXException {
             mBuilder = new StringBuilder();
             mDataTypeMap = new HashMap<>();
-            mConfigurations = new ArrayList<>();
+            mTypes = new ArrayList<>();
             mMeasureParameters = new ArrayList<>();
         }
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-            if (localName.equals(CONFIGURATION)) {
-                mConfiguration = new Configuration();
+            if (localName.equals(SENSOR_TYPE)) {
+                mType = new Sensor.Type();
             } else if (localName.equals(PARAPHRASES)) {
                 mParaphrases = new HashMap<>();
             } else if (localName.equals(DATA_TYPE_CUSTOM_NAME)) {
@@ -186,7 +237,7 @@ public class ConfigurationManager {
         public void endElement(String uri, String localName, String qName) throws SAXException {
             switch (localName) {
                 case "value":
-                    mDataType = new DataType((byte)Integer.parseInt(mBuilder.toString(), 16));
+                    mDataType = new Sensor.Measurement.DataType((byte)Integer.parseInt(mBuilder.toString(), 16));
                     break;
                 case "name":
                     mDataType.mName = mBuilder.toString();
@@ -216,13 +267,13 @@ public class ConfigurationManager {
                     mDataTypeMap.put(mDataType.mValue, mDataType);
                     break;
                 case "SensorName":
-                    mConfiguration.mSensorGeneralName = mBuilder.toString();
+                    mType.mSensorGeneralName = mBuilder.toString();
                     break;
                 case "start":
-                    mConfiguration.mStartAddress = Integer.parseInt(mBuilder.toString(), 16);
+                    mType.mStartAddress = Integer.parseInt(mBuilder.toString(), 16);
                     break;
                 case "end":
-                    mConfiguration.mEndAddress = Integer.parseInt(mBuilder.toString(), 16);
+                    mType.mEndAddress = Integer.parseInt(mBuilder.toString(), 16);
                     break;
                 case "DataTypeValue":
                     mDataTypeValue = (byte)Integer.parseInt(mBuilder.toString(), 16);
@@ -234,11 +285,11 @@ public class ConfigurationManager {
                     //获取数据类型
                     mDataType = mDataTypeMap.get(mDataTypeValue);
                     if (mDataType == null) {
-                        mDataType = new DataType(mDataTypeValue);
+                        mDataType = new Sensor.Measurement.DataType(mDataTypeValue);
                         mDataTypeMap.put(mDataTypeValue, mDataType);
                     }
                     //生成测量参数
-                    mMeasureParameter = new Configuration.MeasureParameter(mDataType,
+                    mMeasureParameter = new Sensor.Type.MeasureParameter(mDataType,
                             mDataTypeCustomName != null
                                     ? (mCustomDataTypeNameType == 0
                                         ? mDataType.getName() + mDataTypeCustomName
@@ -254,12 +305,12 @@ public class ConfigurationManager {
                     }
                     break;
                 case "measurements":
-                    mConfiguration.mMeasureParameters = new Configuration.MeasureParameter[mMeasureParameters.size()];
-                    mMeasureParameters.toArray(mConfiguration.mMeasureParameters);
+                    mType.mMeasureParameters = new Sensor.Type.MeasureParameter[mMeasureParameters.size()];
+                    mMeasureParameters.toArray(mType.mMeasureParameters);
                     mMeasureParameters.clear();
                     break;
-                case "configuration":
-                    mConfigurations.add(mConfiguration);
+                case SENSOR_TYPE:
+                    mTypes.add(mType);
                     break;
                 case "on":
                     mOn = mBuilder.toString();
@@ -291,10 +342,10 @@ public class ConfigurationManager {
                             break;
                     }
                     break;
-                case "configurations":
-                    Collections.sort(mConfigurations, new Comparator<Configuration>() {
+                case "SensorTypes":
+                    Collections.sort(mTypes, new Comparator<Sensor.Type>() {
                         @Override
-                        public int compare(Configuration c1, Configuration c2) {
+                        public int compare(Sensor.Type c1, Sensor.Type c2) {
                             return c1.mStartAddress - c2.mStartAddress;
                         }
                     });
@@ -305,8 +356,8 @@ public class ConfigurationManager {
         }
 
         private int findMeasureParameter(
-                List<Configuration.MeasureParameter> measureParameters,
-                Configuration.MeasureParameter parameterGetter) {
+                List<Sensor.Type.MeasureParameter> measureParameters,
+                Sensor.Type.MeasureParameter parameterGetter) {
             int index, size = measureParameters.size();
             final int threshold = 3;
             if (size > threshold) {
@@ -327,9 +378,9 @@ public class ConfigurationManager {
             return index;
         }
 
-        private static final Comparator<Configuration.MeasureParameter> MEASURE_PARAMETER_COMPARATOR = new Comparator<Configuration.MeasureParameter>() {
+        private static final Comparator<Sensor.Type.MeasureParameter> MEASURE_PARAMETER_COMPARATOR = new Comparator<Sensor.Type.MeasureParameter>() {
             @Override
-            public int compare(Configuration.MeasureParameter mp1, Configuration.MeasureParameter mp2) {
+            public int compare(Sensor.Type.MeasureParameter mp1, Sensor.Type.MeasureParameter mp2) {
                 return mp1.mInvolvedDataType.mValue - mp2.mInvolvedDataType.mValue;
             }
         };
