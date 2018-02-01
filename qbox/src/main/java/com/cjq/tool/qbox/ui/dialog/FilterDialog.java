@@ -615,6 +615,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
     private static class Page implements CompoundButton.OnCheckedChangeListener, FilterType.OnTagStateChangeListener {
 
         private static int adaptivePaneMaxHeight;
+        private static int paneHeightLimit;
 
         private final FilterType mType;
         private View mView;
@@ -695,7 +696,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
             if (builder.mPaneMaxHeight != 0) {
                 paneMaxHeight = builder.mPaneMaxHeight;
             } else {
-                adaptivePaneMaxHeight = Math.max(adaptivePaneMaxHeight, builder.mPaneHeight);
+                adaptivePaneMaxHeight = Math.max(adaptivePaneMaxHeight, Math.min(builder.mPaneHeight, paneHeightLimit));
                 paneMaxHeight = adaptivePaneMaxHeight + builder.mTagsPadding * 2;
             }
             return paneMaxHeight;
@@ -743,6 +744,9 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                 mPaneMaxHeight = decorator.getFilterPaneHeightDimenRes() != 0
                         ? resources.getDimensionPixelOffset(decorator.getFilterPaneHeightDimenRes())
                         : 0;
+                if (paneHeightLimit == 0) {
+                    paneHeightLimit = resources.getDisplayMetrics().heightPixels * 2 / 3;
+                }
             }
 
             public CheckBox build(Context context, Page page, int tagNo) {
@@ -874,72 +878,11 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         private Page[] buildPagesByTypes(ArrayList<FilterType> types) {
             int size = types.size();
             Page[] pages = new Page[size];
-            //Page.TagBuilder parameter = new Page.TagBuilder(context, decorator);
             for (int i = 0;i < size;++i) {
                 pages[i] = new Page(types.get(i));
-                //pages[i] = buildPageByType(context, types.get(i), decorator, parameter);
             }
             return pages;
         }
-
-//        private Page buildPageByType(Context context, FilterType type, Decorator decorator, Page.TagBuilder tagBuilder) {
-//            ScrollView view = new ScrollView(context);
-//            Page page = new Page(type, view);
-//            view.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-//            RelativeLayout layout = new RelativeLayout(context);
-//            layout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-//            layout.setPadding(tagBuilder.mTagsPadding, tagBuilder.mTagsPadding, tagBuilder.mTagsPadding, tagBuilder.mTagsPadding);
-//            view.addView(layout);
-//            tagBuilder.measureMaxWidth(layout, false);
-//            //添加“全部”Tag
-//            if (decorator.isDisplayTagAll()) {
-//                page.mChkAll = tagBuilder.build(context, page, Page.TagBuilder.TAG_ALL_NO);
-//                layout.addView(page.mChkAll);
-//            }
-//            for (int tagNo = 0, tagCount = type.mTags.length;tagNo < tagCount;++tagNo) {
-//                CheckBox box = tagBuilder.build(context, page, tagNo);
-//                page.mChkTags[tagNo] = box;
-//                layout.addView(box);
-//            }
-//            return page;
-//        }
-
-//        private int buildTag(Context context, Page page, int tagNo, Page.TagBuilder parameter) {
-//            CheckBox box = new CheckBox(context);
-//            box.setOnCheckedChangeListener(page);
-//            //区分“全部”Tag和普通Tag
-//            if (tagNo == -1) {
-//                box.setText(parameter.mTagAllLabel);
-//                box.setChecked(page.mType.isSelected());
-//            } else {
-//                FilterType.Tag tag = page.mType.mTags[i];
-//                box.setText(tag.mEntry);
-//                box.setChecked(tag.mSelected);
-//            }
-//            box.setTag(tagNo);
-//            box.setButtonDrawable(parameter.mTagButtonFrame);
-//            box.setBackground(parameter.mTagBackgroundRes);
-//            if (parameter.mTagTextColorStateList != null) {
-//                box.setTextColor(parameter.mTagTextColorStateList);
-//            } else if (parameter.mTagTextColorInt != 0) {
-//                box.setTextColor(parameter.mTagTextColorInt);
-//            }
-//            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-//            if (parameter.getPaneCurrentWidth() == 0) {
-//                if (tagNo != -1) {
-//                    params.addRule(RelativeLayout.BELOW, previousId);
-//                }
-//            }
-//            if (previousId != 0) {
-//                params.addRule(RelativeLayout.BELOW, previousId);
-//            }
-//            box.setLayoutParams(params);
-//            previousId = View.generateViewId();
-//            box.setId(previousId);
-//            layout.addView(box);
-//            page.mChkTags[tagNo] = box;
-//            return previousId;
-//        }
 
         @Override
         public int getCount() {

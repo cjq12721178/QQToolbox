@@ -91,6 +91,10 @@ public class Sensor extends ValueContainer<Sensor.Value> {
         }
     }
 
+    public Type getType() {
+        return mType;
+    }
+
     public boolean isUnknown() {
         return mType instanceof UnknownType;
     }
@@ -162,6 +166,10 @@ public class Sensor extends ValueContainer<Sensor.Value> {
     //返回传感器名称（可以经过SensorDecorator修饰）
     public String getName() {
         return mDecorator != null ? mDecorator.getName() : mType.mSensorGeneralName;
+    }
+
+    public int getRawAddress() {
+        return mRawAddress;
     }
 
     public String getFormatAddress() {

@@ -561,15 +561,15 @@
 			<measurements>
 				<measurement>
 					<DataTypeValue>66</DataTypeValue>
-					<DataTypeCustomName SensorType="0">X轴</DataTypeCustomName>
+					<DataTypeCustomName type="0">X轴</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>66</DataTypeValue>
-					<DataTypeCustomName SensorType="0">Y轴</DataTypeCustomName>
+					<DataTypeCustomName type="0">Y轴</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>66</DataTypeValue>
-					<DataTypeCustomName SensorType="0">Z轴</DataTypeCustomName>
+					<DataTypeCustomName type="0">Z轴</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>67</DataTypeValue>
@@ -589,23 +589,23 @@
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
-					<DataTypeCustomName SensorType="1">环境温度</DataTypeCustomName>
+					<DataTypeCustomName type="1">环境温度</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>6A</DataTypeValue>
-					<DataTypeCustomName SensorType="1">坠坨偏移</DataTypeCustomName>
+					<DataTypeCustomName type="1">坠坨偏移</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>6B</DataTypeValue>
-					<DataTypeCustomName SensorType="1">坠坨距离</DataTypeCustomName>
+					<DataTypeCustomName type="1">坠坨距离</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>A1</DataTypeValue>
-					<DataTypeCustomName SensorType="1">温补系数</DataTypeCustomName>
+					<DataTypeCustomName type="1">温补系数</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>A8</DataTypeValue>
-					<DataTypeCustomName SensorType="1">指示范围</DataTypeCustomName>
+					<DataTypeCustomName type="1">指示范围</DataTypeCustomName>
 				</measurement>
 			</measurements>
 		</SensorType>
@@ -649,15 +649,15 @@
 			<measurements>
 				<measurement>
 					<DataTypeValue>65</DataTypeValue>
-					<DataTypeCustomName SensorType="0">X轴</DataTypeCustomName>
+					<DataTypeCustomName type="0">X轴</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>65</DataTypeValue>
-					<DataTypeCustomName SensorType="0">Y轴</DataTypeCustomName>
+					<DataTypeCustomName type="0">Y轴</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>65</DataTypeValue>
-					<DataTypeCustomName SensorType="0">Z轴</DataTypeCustomName>
+					<DataTypeCustomName type="0">Z轴</DataTypeCustomName>
 				</measurement>
 			</measurements>
 		</SensorType>
@@ -776,195 +776,195 @@
 			<measurements>
 				<measurement>
 					<DataTypeValue>20</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>20</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>20</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>21</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>21</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>21</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>22</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>22</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>22</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>23</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>23</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>23</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>24</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>24</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>24</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>25</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>25</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>25</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>26</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>26</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>26</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>27</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>27</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>27</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>28</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>28</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>28</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>29</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>29</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>29</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2A</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2A</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2A</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2B</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2B</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2B</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2C</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2C</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2C</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2D</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2D</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2D</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2E</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2E</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2E</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2F</DataTypeValue>
-					<DataTypeCustomName SensorType="0">A相</DataTypeCustomName>
+					<DataTypeCustomName type="0">A相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2F</DataTypeValue>
-					<DataTypeCustomName SensorType="0">B相</DataTypeCustomName>
+					<DataTypeCustomName type="0">B相</DataTypeCustomName>
 				</measurement>
 				<measurement>
 					<DataTypeValue>2F</DataTypeValue>
-					<DataTypeCustomName SensorType="0">C相</DataTypeCustomName>
+					<DataTypeCustomName type="0">C相</DataTypeCustomName>
 				</measurement>
 			</measurements>
 		</SensorType>

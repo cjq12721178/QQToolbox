@@ -209,3 +209,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20180127-1.1.6(62):
 1. 修复FilterDialog选择逻辑显示有误的问题
 2. 删除FilterDialog方法addFilterType中的无效参数labelValue
+
+20180201-1.1.7(63):
+1. 为FilterDialog的自适应高度模式设置高度上限（当前为屏幕的三分之二）
