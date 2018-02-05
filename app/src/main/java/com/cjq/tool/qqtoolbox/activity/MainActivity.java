@@ -24,6 +24,7 @@ import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
 import com.cjq.tool.qbox.ui.dialog.FilterDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
+import com.cjq.tool.qbox.ui.dialog.SearchDialog;
 import com.cjq.tool.qbox.ui.dialog.SortDialog;
 import com.cjq.tool.qbox.ui.manager.SwitchableFragmentManager;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
@@ -52,7 +53,8 @@ public class MainActivity
         FilterDialog.OnFilterChangeListener,
         CompoundButton.OnCheckedChangeListener,
         TextView.OnEditorActionListener,
-        DataReceiver.Listener {
+        DataReceiver.Listener,
+        SearchDialog.OnSearchListener {
 
     private SwitchableFragmentManager mSwitchableFragmentManager;
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
@@ -70,6 +72,7 @@ public class MainActivity
     private String mEmissionTextCopy;
     private String mReceptionTextCopy;
     private FilterDialog mFilterDialog;
+    private SearchDialog mSearchDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -345,6 +348,13 @@ public class MainActivity
                 }
                 mFilterDialog.show(getSupportFragmentManager(), "test_filter_dialog");
                 break;
+            case R.id.btn_search_dialog:
+                if (mSearchDialog == null) {
+                    mSearchDialog = new SearchDialog();
+                    mSearchDialog.setTitle("test search dialog");
+                }
+                mSearchDialog.show(getSupportFragmentManager(), "search_dialog");
+                break;
         }
     }
 
@@ -514,5 +524,10 @@ public class MainActivity
             }
         }
         return builder.toString();
+    }
+
+    @Override
+    public void onSearch(String target) {
+        Log.d(DebugTag.GENERAL_LOG_TAG, "search content: " + target);
     }
 }

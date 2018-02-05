@@ -212,3 +212,10 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20180201-1.1.7(63):
 1. 为FilterDialog的自适应高度模式设置高度上限（当前为屏幕的三分之二）
+
+20180205-1.2.0(64):
+1. 新增BaseEditDialog类，继承自BaseDialog
+2. 使EditDialog改为继承BaseEditDialog而不是之前的BaseDialog
+3. 新增SearchDialog，继承自BaseEditDialog
+4. RecyclerViewBaseAdapter类新增方法notifyDataSetChanged(int previousSize)
+5. 将ListAdapterDelegateManager类改为非虚类

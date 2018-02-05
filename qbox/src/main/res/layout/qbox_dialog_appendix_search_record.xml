@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingStart="@dimen/qbox_padding"
+    android:paddingEnd="@dimen/qbox_padding">
+    
+    <ImageButton
+        android:layout_width="@dimen/qbox_dialog_search_remove_size"
+        android:layout_height="@dimen/qbox_dialog_search_remove_size"
+        android:id="@+id/ib_remove"
+        android:src="@drawable/qbox_ic_remove"
+        android:scaleType="fitCenter"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:background="@null"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_record"
+        android:textSize="@dimen/qbox_dialog_search_record_text_size"
+        android:layout_alignParentStart="true"
+        android:layout_toLeftOf="@id/ib_remove"
+        android:layout_centerVertical="true"/>
+
+</RelativeLayout>

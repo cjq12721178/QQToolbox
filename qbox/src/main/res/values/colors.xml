@@ -7,4 +7,5 @@
     <color name="qbox_text_check_box_checked">#E2F6D1</color>
     <color name="qbox_toast_text">#B97A57</color>
     <color name="qbox_background_button_unselected">#C0C0C0</color>
+    <color name="qbox_dialog_base_edit_text_hint">#AAAAAA</color>
 </resources>

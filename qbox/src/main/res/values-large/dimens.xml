@@ -13,4 +13,6 @@
     <dimen name="qbox_dialog_filter_tag_padding">6dp</dimen>
     <dimen name="qbox_dialog_filter_tag_radius">18dp</dimen>
     <dimen name="qbox_dialog_filter_label_text_size">17sp</dimen>
+    <dimen name="qbox_dialog_search_remove_size">28dp</dimen>
+    <dimen name="qbox_dialog_search_record_text_size">17sp</dimen>
 </resources>

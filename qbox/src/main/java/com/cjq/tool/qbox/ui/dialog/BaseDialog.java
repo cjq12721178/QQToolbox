@@ -126,17 +126,6 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
         public final void reset() {
             mParameters.clear();
-            //setOkCancelLayout(R.layout.qbox_group_ok_cancel);
-            //setOkLayout(R.layout.qbox_group_ok);
-            //setOkId(R.id.btn_ok);
-            //setCancelId(R.id.btn_cancel);
-            //setBaseBackground(R.drawable.qbox_ic_dialog_background);
-            //setBasePadding(R.dimen.qbox_padding_dialog_base);
-            //setDrawSeparationLine(true);
-            //setSeparationLineBackground(R.color.qbox_background_dialog_separation_line);
-            //setSeparationLineWidth(R.dimen.qbox_dialog_separation_line_width_fixed);
-            //setViewVerticalInterval(R.dimen.qbox_dialog_view_interval_vertical);
-            //setContentLayoutRes(getDefaultContentLayoutRes());
         }
 
         void addParameters(Decorator baseDecorator) {
@@ -472,10 +461,11 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     private LinearLayout inflateBaseView(LayoutInflater inflater,
                                          D decorator) {
         LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.qbox_dialog_base, null);
-        int background = decorator.getBaseBackgroundRes();
-        if (background != 0) {
-            layout.setBackgroundResource(background);
-        }
+        setViewBackground(layout, decorator.getBaseBackgroundRes());
+//        int background = decorator.getBaseBackgroundRes();
+//        if (background != 0) {
+//            layout.setBackgroundResource(background);
+//        }
         Resources resources = getResources();
         int leftPaddingDimenRes = decorator.getBaseLeftPaddingDimenRes();
         int topPaddingDimenRes = decorator.getBaseTopPaddingDimenRes();
@@ -499,13 +489,31 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                 bottomPadding != 0) {
             layout.setPadding(leftPadding, topPadding, rightPadding, bottomPadding);
         } else {
-            int paddingDimenRes = decorator.getBasePaddingDimenRes();
-            if (paddingDimenRes != 0) {
-                int padding = resources.getDimensionPixelOffset(paddingDimenRes);
-                layout.setPadding(padding, padding, padding, padding);
-            }
+            setViewPadding(layout, decorator.getBasePaddingDimenRes(), resources);
+//            int paddingDimenRes = decorator.getBasePaddingDimenRes();
+//            if (paddingDimenRes != 0) {
+//                int padding = resources.getDimensionPixelOffset(paddingDimenRes);
+//                layout.setPadding(padding, padding, padding, padding);
+//            }
         }
         return layout;
+    }
+
+    protected void setViewBackground(View view, @DrawableRes int backgroundRes) {
+        if (backgroundRes != 0) {
+            view.setBackgroundResource(backgroundRes);
+        }
+    }
+
+    protected void setViewPadding(View view, @DimenRes int paddingDimenRes) {
+        setViewPadding(view, paddingDimenRes, getResources());
+    }
+
+    protected void setViewPadding(View view, @DimenRes int paddingDimenRes, Resources resources) {
+        if (paddingDimenRes != 0) {
+            int padding = resources.getDimensionPixelOffset(paddingDimenRes);
+            view.setPadding(padding, padding, padding, padding);
+        }
     }
 
     private void onCreateContentView(LayoutInflater inflater,
@@ -647,7 +655,23 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     }
 
     protected void setTextViewSize(TextView view, @DimenRes int textSizeRes) {
-        view.setTextSize(TypedValue.COMPLEX_UNIT_PX, getResources().getDimension(textSizeRes));
+        setTextViewSize(view, textSizeRes, getResources());
+    }
+
+    protected void setTextViewSize(TextView view, @DimenRes int textSizeRes, Resources resources) {
+        if (textSizeRes != 0) {
+            view.setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimensionPixelSize(textSizeRes));
+        }
+    }
+
+    protected void setTextViewHintColor(TextView view, @ColorRes int hintColorRes) {
+        setTextViewHintColor(view, hintColorRes, getResources());
+    }
+
+    protected void setTextViewHintColor(TextView view, @ColorRes int hintColorRes, Resources resources) {
+        if (hintColorRes != 0) {
+            view.setHintTextColor(resources.getColor(hintColorRes));
+        }
     }
 
     protected int getExitType() {
@@ -682,36 +706,6 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         }
     }
 
-//    @Override
-//    public void show(FragmentManager manager, String tag) {
-//        throw new UnsupportedOperationException("use show(FragmentManager manager, String tag, String title) for instead");
-//    }
-//
-//    @Override
-//    public int show(FragmentTransaction transaction, String tag) {
-//        throw new UnsupportedOperationException("use show(FragmentTransaction transaction, String tag, String title) for instead");
-//    }
-//
-//    public void show(FragmentManager manager, String tag, String title) {
-//        setTitle(title);
-//        super.show(manager, tag);
-//    }
-//
-//    public int show(FragmentTransaction transaction, String tag, String title) {
-//        setTitle(title);
-//        return super.show(transaction, tag);
-//    }
-//
-//    public void show(FragmentManager manager, String tag, @StringRes int titleRes) {
-//        setTitle(titleRes);
-//        super.show(manager, tag);
-//    }
-//
-//    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes) {
-//        setTitle(titleRes);
-//        return super.show(transaction, tag);
-//    }
-
     public void setTitle(String title) {
         getArguments().putString(ARGUMENT_KEY_TITLE_STRING, title);
     }
@@ -722,19 +716,6 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
 
     private String getTitle() {
         return getString(ARGUMENT_KEY_TITLE_RESOURCE, ARGUMENT_KEY_TITLE_STRING, getDefaultTitleRes());
-//        int titleRes = getArguments().getInt(ARGUMENT_KEY_TITLE_RESOURCE);
-//        if (titleRes != 0) {
-//            return getString(titleRes);
-//        }
-//        String title = getArguments().getString(ARGUMENT_KEY_TITLE_STRING);
-//        if (!TextUtils.isEmpty(title)) {
-//            return title;
-//        }
-//        int defaultTitleRes = getDefaultTitleRes();
-//        if (defaultTitleRes != 0) {
-//            return getString(defaultTitleRes);
-//        }
-//        return null;
     }
 
     protected String getString(String strResKey, String strKey) {
@@ -761,7 +742,11 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     }
 
     public boolean isDrawTitle() {
-        return getArguments().getBoolean(ARGUMENT_KEY_DRAW_TITLE, true);
+        return getArguments().getBoolean(ARGUMENT_KEY_DRAW_TITLE, isDefaultDrawTitle());
+    }
+
+    public boolean isDefaultDrawTitle() {
+        return true;
     }
 
     protected @StringRes int getDefaultTitleRes() {

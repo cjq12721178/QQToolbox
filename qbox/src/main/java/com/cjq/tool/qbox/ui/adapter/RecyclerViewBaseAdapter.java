@@ -111,28 +111,58 @@ public abstract class RecyclerViewBaseAdapter<E>
     }
 
     private boolean onItemSelected(View v) {
+        int currentPosition = getPositionByItemView(v);
+        if (currentPosition == -1) {
+            return false;
+        }
+        int lastPosition = mSelectedIndex;
+        if (currentPosition == RecyclerView.NO_POSITION) {
+            return false;
+        }
+        mSelectedIndex = currentPosition;
+        if (mUpdateSelectedState) {
+            if (lastPosition != -1) {
+                notifyItemChanged(lastPosition, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
+            }
+            notifyItemChanged(currentPosition, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
+        }
+        return true;
+//        try {
+//            Field holderField = RecyclerView.LayoutParams.class.getDeclaredField("mViewHolder");
+//            holderField.setAccessible(true);
+//            RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) holderField.get(v.getLayoutParams());
+//            int currentPosition = holder.getLayoutPosition();
+//            int lastPosition = mSelectedIndex;
+//            if (currentPosition != RecyclerView.NO_POSITION) {
+//                mSelectedIndex = currentPosition;
+//                if (mUpdateSelectedState) {
+//                    if (lastPosition != -1) {
+//                        notifyItemChanged(lastPosition, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
+//                    }
+//                    notifyItemChanged(currentPosition, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
+//                }
+//                return true;
+//            }
+//        } catch (NoSuchFieldException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
+//        return false;
+    }
+
+    public static int getPositionByItemView(View v) {
         try {
             Field holderField = RecyclerView.LayoutParams.class.getDeclaredField("mViewHolder");
             holderField.setAccessible(true);
             RecyclerView.ViewHolder holder = (RecyclerView.ViewHolder) holderField.get(v.getLayoutParams());
-            int currentPosition = holder.getLayoutPosition();
-            int lastPosition = mSelectedIndex;
-            if (currentPosition != RecyclerView.NO_POSITION) {
-                mSelectedIndex = currentPosition;
-                if (mUpdateSelectedState) {
-                    if (lastPosition != -1) {
-                        notifyItemChanged(lastPosition, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
-                    }
-                    notifyItemChanged(currentPosition, UPDATE_TYPE_SELECTED_INDEX_CHANGED);
-                }
-                return true;
-            }
+            return holder.getLayoutPosition();
         } catch (NoSuchFieldException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }
-        return false;
+        return -1;
     }
 
     @Override
@@ -168,6 +198,19 @@ public abstract class RecyclerViewBaseAdapter<E>
     @Override
     public int getItemViewType() {
         return 0;
+    }
+
+    public void notifyDataSetChanged(int previousSize) {
+        int currentSize = getItemCount();
+        if (previousSize < currentSize) {
+            notifyItemRangeChanged(0, previousSize);
+            notifyItemRangeInserted(previousSize, currentSize - previousSize);
+        } else if (previousSize > currentSize) {
+            notifyItemRangeChanged(0, currentSize);
+            notifyItemRangeRemoved(currentSize, previousSize - currentSize);
+        } else {
+            notifyItemRangeChanged(0, currentSize);
+        }
     }
 
     public interface OnItemClickListener {

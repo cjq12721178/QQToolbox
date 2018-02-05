@@ -1,5 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-    <include layout="@layout/qbox_edit_text"
-        android:id="@+id/il_text"/>
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/et_content"
+        android:inputType="textMultiLine"
+        android:textCursorDrawable="@null"
+        android:selectAllOnFocus="true"/>
 </merge>

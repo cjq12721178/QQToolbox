@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+       android:layout_width="match_parent"
+       android:layout_height="match_parent">
+    <EditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/et_search_content"
+        android:inputType="text"
+        android:imeOptions="actionSearch"
+        android:textCursorDrawable="@null"
+        android:selectAllOnFocus="true"/>
+    <ViewStub
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/vs_search_record"
+        android:layout="@layout/qbox_dialog_content_search_record"/>
+</merge>
