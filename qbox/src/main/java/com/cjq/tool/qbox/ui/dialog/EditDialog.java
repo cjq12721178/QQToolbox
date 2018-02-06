@@ -7,6 +7,7 @@ import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 
 import com.cjq.tool.qbox.R;
@@ -40,7 +41,14 @@ public class EditDialog extends BaseEditDialog<EditDialog.Decorator> {
         }
     }
 
-//    @Override
+    @Override
+    protected void onSetContentView(View contentView, Decorator decorator, @Nullable Bundle savedInstanceState) {
+        super.onSetContentView(contentView, decorator, savedInstanceState);
+        getEditText().requestFocus();
+        getDialog().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+    }
+
+    //    @Override
 //    protected void onSetContentView(View contentView,
 //                                    Decorator decorator,
 //                                    @Nullable Bundle savedInstanceState) {

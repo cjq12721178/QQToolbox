@@ -219,3 +219,7 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 3. 新增SearchDialog，继承自BaseEditDialog
 4. RecyclerViewBaseAdapter类新增方法notifyDataSetChanged(int previousSize)
 5. 将ListAdapterDelegateManager类改为非虚类
+
+20180206-1.2.1(65):
+1. 修复SearchDialog记录空白搜索内容的问题
+2. 使SearchDialog和EditDialog表现为，当对话框打开时，出现软键盘，并全选所有输入框内容

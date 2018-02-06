@@ -6,5 +6,7 @@
         android:id="@+id/et_content"
         android:inputType="textMultiLine"
         android:textCursorDrawable="@null"
-        android:selectAllOnFocus="true"/>
+        android:focusable="true"
+        android:selectAllOnFocus="true"
+        android:focusableInTouchMode="true"/>
 </merge>

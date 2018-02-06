@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -40,7 +41,7 @@ import java.util.Set;
  * Created by CJQ on 2018/2/2.
  */
 
-public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> implements View.OnTouchListener, TextView.OnEditorActionListener {
+public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> implements View.OnTouchListener, TextView.OnEditorActionListener, View.OnFocusChangeListener {
 
     private List<String> mSearchRecords;
     private SearchRecordAdapter mSearchRecordAdapter;
@@ -103,6 +104,7 @@ public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> impleme
         }
         editText.setOnEditorActionListener(this);
         editText.addTextChangedListener(mSearchContentWatcher);
+        editText.setOnFocusChangeListener(this);
 
         //罗列历史搜索记录
         mSearchRecords = importSearchRecords();
@@ -152,13 +154,15 @@ public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> impleme
 
     private void onSearch() {
         String searchContent = getEditText().getText().toString();
-        if (mSearchRecords == null) {
-            mSearchRecords = new ArrayList<>(1);
-            mSearchRecords.add(searchContent);
-            exportSearchRecords();
-        } else if (!mSearchRecords.contains(searchContent)) {
-            mSearchRecords.add(searchContent);
-            exportSearchRecords();
+        if (!TextUtils.isEmpty(searchContent)) {
+            if (mSearchRecords == null) {
+                mSearchRecords = new ArrayList<>(1);
+                mSearchRecords.add(searchContent);
+                exportSearchRecords();
+            } else if (!mSearchRecords.contains(searchContent)) {
+                mSearchRecords.add(searchContent);
+                exportSearchRecords();
+            }
         }
         OnSearchListener listener = getListener(OnSearchListener.class);
         if (listener != null) {
@@ -249,6 +253,13 @@ public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> impleme
             return true;
         }
         return false;
+    }
+
+    @Override
+    public void onFocusChange(View v, boolean hasFocus) {
+        if (hasFocus) {
+            getEditText().selectAll();
+        }
     }
 
     public interface OnSearchListener {

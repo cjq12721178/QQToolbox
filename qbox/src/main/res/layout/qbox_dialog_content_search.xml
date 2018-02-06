@@ -9,7 +9,9 @@
         android:inputType="text"
         android:imeOptions="actionSearch"
         android:textCursorDrawable="@null"
-        android:selectAllOnFocus="true"/>
+        android:focusable="true"
+        android:selectAllOnFocus="true"
+        android:focusableInTouchMode="true"/>
     <ViewStub
         android:layout_width="match_parent"
         android:layout_height="match_parent"
