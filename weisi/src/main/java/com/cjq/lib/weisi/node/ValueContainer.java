@@ -1,9 +1,14 @@
 package com.cjq.lib.weisi.node;
 
 
+import android.support.annotation.IntDef;
+
 import com.cjq.lib.weisi.util.ExpandCollections;
 import com.cjq.lib.weisi.util.ExpandComparator;
 
+import java.lang.annotation.Inherited;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -13,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  * Created by CJQ on 2017/11/3.
  */
 
-public abstract class ValueContainer<V extends ValueContainer.Value> {
+public abstract class ValueContainer<V extends ValueContainer.Value, C extends ValueContainer.Configuration<V>> {
 
     //分为两种情况，一是在传感器中添加数据的时候，未能按照
     //dataTypeValue和dataTypeValueIndex找到相应measurement;
@@ -34,11 +39,12 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
     protected final V mRealTimeValue;
     //用于缓存实时数据
     private final List<V> mDynamicValues;
-    private final List<DailyHistoryValuePool<V>> mHistoryValues;
+    private final List<DailyHistoryValuePool<V, C>> mHistoryValues;
     private int mDynamicValueHead;
     private int mDynamicValueSum;
     //protected String mName;
-    private DailyHistoryValuePool<V> mCurrentDailyHistoryValuePool;
+    private DailyHistoryValuePool<V, C> mCurrentDailyHistoryValuePool;
+    private C mConfiguration;
 
     public ValueContainer(int maxDynamicValueSize) {
         MAX_DYNAMIC_VALUE_SIZE = maxDynamicValueSize;
@@ -60,9 +66,45 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
     protected abstract V onCreateValue(long timestamp);
 
+    protected abstract C getEmptyConfiguration();
 //    public String getGeneralName() {
 //        return mName;
 //    }
+
+    public void setConfiguration(C configuration) {
+        if (configuration != null) {
+            mConfiguration = configuration;
+        } else {
+            mConfiguration = getEmptyConfiguration();
+        }
+    }
+
+    public C getConfiguration() {
+        return mConfiguration;
+    }
+
+    public abstract String getDefaultName();
+
+    public String getDecoratedName() {
+        Decorator<V> decorator = mConfiguration.getDecorator();
+        return decorator != null ? decorator.getCustomName() : null;
+    }
+
+    public String getName() {
+        String decoratedName = getDecoratedName();
+        return decoratedName != null ? decoratedName : getDefaultName();
+    }
+
+    public String decorateValue(V v) {
+        return decorateValue(v, 0);
+    }
+
+    public String decorateValue(V v, int para) {
+        Decorator<V> decorator = mConfiguration.getDecorator();
+        return decorator != null
+                ? decorator.getCustomValue(v, para)
+                : null;
+    }
 
     public void setIntraday(long dateTime) {
         if (mCurrentDailyHistoryValuePool == null || !mCurrentDailyHistoryValuePool.contains(dateTime)) {
@@ -82,7 +124,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                 : false;
     }
 
-    private DailyHistoryValuePool<V> findDailyHistoryValuePool(long dateTime) {
+    private DailyHistoryValuePool<V, C> findDailyHistoryValuePool(long dateTime) {
         int position = findDailyHistoryValuePoolPosition(dateTime);
         return position >= 0 ? mHistoryValues.get(position) : null;
     }
@@ -116,7 +158,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return getSomedayEarliestHistoryValue(findDailyHistoryValuePool(somedayMills));
     }
 
-    private V getSomedayEarliestHistoryValue(DailyHistoryValuePool<V> pool) {
+    private V getSomedayEarliestHistoryValue(DailyHistoryValuePool<V, C> pool) {
         return pool != null
                 ? pool.getEarliestValue()
                 : null;
@@ -141,7 +183,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return getSomedayLatestHistoryValue(findDailyHistoryValuePool(somedayMills));
     }
 
-    private V getSomedayLatestHistoryValue(DailyHistoryValuePool<V> pool) {
+    private V getSomedayLatestHistoryValue(DailyHistoryValuePool<V, C> pool) {
         return pool != null
                 ? pool.getLatestValue()
                 : null;
@@ -149,7 +191,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
 
     //注意：该方法不检查index范围
     public V getHistoryValue(int index) {
-        DailyHistoryValuePool<V> pool;
+        DailyHistoryValuePool<V, C> pool;
         for (int i = 0, n = mHistoryValues.size(), size, position = index;i < n;++i) {
             pool = mHistoryValues.get(i);
             size = pool.mValues.size();
@@ -218,8 +260,8 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return mDynamicValues.size();
     }
 
-    protected DailyHistoryValuePool<V> fastGetDailyHistoryValuePool(long timestamp) {
-        DailyHistoryValuePool<V> pool;
+    protected DailyHistoryValuePool<V, C> fastGetDailyHistoryValuePool(long timestamp) {
+        DailyHistoryValuePool<V, C> pool;
         if (mCurrentDailyHistoryValuePool != null
                 && mCurrentDailyHistoryValuePool.contains(timestamp)) {
             pool = mCurrentDailyHistoryValuePool;
@@ -229,8 +271,8 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         return pool;
     }
 
-    private DailyHistoryValuePool<V> getDailyHistoryValuePool(long timestamp) {
-        DailyHistoryValuePool<V> pool;
+    private DailyHistoryValuePool<V, C> getDailyHistoryValuePool(long timestamp) {
+        DailyHistoryValuePool<V, C> pool;
         synchronized (mHistoryValues) {
             int position = findDailyHistoryValuePoolPosition(timestamp);
             if (position >= 0) {
@@ -453,7 +495,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         }
     }
 
-    protected static class DailyHistoryValuePool<V extends Value> {
+    protected static class DailyHistoryValuePool<V extends Value, C extends Configuration<V>> {
 
         private static final long ONE_DAY_MILLISECONDS = TimeUnit.DAYS.toMillis(1);
         private static final ExpandComparator<DailyHistoryValuePool, Long> CLASSIFIER = new ExpandComparator<DailyHistoryValuePool, Long>() {
@@ -509,7 +551,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
         //若有新的数据添加，返回position
         //若只是原有数据的更新，返回-position-1
         //注意和Collections.binarySearch()返回值相反
-        protected int addValue(ValueContainer<V> container, long timestamp) {
+        protected int addValue(ValueContainer<V, C> container, long timestamp) {
             synchronized (mValues) {
                 V v;
                 int size = mValues.size();
@@ -579,6 +621,30 @@ public abstract class ValueContainer<V extends ValueContainer.Value> {
                         timestamp,
                         Value.SEARCH_HELPER);
             }
+        }
+    }
+
+    public interface Decorator<V> {
+        String getCustomName();
+        //para为保留参数，针对V有多种类型的值时进行区分
+        String getCustomValue(V value, int para);
+    }
+
+    public interface Warner<V> {
+        int RESULT_NORMAL = 0;
+        int test(V value);
+    }
+
+    public static class Configuration<V> {
+
+        private Decorator<V> mDecorator;
+
+        public Decorator<V> getDecorator() {
+            return mDecorator;
+        }
+
+        public void setDecorator(Decorator<V> decorator) {
+            mDecorator = decorator;
         }
     }
 }

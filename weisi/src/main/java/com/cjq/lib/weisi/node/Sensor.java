@@ -1,27 +1,30 @@
 package com.cjq.lib.weisi.node;
 
 
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.cjq.lib.weisi.util.ExpandCollections;
 import com.cjq.lib.weisi.util.ExpandComparator;
 
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 
 /**
  * Created by CJQ on 2017/6/16.
  */
 
-public class Sensor extends ValueContainer<Sensor.Value> {
+public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
 
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
     private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
     private static final int BLE_PROTOCOL_FAMILY_SENSOR_ADDRESS_LENGTH = 6;
     private static OnDynamicValueCaptureListener onDynamicValueCaptureListener;
+    private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
 
     //private boolean mUnknown;
     private final int mRawAddress;
@@ -29,11 +32,12 @@ public class Sensor extends ValueContainer<Sensor.Value> {
     //private final String mFormatAddress;
     private final List<Measurement> mMeasurementKinds;
     private List<Measurement> mMeasurementCollections;
-    private Decorator mDecorator;
+    //private Decorator mDecorator;
+    //private Configuration mConfiguration;
     private long mFirstValueReceivedTimestamp;
     private long mNetInTimestamp;
 
-    Sensor(int address, Decorator decorator, int maxDynamicValueSize) {
+    Sensor(int address, int maxDynamicValueSize) {
         super(maxDynamicValueSize);
         //设置地址
         mRawAddress = address & 0xffffff;
@@ -59,7 +63,8 @@ public class Sensor extends ValueContainer<Sensor.Value> {
         mType = type;
         //mName = type.getSensorGeneralName();
         generateMeasurementCollections();
-        setDecorator(decorator);
+        resetConfiguration();
+        //setDecorator(decorator);
     }
 
     public static void setOnDynamicValueCaptureListener(OnDynamicValueCaptureListener listener) {
@@ -99,39 +104,70 @@ public class Sensor extends ValueContainer<Sensor.Value> {
         return mType instanceof UnknownType;
     }
 
-    public void setDecorator(Decorator decorator) {
-        if (decorator == mDecorator) {
-            return;
-        }
-        mDecorator = decorator;
-        synchronized (mMeasurementKinds) {
-            if (decorator == null) {
-                for (Measurement measurement :
-                        mMeasurementKinds) {
-                    measurement.setDecorator(null);
-                }
+    public void resetConfiguration() {
+        SensorManager.ValueContainerConfigurationProvider provider = SensorManager.getConfigurationProvider();
+        if (provider == null) {
+            clearConfiguration();
+        } else {
+            Configuration configuration = provider.getSensorConfiguration(mRawAddress);
+            if (configuration == null) {
+                clearConfiguration();
             } else {
-                Iterator<Measurement> measurementIterator = mMeasurementKinds.iterator();
-                Measurement measurement = measurementIterator.next();
-                Measurement.Decorator[] measurementDecorators = decorator.getMeasurementDecorators();
-                for (int measurementDecoratorIndex = 0;
-                     measurementDecoratorIndex < measurementDecorators.length
-                             && measurement != null;) {
-                    if (measurement.getDataType().mValue
-                            == measurementDecorators[measurementDecoratorIndex].getDataTypeValue()) {
-                        measurement.setDecorator(measurementDecorators[measurementDecoratorIndex]);
-                        measurement = measurement.getNextSameDataTypeMeasurement();
-                        if (measurement == null) {
-                            measurement = measurementIterator.next();
-                        }
-                        ++measurementDecoratorIndex;
-                    } else {
-                        measurement = measurementIterator.next();
-                    }
+                setConfiguration(configuration);
+                int dataTypeValueIndex;
+                for (Measurement measurement : mMeasurementKinds) {
+                    dataTypeValueIndex = 0;
+                    do {
+                        measurement.setConfiguration(provider.getMeasurementConfiguration(Measurement.ID.getId(mRawAddress, measurement.mDataType.mValue, dataTypeValueIndex)));
+                        ++dataTypeValueIndex;
+                    } while ((measurement = measurement.getNextSameDataTypeMeasurement()) != null);
                 }
             }
         }
     }
+
+    private void clearConfiguration() {
+        setConfiguration(null);
+        for (Measurement measurement : mMeasurementKinds) {
+            do {
+                measurement.setConfiguration(null);
+            } while ((measurement = measurement.getNextSameDataTypeMeasurement()) != null);
+        }
+    }
+
+//    public void setDecorator(Decorator decorator) {
+//        if (decorator == mDecorator) {
+//            return;
+//        }
+//        mDecorator = decorator;
+//        synchronized (mMeasurementKinds) {
+//            if (decorator == null) {
+//                for (Measurement measurement :
+//                        mMeasurementKinds) {
+//                    measurement.setDecorator(null);
+//                }
+//            } else {
+//                Iterator<Measurement> measurementIterator = mMeasurementKinds.iterator();
+//                Measurement measurement = measurementIterator.next();
+//                Measurement.Decorator[] measurementDecorators = decorator.getMeasurementDecorators();
+//                for (int measurementDecoratorIndex = 0;
+//                     measurementDecoratorIndex < measurementDecorators.length
+//                             && measurement != null;) {
+//                    if (measurement.getDataType().mValue
+//                            == measurementDecorators[measurementDecoratorIndex].getDataTypeValue()) {
+//                        measurement.setDecorator(measurementDecorators[measurementDecoratorIndex]);
+//                        measurement = measurement.getNextSameDataTypeMeasurement();
+//                        if (measurement == null) {
+//                            measurement = measurementIterator.next();
+//                        }
+//                        ++measurementDecoratorIndex;
+//                    } else {
+//                        measurement = measurementIterator.next();
+//                    }
+//                }
+//            }
+//        }
+//    }
 
     //一般情况下传感器所拥有的测量量由配置文件读取，
     //对于未配置的传感器，可以采用该方法动态添加测量量
@@ -143,7 +179,6 @@ public class Sensor extends ValueContainer<Sensor.Value> {
                                        Measurement.Decorator decorator) {
         Measurement newMeasurement = new Measurement(
                 SensorManager.getDataType(mRawAddress, dataTypeValue, true),
-                decorator,
                 MAX_DYNAMIC_VALUE_SIZE);
         synchronized (mMeasurementKinds) {
             if (position >= 0) {
@@ -163,10 +198,22 @@ public class Sensor extends ValueContainer<Sensor.Value> {
         return new Value(timestamp, 0);
     }
 
-    //返回传感器名称（可以经过SensorDecorator修饰）
-    public String getName() {
-        return mDecorator != null ? mDecorator.getName() : mType.mSensorGeneralName;
+    @Override
+    protected Configuration getEmptyConfiguration() {
+        return EMPTY_CONFIGURATION;
     }
+
+    @Override
+    public String getDefaultName() {
+        return mType.mSensorGeneralName;
+    }
+
+    //返回传感器名称（可以经过SensorDecorator修饰）
+//    public String getName() {
+//        Decorator<Value> decorator = getConfiguration().getDecorator();
+//        return decorator != null ? decorator.getCustomName() : mType.mSensorGeneralName;
+//        //return mDecorator != null ? mDecorator.getName() : mType.mSensorGeneralName;
+//    }
 
     public int getRawAddress() {
         return mRawAddress;
@@ -353,7 +400,7 @@ public class Sensor extends ValueContainer<Sensor.Value> {
     }
 
     public int addHistoryValue(long timestamp, float batteryVoltage) {
-        DailyHistoryValuePool<Value> pool = fastGetDailyHistoryValuePool(timestamp);
+        DailyHistoryValuePool<Value, Configuration> pool = fastGetDailyHistoryValuePool(timestamp);
         int position = pool.addValue(this, timestamp);
         setValueContent(pool.getValue((position < 0
                 ? -position - 1
@@ -565,20 +612,22 @@ public class Sensor extends ValueContainer<Sensor.Value> {
      */
 
     public static class Measurement
-            extends ValueContainer<Measurement.Value> {
+            extends ValueContainer<Measurement.Value, Measurement.Configuration> {
 
         //private static boolean enableSaveRealTimeValue = false;
+        private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
 
         private final DataType mDataType;
         private final String mName;
         private Measurement mNextMeasurement;
-        private Decorator mDecorator;
+        //private Decorator mDecorator;
+        //private Configuration mConfiguration;
 
         //用于生成测量参数及其相同数据类型的阵列（根据配置静态生成）
         Measurement(@NonNull Type.MeasureParameter parameter,
                     int maxDynamicValueSize) {
             super(maxDynamicValueSize);
-            if (parameter == null || parameter.mInvolvedDataType == null) {
+            if (parameter.mInvolvedDataType == null) {
                 throw new NullPointerException("measure parameter can not be null");
             }
             mDataType = parameter.mInvolvedDataType;
@@ -598,28 +647,53 @@ public class Sensor extends ValueContainer<Sensor.Value> {
 
         //用于生成单个测量参数（动态添加）
         Measurement(@NonNull DataType dataType,
-                    Decorator decorator,
                     int maxValueSize) {
             super(maxValueSize);
-            if (dataType == null) {
-                throw new NullPointerException("dataType can not be null");
-            }
+//            if (dataType == null) {
+//                throw new NullPointerException("dataType can not be null");
+//            }
             mDataType = dataType;
-            mDecorator = decorator;
+            //mDecorator = decorator;
             mName = dataType.getDefaultName();
+            setConfiguration(null);
         }
 
-        public String getName() {
-            return mDecorator != null ? mDecorator.getName() : mName;
-        }
+//        public String getName() {
+//            //return mDecorator != null ? mDecorator.getName() : mName;
+//            Decorator<Value> decorator = getConfiguration().getDecorator();
+//            return decorator != null ? decorator.getCustomName() : mName;
+//        }
 
         @Override
         protected Value onCreateValue(long timestamp) {
             return new Value(timestamp, 0);
         }
 
+        @Override
+        protected Configuration getEmptyConfiguration() {
+            return EMPTY_CONFIGURATION;
+        }
+
+        @Override
+        public String getDefaultName() {
+            return mName;
+        }
+
         public DataType getDataType() {
             return mDataType;
+        }
+
+        public int testValue(Warner<Value> warner, Value value) {
+            return warner.test(value);
+        }
+
+        public int testValue(Value value) {
+            Warner<Value> warner = getConfiguration().getWarner();
+            return warner != null ? warner.test(value) : Warner.RESULT_NORMAL;
+        }
+
+        public int testRealTimeValue() {
+            return testValue(mRealTimeValue);
         }
 
         public Measurement getNextSameDataTypeMeasurement() {
@@ -655,16 +729,50 @@ public class Sensor extends ValueContainer<Sensor.Value> {
             }
         }
 
-        public String getDecoratedRealTimeValue() {
+        public String getCustomRealTimeValue() {
             return mRealTimeValue.mTimestamp != 0
-                    ? mDataType.getDecoratedValue(mRealTimeValue.mRawValue)
+                    ? decorateValue(mRealTimeValue)
                     : null;
         }
 
-        public String getDecoratedRealTimeValueWithUnit() {
+        public String getFormattedRealTimeValue() {
             return mRealTimeValue.mTimestamp != 0
-                    ? mDataType.getDecoratedValueWithUnit(mRealTimeValue.mRawValue)
+                    ? formatValue(mRealTimeValue.mRawValue)
                     : null;
+        }
+
+//        public String getDecoratedRealTimeValue() {
+//            return mRealTimeValue.mTimestamp != 0
+//                    ? mDataType.getFormattedValue(mRealTimeValue.mRawValue)
+//                    : null;
+//        }
+
+        public String getFormattedRealTimeValueWithUnit() {
+            return mRealTimeValue.mTimestamp != 0
+                    ? formatValueWithUnit(mRealTimeValue.mRawValue)
+                    : null;
+        }
+
+//        public String getDecoratedRealTimeValueWithUnit() {
+//            return mRealTimeValue.mTimestamp != 0
+//                    ? mDataType.formatValueWithUnit(mRealTimeValue.mRawValue)
+//                    : null;
+//        }
+
+        public String formatValue(Value v) {
+            return mDataType.formatValue(v);
+        }
+
+        public String formatValue(double rawValue) {
+            return mDataType.formatValue(rawValue);
+        }
+
+        public String formatValueWithUnit(Value v) {
+            return mDataType.formatValueWithUnit(v);
+        }
+
+        public String formatValueWithUnit(double rawValue) {
+            return mDataType.formatValueWithUnit(rawValue);
         }
 
         int addDynamicValue(int address, long timestamp, double rawValue) {
@@ -673,7 +781,7 @@ public class Sensor extends ValueContainer<Sensor.Value> {
         }
 
         int addHistoryValue(long timestamp, double rawValue) {
-            DailyHistoryValuePool<Value> pool = fastGetDailyHistoryValuePool(timestamp);
+            DailyHistoryValuePool<Value, Configuration> pool = fastGetDailyHistoryValuePool(timestamp);
             int position = pool.addValue(this, timestamp);
             setValueContent(pool.getValue((position < 0
                     ? -position - 1
@@ -704,9 +812,9 @@ public class Sensor extends ValueContainer<Sensor.Value> {
             }
         }
 
-        public void setDecorator(Decorator decorator) {
-            mDecorator = decorator;
-        }
+//        public void setDecorator(Decorator decorator) {
+//            mDecorator = decorator;
+//        }
 
     //    @Override
     //    public byte getDataTypeValue() {
@@ -750,6 +858,10 @@ public class Sensor extends ValueContainer<Sensor.Value> {
                 return mValue;
             }
 
+            public String getFormattedValue() {
+                return String.format("%02X", mValue);
+            }
+
             public String getName() {
                 return mName;
             }
@@ -762,19 +874,19 @@ public class Sensor extends ValueContainer<Sensor.Value> {
                 return mUnit;
             }
 
-            public String getDecoratedValue(Value value) {
-                return value != null ? getDecoratedValue(value.mRawValue) : "";
+            public String formatValue(Value value) {
+                return value != null ? formatValue(value.mRawValue) : "";
             }
 
-            public String getDecoratedValue(double rawValue) {
+            public String formatValue(double rawValue) {
                 return mInterpreter.interpret(rawValue);
             }
 
-            public String getDecoratedValueWithUnit(Value value) {
-                return value != null ? getDecoratedValueWithUnit(value.mRawValue) : "";
+            public String formatValueWithUnit(Value value) {
+                return value != null ? formatValueWithUnit(value.mRawValue) : "";
             }
 
-            public String getDecoratedValueWithUnit(double rawValue) {
+            public String formatValueWithUnit(double rawValue) {
                 return mUnit != "" ?
                         mInterpreter.interpret(rawValue) + mUnit :
                         mInterpreter.interpret(rawValue);
@@ -836,26 +948,75 @@ public class Sensor extends ValueContainer<Sensor.Value> {
          * Created by CJQ on 2017/8/9.
          */
 
-        public static class Decorator {
+//        public static class Decorator {
+//
+//            private final byte mDataTypeValue;
+//            private String mName;
+//
+//            public Decorator(byte dataTypeValue) {
+//                mDataTypeValue = dataTypeValue;
+//            }
+//
+//            public byte getDataTypeValue() {
+//                return mDataTypeValue;
+//            }
+//
+//            public String getName() {
+//                return mName;
+//            }
+//
+//            public void setName(String name) {
+//                mName = name;
+//            }
+//        }
 
-            private final byte mDataTypeValue;
-            private String mName;
+//        public static class Configuration {
+//
+//            private Decorator<Value> mDecorator;
+//
+//            public Decorator<Value> getDecorator() {
+//                return mDecorator;
+//            }
+//
+//            public void setDecorator(Decorator<Value> decorator) {
+//                mDecorator = decorator;
+//            }
+//        }
 
-            public Decorator(byte dataTypeValue) {
-                mDataTypeValue = dataTypeValue;
+        public static class Configuration extends ValueContainer.Configuration<Value> {
+
+            private Warner<Value> mWarner;
+
+            public Warner<Value> getWarner() {
+                return mWarner;
             }
 
-            public byte getDataTypeValue() {
-                return mDataTypeValue;
+            public void setWarner(Warner<Value> warner) {
+                mWarner = warner;
+            }
+        }
+
+        private static class EmptyConfiguration extends Configuration {
+
+            @Override
+            public void setDecorator(Decorator<Value> decorator) {
+                throw new UnsupportedOperationException("inner configuration can not set decorator");
+            }
+        }
+
+        public interface SingleValueDomainWarner extends Warner<Value> {
+            @IntDef({RESULT_NORMAL,
+                    RESULT_ABOVE_HIGHER_LIMIT,
+                    RESULT_BELOW_LOWER_LIMIT})
+            @Retention(RetentionPolicy.SOURCE)
+            @interface Result {
             }
 
-            public String getName() {
-                return mName;
-            }
+            int RESULT_ABOVE_HIGHER_LIMIT = 1;
+            int RESULT_BELOW_LOWER_LIMIT = 2;
 
-            public void setName(String name) {
-                mName = name;
-            }
+            @Override
+            @Result int test(Value value);
         }
     }
 
@@ -863,43 +1024,55 @@ public class Sensor extends ValueContainer<Sensor.Value> {
      * Created by CJQ on 2017/8/9.
      */
 
-    public static class Decorator {
+//    public static class Decorator {
+//
+//        private final int mRawAddress;
+//        private String mName;
+//        private final Measurement.Decorator[] mMeasurementDecorators;
+//
+//        public Decorator(int rawAddress) {
+//            if ((rawAddress & 0xff000000) != 0) {
+//                throw new IllegalArgumentException("raw address error");
+//            }
+//            //根据配置生成测量参数修饰器列表
+//            Type type = SensorManager.findSensorType(rawAddress);
+//            if (type == null) {
+//                throw new NullPointerException("current sensor address is not in type range");
+//            }
+//            mRawAddress = rawAddress;
+//            List<Measurement.Decorator> measurementDecorators = new ArrayList<>();
+//            for (Type.MeasureParameter parameter :
+//                    type.getMeasureParameters()) {
+//                do {
+//                    measurementDecorators.add(new Measurement.Decorator(parameter.mInvolvedDataType.mValue));
+//                } while ((parameter = parameter.mNext) != null);
+//            }
+//            mMeasurementDecorators = new Measurement.Decorator[measurementDecorators.size()];
+//            measurementDecorators.toArray(mMeasurementDecorators);
+//        }
+//
+//        public String getName() {
+//            return mName;
+//        }
+//
+//        public void setName(String name) {
+//            mName = name;
+//        }
+//
+//        public Measurement.Decorator[] getMeasurementDecorators() {
+//            return mMeasurementDecorators;
+//        }
+//    }
 
-        private final int mRawAddress;
-        private String mName;
-        private final Measurement.Decorator[] mMeasurementDecorators;
+    public static class Configuration extends ValueContainer.Configuration<Value> {
 
-        public Decorator(int rawAddress) {
-            if ((rawAddress & 0xff000000) != 0) {
-                throw new IllegalArgumentException("raw address error");
-            }
-            //根据配置生成测量参数修饰器列表
-            Type type = SensorManager.findSensorType(rawAddress);
-            if (type == null) {
-                throw new NullPointerException("current sensor address is not in type range");
-            }
-            mRawAddress = rawAddress;
-            List<Measurement.Decorator> measurementDecorators = new ArrayList<>();
-            for (Type.MeasureParameter parameter :
-                    type.getMeasureParameters()) {
-                do {
-                    measurementDecorators.add(new Measurement.Decorator(parameter.mInvolvedDataType.mValue));
-                } while ((parameter = parameter.mNext) != null);
-            }
-            mMeasurementDecorators = new Measurement.Decorator[measurementDecorators.size()];
-            measurementDecorators.toArray(mMeasurementDecorators);
-        }
+    }
 
-        public String getName() {
-            return mName;
-        }
+    private static class EmptyConfiguration extends Configuration {
 
-        public void setName(String name) {
-            mName = name;
-        }
-
-        public Measurement.Decorator[] getMeasurementDecorators() {
-            return mMeasurementDecorators;
+        @Override
+        public void setDecorator(Decorator<Value> decorator) {
+            throw new UnsupportedOperationException("inner configuration can not set decorator");
         }
     }
 }

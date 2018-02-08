@@ -18,6 +18,8 @@ import android.widget.Toast;
 
 import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.SerialPortKit;
+import com.cjq.lib.weisi.node.Sensor;
+import com.cjq.lib.weisi.node.ValueContainer;
 import com.cjq.lib.weisi.protocol.UdpSensorProtocol;
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
@@ -530,4 +532,31 @@ public class MainActivity
     public void onSearch(String target) {
         Log.d(DebugTag.GENERAL_LOG_TAG, "search content: " + target);
     }
+
+//    public void test() {
+//        WarnerImpl warner = new WarnerImpl();
+//    }
+//
+//    private static class Value extends ValueContainer.Value {
+//
+//        public Value(long timestamp) {
+//            super(timestamp);
+//        }
+//    }
+//
+//    private static class WarnerImpl implements ValueContainer.Warner<Value> {
+//
+//        @Override
+//        public int test(Value value) {
+//            return RESULT_NORMAL;
+//        }
+//    }
+//
+//    private static class SingleValueDomainWarnerImpl implements Sensor.Measurement.SingleValueDomainWarner {
+//
+//        @Override
+//        public int test(Sensor.Measurement.Value value) {
+//            return RESULT_ABOVE_HIGHER_LIMIT;
+//        }
+//    }
 }

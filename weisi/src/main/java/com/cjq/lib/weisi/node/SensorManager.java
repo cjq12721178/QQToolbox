@@ -32,6 +32,11 @@ public class SensorManager {
     private static final Map<Byte, Sensor.Measurement.DataType> ESB_DATA_TYPES = new HashMap<>();
     private static final List<Sensor.Type> BLE_SENSOR_TYPES = new ArrayList<>();
     private static final List<Sensor.Type> ESB_SENSOR_TYPES = new ArrayList<>();
+    private static ValueContainerConfigurationProvider configurationProvider;
+//    static {
+//        setValueContainerConfigurationProvider(null);
+//    }
+
     private static final ExpandComparator<Sensor.Type, Integer> SENSOR_TYPE_SEARCH_COMPARATOR = new ExpandComparator<Sensor.Type, Integer>() {
         @Override
         public int compare(Sensor.Type type, Integer targetAddress) {
@@ -48,23 +53,24 @@ public class SensorManager {
     private SensorManager() {
     }
 
-    public static Sensor getSensor(int address, boolean autoCreate) {
-        return getSensor(address, null, autoCreate);
-    }
+//    public static Sensor getSensor(int address, boolean autoCreate) {
+//        return getSensor(address, null, autoCreate);
+//    }
 
-    public static Sensor createSensor(int address, Sensor.Decorator decorator) {
-        return getSensor(address, decorator, true);
-    }
+//    public static Sensor createSensor(int address, Sensor.Decorator decorator) {
+//        return getSensor(address, decorator, true);
+//    }
 
-    private static synchronized Sensor getSensor(int address, Sensor.Decorator decorator, boolean autoCreate) {
+    public static synchronized Sensor getSensor(int address, boolean autoCreate) {
         Sensor sensor = SENSOR_MAP.get(address);
-        if (autoCreate) {
-            if (sensor == null) {
-                sensor = new Sensor(address, decorator, DEFAULT_DYNAMIC_SENSOR_MAX_VALUE_SIZE);
-                SENSOR_MAP.put(address, sensor);
-            } else {
-                sensor.setDecorator(decorator);
-            }
+        if (autoCreate && sensor == null) {
+            sensor = new Sensor(address, DEFAULT_DYNAMIC_SENSOR_MAX_VALUE_SIZE);
+            SENSOR_MAP.put(address, sensor);
+//            if (sensor == null) {
+//
+//            } else {
+//                sensor.setDecorator(decorator);
+//            }
         }
         return sensor;
     }
@@ -172,6 +178,37 @@ public class SensorManager {
             return null;
         }
     }
+
+    public static void setValueContainerConfigurationProvider(ValueContainerConfigurationProvider provider) {
+        configurationProvider = provider;
+//        if (provider != null) {
+//            configurationProvider = provider;
+//        } else {
+//            configurationProvider = new EmptyValueContainerConfigurationProvider();
+//        }
+    }
+
+    static ValueContainerConfigurationProvider getConfigurationProvider() {
+        return configurationProvider;
+    }
+
+    public interface ValueContainerConfigurationProvider {
+        Sensor.Configuration getSensorConfiguration(int address);
+        Sensor.Measurement.Configuration getMeasurementConfiguration(long id);
+    }
+
+//    private static class EmptyValueContainerConfigurationProvider implements ValueContainerConfigurationProvider {
+//
+//        @Override
+//        public Sensor.Configuration getSensorConfiguration(int address) {
+//            return null;
+//        }
+//
+//        @Override
+//        public Sensor.Measurement.Configuration getMeasurementConfiguration(long id) {
+//            return null;
+//        }
+//    }
 
     private static class ConfigurationImporter extends DefaultHandler {
 

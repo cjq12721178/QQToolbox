@@ -1,8 +1,15 @@
 package com.cjq.lib.weisi;
 
+import android.support.annotation.IntDef;
+import android.support.annotation.NonNull;
+import android.support.annotation.Size;
+
 import com.cjq.lib.weisi.node.ValueContainer;
 
 import org.junit.Test;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 import static org.junit.Assert.*;
 
@@ -51,7 +58,7 @@ public class ValueContainerTest {
         }
     }
 
-    private static class ValueContainerImpl extends ValueContainer<ValueContainerImpl.Value> {
+    private static class ValueContainerImpl extends ValueContainer<ValueContainerImpl.Value, ValueContainerImpl.Configuration> {
 
         public ValueContainerImpl(int maxDynamicValueSize) {
             super(maxDynamicValueSize);
@@ -60,6 +67,16 @@ public class ValueContainerTest {
         @Override
         protected Value onCreateValue(long timestamp) {
             return new Value(timestamp, 0);
+        }
+
+        @Override
+        protected Configuration getEmptyConfiguration() {
+            return null;
+        }
+
+        @Override
+        public String getDefaultName() {
+            return null;
         }
 
         public int addDynamicValue(long timestamp, float batteryVoltage) {
@@ -107,5 +124,45 @@ public class ValueContainerTest {
                 return mBatteryVoltage;
             }
         }
+
+        public static class Configuration extends ValueContainer.Configuration<Value> {
+
+        }
     }
+
+//    @Test
+//    public void warnerResult() {
+//        WarnerImpl warner = new WarnerImpl();
+//        warner.setResult(5);
+//        //warner.setDescription(null);
+//        warner.setValue(123);
+//        assertEquals(5, warner.getResult());
+//        assertEquals(3, warner.test(new ValueContainerImpl.Value(2, 2)));
+//    }
+//
+//    private static class WarnerImpl implements ValueContainer.Warner<ValueContainerImpl.Value> {
+//
+//        private @Result int mResult;
+//
+//        @Override
+//        public int test(ValueContainerImpl.Value value) {
+//            return 3;
+//        }
+//
+//        public void setResult(@Result int result) {
+//            mResult = result;
+//        }
+//
+//        public int getResult() {
+//            return mResult;
+//        }
+//
+//        public void setDescription(@NonNull String description) {
+//
+//        }
+//
+//        public void setValue(@Size(min=1,max=10) int value) {
+//
+//        }
+//    }
 }

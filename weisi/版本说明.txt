@@ -353,3 +353,10 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 20180201-4.1.0(92):
 1. 新增Sensor方法getType
 2. 修复Sensor获取原始地址方法丢失的问题
+
+20180207-4.2.0(93):
+1. ValueContainer新增Configuration类并拥有其实例
+2. 将原来Sensor和Measurement中的Decorator类修改，将其实例移至Configuration
+3. 调整部分方法名称
+4. 新增Warner接口，用于传感器数据告警
+5. SensorManager新增接口ValueContainerConfigurationProvider和方法setValueContainerConfigurationProvider用于对传感器配置的支持
