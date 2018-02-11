@@ -360,3 +360,10 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 3. 调整部分方法名称
 4. 新增Warner接口，用于传感器数据告警
 5. SensorManager新增接口ValueContainerConfigurationProvider和方法setValueContainerConfigurationProvider用于对传感器配置的支持
+
+20180208-4.3.0(95):
+1. ValueContainer补充getDecoratedRealTimeValue方法
+2. 新增warner接口SwitchWarner，用于对开关量进行告警设置
+3. 修改SensorManager方法setValueContainerConfigurationProvider的参数，增加isResetConfigurations以提供configuration重置
+4. 修改SensorManager.ValueContainerConfigurationProvider.getMeasurementConfiguration方法，将原参数（long id）改为(int address, byte dataTypeValue, int dataTypeValueIndex)
+5. 将ValueContainer、Sensor和Measurement各自的Configuration从类改为接口

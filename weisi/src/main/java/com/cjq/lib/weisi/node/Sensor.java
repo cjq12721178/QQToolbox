@@ -118,7 +118,7 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
                 for (Measurement measurement : mMeasurementKinds) {
                     dataTypeValueIndex = 0;
                     do {
-                        measurement.setConfiguration(provider.getMeasurementConfiguration(Measurement.ID.getId(mRawAddress, measurement.mDataType.mValue, dataTypeValueIndex)));
+                        measurement.setConfiguration(provider.getMeasurementConfiguration(mRawAddress, measurement.mDataType.mValue, dataTypeValueIndex));
                         ++dataTypeValueIndex;
                     } while ((measurement = measurement.getNextSameDataTypeMeasurement()) != null);
                 }
@@ -983,37 +983,64 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
 //            }
 //        }
 
-        public static class Configuration extends ValueContainer.Configuration<Value> {
+//        public static class Configuration extends ValueContainer.Configuration<Value> {
+//
+//            private Warner<Value> mWarner;
+//
+//            public Warner<Value> getWarner() {
+//                return mWarner;
+//            }
+//
+//            public void setWarner(Warner<Value> warner) {
+//                mWarner = warner;
+//            }
+//        }
 
-            private Warner<Value> mWarner;
+        public interface Configuration extends ValueContainer.Configuration<Value> {
 
-            public Warner<Value> getWarner() {
-                return mWarner;
-            }
+            Warner<Value> getWarner();
 
-            public void setWarner(Warner<Value> warner) {
-                mWarner = warner;
-            }
+            void setWarner(Warner<Value> warner);
         }
 
-        private static class EmptyConfiguration extends Configuration {
+        private static class EmptyConfiguration
+                extends ValueContainer.EmptyConfiguration<Value>
+                implements Configuration {
 
             @Override
-            public void setDecorator(Decorator<Value> decorator) {
-                throw new UnsupportedOperationException("inner configuration can not set decorator");
+            public Warner<Value> getWarner() {
+                return null;
+            }
+
+            @Override
+            public void setWarner(Warner<Value> warner) {
+                throw new UnsupportedOperationException("inner configuration can not set warner");
             }
         }
 
-        public interface SingleValueDomainWarner extends Warner<Value> {
+        public interface SingleRangeWarner extends Warner<Value> {
             @IntDef({RESULT_NORMAL,
-                    RESULT_ABOVE_HIGHER_LIMIT,
-                    RESULT_BELOW_LOWER_LIMIT})
+                    RESULT_ABOVE_HIGH_LIMIT,
+                    RESULT_BELOW_LOW_LIMIT})
             @Retention(RetentionPolicy.SOURCE)
             @interface Result {
             }
 
-            int RESULT_ABOVE_HIGHER_LIMIT = 1;
-            int RESULT_BELOW_LOWER_LIMIT = 2;
+            int RESULT_ABOVE_HIGH_LIMIT = 1;
+            int RESULT_BELOW_LOW_LIMIT = 2;
+
+            @Override
+            @Result int test(Value value);
+        }
+
+        public interface SwitchWarner extends Warner<Value> {
+            @IntDef({RESULT_IN_NORMAL_STATE, RESULT_IN_ABNORMAL_STATE})
+            @Retention(RetentionPolicy.SOURCE)
+            @interface Result {
+            }
+
+            int RESULT_IN_NORMAL_STATE = RESULT_NORMAL;
+            int RESULT_IN_ABNORMAL_STATE = 1;
 
             @Override
             @Result int test(Value value);
@@ -1064,15 +1091,15 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
 //        }
 //    }
 
-    public static class Configuration extends ValueContainer.Configuration<Value> {
+//    public static class Configuration extends ValueContainer.Configuration<Value> {
+//
+//    }
 
+    public interface Configuration extends ValueContainer.Configuration<Value> {
     }
 
-    private static class EmptyConfiguration extends Configuration {
-
-        @Override
-        public void setDecorator(Decorator<Value> decorator) {
-            throw new UnsupportedOperationException("inner configuration can not set decorator");
-        }
+    private static class EmptyConfiguration
+            extends ValueContainer.EmptyConfiguration<Value>
+            implements Configuration{
     }
 }

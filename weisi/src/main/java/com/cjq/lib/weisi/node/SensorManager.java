@@ -179,13 +179,16 @@ public class SensorManager {
         }
     }
 
-    public static void setValueContainerConfigurationProvider(ValueContainerConfigurationProvider provider) {
-        configurationProvider = provider;
-//        if (provider != null) {
-//            configurationProvider = provider;
-//        } else {
-//            configurationProvider = new EmptyValueContainerConfigurationProvider();
-//        }
+    public static synchronized void setValueContainerConfigurationProvider(ValueContainerConfigurationProvider provider, boolean isResetConfigurations) {
+        if (configurationProvider != provider) {
+            configurationProvider = provider;
+            if (isResetConfigurations) {
+                for (Sensor sensor
+                        : SENSOR_MAP.values()) {
+                    sensor.resetConfiguration();
+                }
+            }
+        }
     }
 
     static ValueContainerConfigurationProvider getConfigurationProvider() {
@@ -194,7 +197,7 @@ public class SensorManager {
 
     public interface ValueContainerConfigurationProvider {
         Sensor.Configuration getSensorConfiguration(int address);
-        Sensor.Measurement.Configuration getMeasurementConfiguration(long id);
+        Sensor.Measurement.Configuration getMeasurementConfiguration(int address, byte dataTypeValue, int dataTypeValueIndex);
     }
 
 //    private static class EmptyValueContainerConfigurationProvider implements ValueContainerConfigurationProvider {

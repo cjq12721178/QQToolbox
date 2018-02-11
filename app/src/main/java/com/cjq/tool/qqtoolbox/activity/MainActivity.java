@@ -533,30 +533,30 @@ public class MainActivity
         Log.d(DebugTag.GENERAL_LOG_TAG, "search content: " + target);
     }
 
-//    public void test() {
-//        WarnerImpl warner = new WarnerImpl();
-//    }
-//
-//    private static class Value extends ValueContainer.Value {
-//
-//        public Value(long timestamp) {
-//            super(timestamp);
-//        }
-//    }
-//
-//    private static class WarnerImpl implements ValueContainer.Warner<Value> {
-//
-//        @Override
-//        public int test(Value value) {
-//            return RESULT_NORMAL;
-//        }
-//    }
-//
-//    private static class SingleValueDomainWarnerImpl implements Sensor.Measurement.SingleValueDomainWarner {
-//
-//        @Override
-//        public int test(Sensor.Measurement.Value value) {
-//            return RESULT_ABOVE_HIGHER_LIMIT;
-//        }
-//    }
+    public void test() {
+        WarnerImpl warner = new WarnerImpl();
+    }
+
+    private static class Value extends ValueContainer.Value {
+
+        public Value(long timestamp) {
+            super(timestamp);
+        }
+    }
+
+    private static class WarnerImpl implements ValueContainer.Warner<Value> {
+
+        @Override
+        public int test(Value value) {
+            return RESULT_NORMAL;
+        }
+    }
+
+    private static class SingleValueDomainWarnerImpl implements Sensor.Measurement.SingleRangeWarner {
+
+        @Override
+        public int test(Sensor.Measurement.Value value) {
+            return RESULT_ABOVE_HIGH_LIMIT;
+        }
+    }
 }

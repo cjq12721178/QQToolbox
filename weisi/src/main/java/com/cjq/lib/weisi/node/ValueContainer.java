@@ -106,6 +106,10 @@ public abstract class ValueContainer<V extends ValueContainer.Value, C extends V
                 : null;
     }
 
+    public String getDecoratedRealTimeValue() {
+        return decorateValue(mRealTimeValue);
+    }
+
     public void setIntraday(long dateTime) {
         if (mCurrentDailyHistoryValuePool == null || !mCurrentDailyHistoryValuePool.contains(dateTime)) {
             mCurrentDailyHistoryValuePool = getDailyHistoryValuePool(dateTime);
@@ -624,27 +628,45 @@ public abstract class ValueContainer<V extends ValueContainer.Value, C extends V
         }
     }
 
-    public interface Decorator<V> {
+    public interface Decorator<V extends Value> {
         String getCustomName();
         //para为保留参数，针对V有多种类型的值时进行区分
         String getCustomValue(V value, int para);
     }
 
-    public interface Warner<V> {
+    public interface Warner<V extends Value> {
         int RESULT_NORMAL = 0;
         int test(V value);
     }
 
-    public static class Configuration<V> {
+//    public static class Configuration<V> {
+//
+//        private Decorator<V> mDecorator;
+//
+//        public Decorator<V> getDecorator() {
+//            return mDecorator;
+//        }
+//
+//        public void setDecorator(Decorator<V> decorator) {
+//            mDecorator = decorator;
+//        }
+//    }
 
-        private Decorator<V> mDecorator;
+    public interface Configuration<V extends Value> {
+        Decorator<V> getDecorator();
+        void setDecorator(Decorator<V> decorator);
+    }
 
-        public Decorator<V> getDecorator() {
-            return mDecorator;
+    protected static class EmptyConfiguration<V extends Value> implements Configuration<V> {
+
+        @Override
+        public Decorator getDecorator() {
+            return null;
         }
 
-        public void setDecorator(Decorator<V> decorator) {
-            mDecorator = decorator;
+        @Override
+        public void setDecorator(Decorator decorator) {
+            throw new UnsupportedOperationException("inner configuration can not set decorator");
         }
     }
 }
