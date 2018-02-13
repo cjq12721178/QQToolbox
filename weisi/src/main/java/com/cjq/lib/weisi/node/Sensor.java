@@ -211,7 +211,7 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
     //返回传感器名称（可以经过SensorDecorator修饰）
 //    public String getName() {
 //        Decorator<Value> decorator = getConfiguration().getDecorator();
-//        return decorator != null ? decorator.getCustomName() : mType.mSensorGeneralName;
+//        return decorator != null ? decorator.decorateName() : mType.mSensorGeneralName;
 //        //return mDecorator != null ? mDecorator.getName() : mType.mSensorGeneralName;
 //    }
 
@@ -661,7 +661,7 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
 //        public String getName() {
 //            //return mDecorator != null ? mDecorator.getName() : mName;
 //            Decorator<Value> decorator = getConfiguration().getDecorator();
-//            return decorator != null ? decorator.getCustomName() : mName;
+//            return decorator != null ? decorator.decorateName() : mName;
 //        }
 
         @Override
@@ -729,11 +729,11 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
             }
         }
 
-        public String getCustomRealTimeValue() {
-            return mRealTimeValue.mTimestamp != 0
-                    ? decorateValue(mRealTimeValue)
-                    : null;
-        }
+//        public String getCustomRealTimeValue() {
+//            return mRealTimeValue.mTimestamp != 0
+//                    ? decorateValue(mRealTimeValue)
+//                    : null;
+//        }
 
         public String getFormattedRealTimeValue() {
             return mRealTimeValue.mTimestamp != 0

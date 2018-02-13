@@ -125,8 +125,17 @@ public class ValueContainerTest {
             }
         }
 
-        public static class Configuration extends ValueContainer.Configuration<Value> {
+        public static class Configuration implements ValueContainer.Configuration<Value> {
 
+            @Override
+            public Decorator<Value> getDecorator() {
+                return null;
+            }
+
+            @Override
+            public void setDecorator(Decorator<Value> decorator) {
+
+            }
         }
     }
 

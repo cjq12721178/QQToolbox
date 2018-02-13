@@ -367,3 +367,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 3. 修改SensorManager方法setValueContainerConfigurationProvider的参数，增加isResetConfigurations以提供configuration重置
 4. 修改SensorManager.ValueContainerConfigurationProvider.getMeasurementConfiguration方法，将原参数（long id）改为(int address, byte dataTypeValue, int dataTypeValueIndex)
 5. 将ValueContainer、Sensor和Measurement各自的Configuration从类改为接口
+
+20180213-4.3.1(96):
+1. 修改Decorator接口方法名称，getCustomName()->decorateName(String name)，getCustomValue(V value, int para)->decorateValue(v value,int para)

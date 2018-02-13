@@ -1,14 +1,9 @@
 package com.cjq.lib.weisi.node;
 
 
-import android.support.annotation.IntDef;
-
 import com.cjq.lib.weisi.util.ExpandCollections;
 import com.cjq.lib.weisi.util.ExpandComparator;
 
-import java.lang.annotation.Inherited;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -87,7 +82,7 @@ public abstract class ValueContainer<V extends ValueContainer.Value, C extends V
 
     public String getDecoratedName() {
         Decorator<V> decorator = mConfiguration.getDecorator();
-        return decorator != null ? decorator.getCustomName() : null;
+        return decorator != null ? decorator.decorateName(getDefaultName()) : null;
     }
 
     public String getName() {
@@ -102,12 +97,18 @@ public abstract class ValueContainer<V extends ValueContainer.Value, C extends V
     public String decorateValue(V v, int para) {
         Decorator<V> decorator = mConfiguration.getDecorator();
         return decorator != null
-                ? decorator.getCustomValue(v, para)
+                ? decorator.decorateValue(v, para)
                 : null;
     }
 
     public String getDecoratedRealTimeValue() {
-        return decorateValue(mRealTimeValue);
+        return getDecoratedRealTimeValue(0);
+    }
+
+    public String getDecoratedRealTimeValue(int para) {
+        return mRealTimeValue.mTimestamp != 0
+                ? decorateValue(mRealTimeValue, para)
+                : null;
     }
 
     public void setIntraday(long dateTime) {
@@ -629,9 +630,9 @@ public abstract class ValueContainer<V extends ValueContainer.Value, C extends V
     }
 
     public interface Decorator<V extends Value> {
-        String getCustomName();
+        String decorateName(String name);
         //para为保留参数，针对V有多种类型的值时进行区分
-        String getCustomValue(V value, int para);
+        String decorateValue(V value, int para);
     }
 
     public interface Warner<V extends Value> {
