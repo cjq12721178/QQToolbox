@@ -3,6 +3,7 @@ package com.cjq.tool.qbox.ui.adapter;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 
 import java.lang.reflect.Field;
 import java.util.List;
@@ -23,9 +24,9 @@ public abstract class RecyclerViewBaseAdapter<E>
     private int mSelectedIndex = -1;
     private boolean mUpdateSelectedState;
     private final RecyclerViewBaseDataObserver mDataObserver = new RecyclerViewBaseDataObserver();
-    private final AdapterDelegateManager mAdapterDelegateManager;
+    private final AdapterDelegateManager<E> mAdapterDelegateManager;
 
-    public RecyclerViewBaseAdapter(AdapterDelegateManager manager) {
+    public RecyclerViewBaseAdapter(AdapterDelegateManager<E> manager) {
         mAdapterDelegateManager = manager == null
                 ? new SingleAdapterDelegateManager()
                 : manager;
@@ -163,6 +164,15 @@ public abstract class RecyclerViewBaseAdapter<E>
             e.printStackTrace();
         }
         return -1;
+    }
+
+    public static int getPositionByItemChildView(View v) {
+        ViewParent parent = v.getParent();
+        if (parent instanceof View) {
+            return getPositionByItemView((View) parent);
+        } else {
+            return -1;
+        }
     }
 
     @Override

@@ -223,3 +223,15 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20180206-1.2.1(65):
 1. 修复SearchDialog记录空白搜索内容的问题
 2. 使SearchDialog和EditDialog表现为，当对话框打开时，出现软键盘，并全选所有输入框内容
+
+20180227-1.3.0(66):
+1. 新增loader包
+2. 新增SimpleCursorLoader用于简单的数据库加载，可结合CursorAdapter,ListView使用
+3. 新增RecyclerViewCursorLoader，用于从数据库加载数据，对数据更新情况进行细致区分，以配合RecyclerViewCursorAdapter、RecyclerView使用
+4. 新增bean包
+5. 新增RecyclerViewCursorAdapter
+
+20180227-1.3.1(67):
+1. 将RecyclerViewCursorLoader功能移至RecyclerViewCursorAdapter，同时删除RecyclerViewCursorLoader
+2. 将RecyclerViewItemMotion改为RecyclerViewCursorAdapter的内部静态类
+3. RecyclerViewCursorAdapter的scheduleItemXXX方法返回ItemMotionId，同时增加方法cancelItemMotion允许取消之前schedule的motion

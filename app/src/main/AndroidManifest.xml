@@ -39,6 +39,10 @@
         </activity>
         <activity android:name=".activity.ScrollViewInsideViewPagerActivity">
         </activity>
+        <activity android:name=".activity.TestSimpleCursorLoaderActivity">
+        </activity>
+        <activity android:name=".activity.TestRecyclerViewCursorLoaderActivity">
+        </activity>
     </application>
 
 </manifest>

@@ -557,6 +557,33 @@
             android:onClick="onClick"
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
             app:layout_constraintTop_toBottomOf="@id/tv_ble"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_loader"
+            android:text="CursorLoader"
+            android:layout_marginLeft="16dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintTop_toBottomOf="@id/btn_open_ble_activity"
+            app:layout_constraintLeft_toLeftOf="parent"
+            android:layout_marginStart="16dp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_open_test_simple_cursor_loader_activity"
+            android:text="start simple cursor loader activity"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/tv_loader"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_open_test_recycler_view_cursor_loader_activity"
+            android:text="start recycler view cursor loader activity"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/btn_open_test_simple_cursor_loader_activity"/>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>
 

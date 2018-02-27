@@ -357,6 +357,12 @@ public class MainActivity
                 }
                 mSearchDialog.show(getSupportFragmentManager(), "search_dialog");
                 break;
+            case R.id.btn_open_test_simple_cursor_loader_activity:
+                startActivity(new Intent(this, TestSimpleCursorLoaderActivity.class));
+                break;
+            case R.id.btn_open_test_recycler_view_cursor_loader_activity:
+                startActivity(new Intent(this, TestRecyclerViewCursorLoaderActivity.class));
+                break;
         }
     }
 
