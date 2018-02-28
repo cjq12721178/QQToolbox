@@ -1,5 +1,6 @@
 package com.cjq.tool.qqtoolbox.activity;
 
+import android.content.AsyncQueryHandler;
 import android.content.Intent;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;

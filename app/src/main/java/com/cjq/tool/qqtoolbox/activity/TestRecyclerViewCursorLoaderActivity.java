@@ -2,6 +2,7 @@ package com.cjq.tool.qqtoolbox.activity;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -16,6 +17,8 @@ import android.widget.TextView;
 
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewCursorAdapter;
+import com.cjq.tool.qbox.database.SQLiteResolverDelegate;
+import com.cjq.tool.qbox.database.SimpleSQLiteAsyncEventHandler;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
 import com.cjq.tool.qbox.util.ExceptionLog;
@@ -30,11 +33,18 @@ public class TestRecyclerViewCursorLoaderActivity
         MyRecyclerViewCursorAdapter.OnContentClickListener,
         LoaderManager.LoaderCallbacks<Cursor>,
         EditDialog.OnContentReceiver,
-        ListDialog.OnItemSelectedListener {
+        ListDialog.OnItemSelectedListener, SimpleSQLiteAsyncEventHandler.OnMissionCompleteListener {
+
+    private static final int TOKEN_MODIFY_NAME = 1;
+    private static final int TOKEN_MODIFY_SEX = 2;
+    private static final int TOKEN_MODIFY_AGE = 3;
+    private static final int TOKEN_ADD_STUDENT = 4;
+    private static final int TOKEN_REMOVE_STUDENT = 5;
 
     private MyRecyclerViewCursorAdapter mAdapter;
     private MySQLiteOpenHelper mOpenHelper;
     private MySimpleCursorLoader mCursorLoader;
+    private SimpleSQLiteAsyncEventHandler mAsyncEventHandler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,6 +54,7 @@ public class TestRecyclerViewCursorLoaderActivity
         findViewById(R.id.btn_add).setOnClickListener(this);
 
         mOpenHelper = new MySQLiteOpenHelper(this);
+        mAsyncEventHandler = new SimpleSQLiteAsyncEventHandler(new SQLiteResolverDelegate(mOpenHelper.getWritableDatabase()), this);
         mAdapter = new MyRecyclerViewCursorAdapter();
         mAdapter.setOnContentClickListener(this);
 
@@ -111,9 +122,17 @@ public class TestRecyclerViewCursorLoaderActivity
     @Override
     public void onRemoveClick(int position) {
         try {
-            mOpenHelper.getWritableDatabase().delete("student", "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
-            mAdapter.scheduleItemRemove(position);
-            mCursorLoader.onContentChanged();
+            //同步
+            //mOpenHelper.getWritableDatabase().delete("student", "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
+            //mAdapter.scheduleItemRemove(position);
+            //mCursorLoader.onContentChanged();
+
+            //异步
+            mAsyncEventHandler.startDelete(TOKEN_REMOVE_STUDENT,
+                    new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_REMOVE),
+                    "student",
+                    "_id = ?",
+                    new String[] { String.valueOf(mAdapter.getItemId(position)) });
         } catch (Exception e) {
             ExceptionLog.display(e);
         }
@@ -142,9 +161,19 @@ public class TestRecyclerViewCursorLoaderActivity
                     int position = dialog.getArguments().getInt("position");
                     ContentValues values = new ContentValues();
                     values.put("name", newValue);
-                    mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
-                    mAdapter.scheduleItemChange(position, MyRecyclerViewCursorAdapter.MODIFY_NAME);
-                    mCursorLoader.onContentChanged();
+
+                    //同步
+                    //mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
+                    //mAdapter.scheduleItemChange(position, MyRecyclerViewCursorAdapter.MODIFY_NAME);
+                    //mCursorLoader.onContentChanged();
+
+                    //异步
+                    mAsyncEventHandler.startUpdate(TOKEN_MODIFY_NAME,
+                            new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_CHANGE),
+                            "student", values,
+                            "_id = ?",
+                            new String[] { String.valueOf(mAdapter.getItemId(position)) },
+                            SQLiteDatabase.CONFLICT_NONE);
                 } catch (Exception e) {
                     ExceptionLog.display(e);
                 }
@@ -154,9 +183,19 @@ public class TestRecyclerViewCursorLoaderActivity
                     int position = dialog.getArguments().getInt("position");
                     ContentValues values = new ContentValues();
                     values.put("age", Integer.parseInt(newValue));
-                    mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
-                    mAdapter.scheduleItemChange(position, MyRecyclerViewCursorAdapter.MODIFY_AGE);
-                    mCursorLoader.onContentChanged();
+
+                    //同步
+                    //mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
+                    //mAdapter.scheduleItemChange(position, MyRecyclerViewCursorAdapter.MODIFY_AGE);
+                    //mCursorLoader.onContentChanged();
+
+                    //异步
+                    mAsyncEventHandler.startUpdate(TOKEN_MODIFY_AGE,
+                            new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_CHANGE),
+                            "student", values,
+                            "_id = ?",
+                            new String[] { String.valueOf(mAdapter.getItemId(position)) },
+                            SQLiteDatabase.CONFLICT_NONE);
                 } catch (Exception e) {
                     ExceptionLog.display(e);
                 }
@@ -171,9 +210,17 @@ public class TestRecyclerViewCursorLoaderActivity
                     values.put("name", paras[1]);
                     values.put("sex", paras[2].equals("男") ? 0 : 1);
                     values.put("age", Integer.parseInt(paras[3]));
-                    mOpenHelper.getWritableDatabase().insert("student", null, values);
-                    mAdapter.scheduleItemInsert(position);
-                    mCursorLoader.onContentChanged();
+
+                    //同步
+                    //mOpenHelper.getWritableDatabase().insert("student", null, values);
+                    //mAdapter.scheduleItemInsert(position);
+                    //mCursorLoader.onContentChanged();
+
+                    //异步
+                    mAsyncEventHandler.startInsert(TOKEN_ADD_STUDENT,
+                            new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_INSERT),
+                            "student", values,
+                            SQLiteDatabase.CONFLICT_NONE);
                 } catch (Exception e) {
                     ExceptionLog.display(e);
                 }
@@ -209,12 +256,61 @@ public class TestRecyclerViewCursorLoaderActivity
             int position = dialog.getArguments().getInt("position");
             ContentValues values = new ContentValues();
             values.put("sex", item.equals("男") ? 0 : 1);
-            mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(dialog.getArguments().getInt("position"))) });
-            mAdapter.scheduleItemChange(position, MyRecyclerViewCursorAdapter.MODIFY_SEX);
-            mCursorLoader.onContentChanged();
+
+            //同步
+            //mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(dialog.getArguments().getInt("position"))) });
+            //mAdapter.scheduleItemChange(position, MyRecyclerViewCursorAdapter.MODIFY_SEX);
+            //mCursorLoader.onContentChanged();
+
+            //异步
+            mAsyncEventHandler.startUpdate(TOKEN_MODIFY_SEX,
+                    new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_CHANGE),
+                    "student", values,
+                    "_id = ?",
+                    new String[] { String.valueOf(mAdapter.getItemId(position)) },
+                    SQLiteDatabase.CONFLICT_NONE);
         } catch (Exception e) {
             ExceptionLog.display(e);
         }
+    }
+
+    @Override
+    public void onQueryComplete(int token, Object cookie, Cursor cursor) {
+
+    }
+
+    @Override
+    public void onInsertComplete(int token, Object cookie, long rowId) {
+        if (rowId != -1 && token == TOKEN_ADD_STUDENT) {
+            mAdapter.scheduleItemMotion((RecyclerViewCursorAdapter.ItemMotion) cookie);
+            mCursorLoader.onContentChanged();
+        }
+    }
+
+    @Override
+    public void onUpdateComplete(int token, Object cookie, int affectedRowCount) {
+        if (affectedRowCount > 0) {
+            mAdapter.scheduleItemMotion((RecyclerViewCursorAdapter.ItemMotion) cookie);
+            mCursorLoader.onContentChanged();
+        }
+    }
+
+    @Override
+    public void onDeleteComplete(int token, Object cookie, int affectedRowCount) {
+        if (affectedRowCount > 0) {
+            mAdapter.scheduleItemMotion((RecyclerViewCursorAdapter.ItemMotion) cookie);
+            mCursorLoader.onContentChanged();
+        }
+    }
+
+    @Override
+    public void onReplaceComplete(int token, Object cookie, long rowId) {
+
+    }
+
+    @Override
+    public void onExecSqlComplete(int token, Object cookie, boolean result) {
+
     }
 }
 

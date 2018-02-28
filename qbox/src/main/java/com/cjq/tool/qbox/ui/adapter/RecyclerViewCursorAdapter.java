@@ -193,6 +193,14 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
         return itemMotion.getId();
     }
 
+    public int scheduleItemMotion(ItemMotion motion) {
+        if (motion == null) {
+            return -1;
+        }
+        mItemMotions.addLast(motion);
+        return motion.getId();
+    }
+
     public void cancelItemMotion(int motionId) {
         for (ItemMotion motion : mItemMotions) {
             if (motion.getId() == motionId) {
@@ -206,13 +214,11 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
      * Created by CJQ on 2018/2/26.
      */
 
-    static class ItemMotion {
+    public static class ItemMotion {
 
         private static int autoincrementId = 0;
 
-        @IntDef({MOTION_CHANGE,
-                MOTION_INSERT,
-                MOTION_REMOVE})
+        @IntDef({MOTION_RESET, MOTION_CHANGE, MOTION_INSERT, MOTION_REMOVE})
         @Retention(RetentionPolicy.SOURCE)
         @interface Motion {
         }
@@ -225,18 +231,18 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
         private final int mId;
         private final int mPositionStart;
         private final int mItemCount;
-        private final int mMotion;
+        private final @Motion int mMotion;
         private final Object mPayload;
 
         public ItemMotion() {
             this(0, 0, MOTION_RESET, null);
         }
 
-        public ItemMotion(int positionStart, int itemCount, int motion) {
+        public ItemMotion(int positionStart, int itemCount, @Motion int motion) {
             this(positionStart, itemCount, motion, null);
         }
 
-        public ItemMotion(int positionStart, int itemCount, int motion, Object payload) {
+        public ItemMotion(int positionStart, int itemCount, @Motion int motion, Object payload) {
             mId = autoincrementId++;
             mPositionStart = positionStart;
             mItemCount = itemCount;
@@ -256,7 +262,7 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
             return mItemCount;
         }
 
-        public int getMotion() {
+        public @Motion int getMotion() {
             return mMotion;
         }
 
