@@ -239,3 +239,8 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 5. 新增SimpleSQLiteAsyncEventHandler类，用于异步操作数据库，仿AsyncEventHandler，同时绕过ContentResolver
 6. 新增接口SQLiteResolver，为SimpleSQLiteAsyncEventHandler提供数据库操作者
 7. 新增类SQLiteResolverDelegate，实现SQLiteResolver接口，为SimpleSQLiteAsyncEventHandler提供简单的数据库操作者
+
+20180302-1.5.0(68):
+1. 改变RecyclerView的点击事件实现方式，将RecyclerViewBaseAdapter中的接口OnItemClickListener和OnItemLongClickListener及其相关实现移除
+2. 新增gesture包，新增SimpleRecyclerViewItemTouchListener用于代替之前在RecyclerViewBaseAdapter中实现的功能，同时增加对Item子view的点击支持
+3. 新增装饰类adapter：HeaderAndFooterWrapper，用于在不影响原有功能的情况下为RecyclerView.Adapter提供提供header和footer服务

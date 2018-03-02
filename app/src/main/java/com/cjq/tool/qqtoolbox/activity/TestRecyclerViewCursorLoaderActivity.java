@@ -21,6 +21,7 @@ import com.cjq.tool.qbox.database.SQLiteResolverDelegate;
 import com.cjq.tool.qbox.database.SimpleSQLiteAsyncEventHandler;
 import com.cjq.tool.qbox.ui.dialog.EditDialog;
 import com.cjq.tool.qbox.ui.dialog.ListDialog;
+import com.cjq.tool.qbox.ui.gesture.SimpleRecyclerViewItemTouchListener;
 import com.cjq.tool.qbox.util.ExceptionLog;
 import com.cjq.tool.qqtoolbox.R;
 import com.cjq.tool.qqtoolbox.database.MySQLiteOpenHelper;
@@ -30,7 +31,7 @@ import java.util.List;
 public class TestRecyclerViewCursorLoaderActivity
         extends AppCompatActivity
         implements View.OnClickListener,
-        MyRecyclerViewCursorAdapter.OnContentClickListener,
+        /* MyRecyclerViewCursorAdapter.OnContentClickListener, */
         LoaderManager.LoaderCallbacks<Cursor>,
         EditDialog.OnContentReceiver,
         ListDialog.OnItemSelectedListener, SimpleSQLiteAsyncEventHandler.OnMissionCompleteListener {
@@ -56,11 +57,65 @@ public class TestRecyclerViewCursorLoaderActivity
         mOpenHelper = new MySQLiteOpenHelper(this);
         mAsyncEventHandler = new SimpleSQLiteAsyncEventHandler(new SQLiteResolverDelegate(mOpenHelper.getWritableDatabase()), this);
         mAdapter = new MyRecyclerViewCursorAdapter();
-        mAdapter.setOnContentClickListener(this);
+        //mAdapter.setOnContentClickListener(this);
 
         RecyclerView rvStudents = findViewById(R.id.rv_students);
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this);
         rvStudents.setLayoutManager(linearLayoutManager);
+        rvStudents.addOnItemTouchListener(new SimpleRecyclerViewItemTouchListener(rvStudents) {
+            @Override
+            public void onItemClick(View v, int position) {
+                switch (v.getId()) {
+                    case R.id.tv_name: {
+                        EditDialog dialog = new EditDialog();
+                        Cursor cursor = mAdapter.getCursor();
+                        cursor.moveToPosition(position);
+                        dialog.setTitle("修改姓名");
+                        dialog.setContent(cursor.getString(cursor.getColumnIndex("name")));
+                        dialog.getArguments().putInt("position", position);
+                        dialog.show(getSupportFragmentManager(), "modify_name");
+                    } break;
+                    case R.id.tv_sex: {
+                        ListDialog dialog = new ListDialog();
+                        //Cursor cursor = mAdapter.getCursor();
+                        dialog.setTitle("修改性别");
+                        dialog.setItems(new String[] { "男", "女" });
+                        dialog.getArguments().putInt("position", position);
+                        //dialog.setContent(cursor.getString(cursor.getColumnIndex("sex")));
+                        dialog.show(getSupportFragmentManager(), "modify_sex");
+                    } break;
+                    case R.id.tv_age: {
+                        EditDialog dialog = new EditDialog();
+                        Cursor cursor = mAdapter.getCursor();
+                        cursor.moveToPosition(position);
+                        dialog.setTitle("修改年龄");
+                        dialog.setContent(cursor.getString(cursor.getColumnIndex("age")));
+                        dialog.getArguments().putInt("position", position);
+                        dialog.show(getSupportFragmentManager(), "modify_age");
+                    } break;
+                    case R.id.btn_remove: {
+                        try {
+                            //同步
+                            //mOpenHelper.getWritableDatabase().delete("student", "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
+                            //mAdapter.scheduleItemRemove(position);
+                            //mCursorLoader.onContentChanged();
+
+                            //异步
+                            mAsyncEventHandler.startDelete(TOKEN_REMOVE_STUDENT,
+                                    new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_REMOVE),
+                                    "student",
+                                    "_id = ?",
+                                    new String[] { String.valueOf(mAdapter.getItemId(position)) });
+                        } catch (Exception e) {
+                            ExceptionLog.display(e);
+                        }
+                    } break;
+                }
+            }
+        }.addItemChildViewTouchEnabled(R.id.tv_name)
+                .addItemChildViewTouchEnabled(R.id.tv_sex)
+                .addItemChildViewTouchEnabled(R.id.tv_age)
+                .addItemChildViewTouchEnabled(R.id.btn_remove));
         rvStudents.setAdapter(mAdapter);
 
         getSupportLoaderManager().initLoader(0, null, this);
@@ -86,57 +141,57 @@ public class TestRecyclerViewCursorLoaderActivity
         }
     }
 
-    @Override
-    public void onNameClick(int position) {
-        EditDialog dialog = new EditDialog();
-        Cursor cursor = mAdapter.getCursor();
-        cursor.moveToPosition(position);
-        dialog.setTitle("修改姓名");
-        dialog.setContent(cursor.getString(cursor.getColumnIndex("name")));
-        dialog.getArguments().putInt("position", position);
-        dialog.show(getSupportFragmentManager(), "modify_name");
-    }
+//    @Override
+//    public void onNameClick(int position) {
+//        EditDialog dialog = new EditDialog();
+//        Cursor cursor = mAdapter.getCursor();
+//        cursor.moveToPosition(position);
+//        dialog.setTitle("修改姓名");
+//        dialog.setContent(cursor.getString(cursor.getColumnIndex("name")));
+//        dialog.getArguments().putInt("position", position);
+//        dialog.show(getSupportFragmentManager(), "modify_name");
+//    }
 
-    @Override
-    public void onSexClick(int position) {
-        ListDialog dialog = new ListDialog();
-        //Cursor cursor = mAdapter.getCursor();
-        dialog.setTitle("修改性别");
-        dialog.setItems(new String[] { "男", "女" });
-        dialog.getArguments().putInt("position", position);
-        //dialog.setContent(cursor.getString(cursor.getColumnIndex("sex")));
-        dialog.show(getSupportFragmentManager(), "modify_sex");
-    }
+//    @Override
+//    public void onSexClick(int position) {
+//        ListDialog dialog = new ListDialog();
+//        //Cursor cursor = mAdapter.getCursor();
+//        dialog.setTitle("修改性别");
+//        dialog.setItems(new String[] { "男", "女" });
+//        dialog.getArguments().putInt("position", position);
+//        //dialog.setContent(cursor.getString(cursor.getColumnIndex("sex")));
+//        dialog.show(getSupportFragmentManager(), "modify_sex");
+//    }
 
-    @Override
-    public void onAgeClick(int position) {
-        EditDialog dialog = new EditDialog();
-        Cursor cursor = mAdapter.getCursor();
-        cursor.moveToPosition(position);
-        dialog.setTitle("修改年龄");
-        dialog.setContent(cursor.getString(cursor.getColumnIndex("age")));
-        dialog.getArguments().putInt("position", position);
-        dialog.show(getSupportFragmentManager(), "modify_age");
-    }
+//    @Override
+//    public void onAgeClick(int position) {
+//        EditDialog dialog = new EditDialog();
+//        Cursor cursor = mAdapter.getCursor();
+//        cursor.moveToPosition(position);
+//        dialog.setTitle("修改年龄");
+//        dialog.setContent(cursor.getString(cursor.getColumnIndex("age")));
+//        dialog.getArguments().putInt("position", position);
+//        dialog.show(getSupportFragmentManager(), "modify_age");
+//    }
 
-    @Override
-    public void onRemoveClick(int position) {
-        try {
-            //同步
-            //mOpenHelper.getWritableDatabase().delete("student", "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
-            //mAdapter.scheduleItemRemove(position);
-            //mCursorLoader.onContentChanged();
-
-            //异步
-            mAsyncEventHandler.startDelete(TOKEN_REMOVE_STUDENT,
-                    new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_REMOVE),
-                    "student",
-                    "_id = ?",
-                    new String[] { String.valueOf(mAdapter.getItemId(position)) });
-        } catch (Exception e) {
-            ExceptionLog.display(e);
-        }
-    }
+//    @Override
+//    public void onRemoveClick(int position) {
+//        try {
+//            //同步
+//            //mOpenHelper.getWritableDatabase().delete("student", "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(position)) });
+//            //mAdapter.scheduleItemRemove(position);
+//            //mCursorLoader.onContentChanged();
+//
+//            //异步
+//            mAsyncEventHandler.startDelete(TOKEN_REMOVE_STUDENT,
+//                    new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_REMOVE),
+//                    "student",
+//                    "_id = ?",
+//                    new String[] { String.valueOf(mAdapter.getItemId(position)) });
+//        } catch (Exception e) {
+//            ExceptionLog.display(e);
+//        }
+//    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
@@ -320,15 +375,15 @@ class MyRecyclerViewCursorAdapter extends RecyclerViewCursorAdapter {
     public static final int MODIFY_SEX = 2;
     public static final int MODIFY_AGE = 3;
 
-    private OnContentClickListener mOnContentClickListener;
+    //private OnContentClickListener mOnContentClickListener;
 
     public MyRecyclerViewCursorAdapter() {
         super(null, "_id");
     }
 
-    public void setOnContentClickListener(OnContentClickListener listener) {
-        mOnContentClickListener = listener;
-    }
+//    public void setOnContentClickListener(OnContentClickListener listener) {
+//        mOnContentClickListener = listener;
+//    }
 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -336,8 +391,7 @@ class MyRecyclerViewCursorAdapter extends RecyclerViewCursorAdapter {
                 .from(parent.getContext())
                 .inflate(R.layout.list_item_cursor_loader,
                         parent,
-                        false),
-                mOnContentClickListener);
+                        false));
     }
 
     @Override
@@ -367,57 +421,57 @@ class MyRecyclerViewCursorAdapter extends RecyclerViewCursorAdapter {
         }
     }
 
-    public interface OnContentClickListener {
-        void onNameClick(int position);
-        void onSexClick(int position);
-        void onAgeClick(int position);
-        void onRemoveClick(int position);
-    }
+//    public interface OnContentClickListener {
+//        void onNameClick(int position);
+//        void onSexClick(int position);
+//        void onAgeClick(int position);
+//        void onRemoveClick(int position);
+//    }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        private final OnContentClickListener mOnContentClickListener;
+        //private final OnContentClickListener mOnContentClickListener;
         private TextView mTvId;
         private TextView mTvName;
         private TextView mTvSex;
         private TextView mTvAge;
         private Button mBtnRemove;
 
-        public ViewHolder(View itemView, OnContentClickListener listener) {
+        public ViewHolder(View itemView) {
             super(itemView);
-            mOnContentClickListener = listener;
+            //mOnContentClickListener = listener;
             mTvId = itemView.findViewById(R.id.tv_id);
             mTvName = itemView.findViewById(R.id.tv_name);
             mTvSex = itemView.findViewById(R.id.tv_sex);
             mTvAge = itemView.findViewById(R.id.tv_age);
             mBtnRemove = itemView.findViewById(R.id.btn_remove);
-            if (listener != null) {
-                mTvName.setOnClickListener(this);
-                mTvSex.setOnClickListener(this);
-                mTvAge.setOnClickListener(this);
-                mBtnRemove.setOnClickListener(this);
-            }
+//            if (listener != null) {
+//                mTvName.setOnClickListener(this);
+//                mTvSex.setOnClickListener(this);
+//                mTvAge.setOnClickListener(this);
+//                mBtnRemove.setOnClickListener(this);
+//            }
         }
 
-        @Override
-        public void onClick(View v) {
-            if (mOnContentClickListener != null) {
-                int position = RecyclerViewBaseAdapter.getPositionByItemChildView(v);
-                switch (v.getId()) {
-                    case R.id.tv_name:
-                        mOnContentClickListener.onNameClick(position);
-                        break;
-                    case R.id.tv_sex:
-                        mOnContentClickListener.onSexClick(position);
-                        break;
-                    case R.id.tv_age:
-                        mOnContentClickListener.onAgeClick(position);
-                        break;
-                    case R.id.btn_remove:
-                        mOnContentClickListener.onRemoveClick(position);
-                        break;
-                }
-            }
-        }
+//        @Override
+//        public void onClick(View v) {
+//            if (mOnContentClickListener != null) {
+//                int position = RecyclerViewBaseAdapter.getPositionByItemChildView(v);
+//                switch (v.getId()) {
+//                    case R.id.tv_name:
+//                        mOnContentClickListener.onNameClick(position);
+//                        break;
+//                    case R.id.tv_sex:
+//                        mOnContentClickListener.onSexClick(position);
+//                        break;
+//                    case R.id.tv_age:
+//                        mOnContentClickListener.onAgeClick(position);
+//                        break;
+//                    case R.id.btn_remove:
+//                        mOnContentClickListener.onRemoveClick(position);
+//                        break;
+//                }
+//            }
+//        }
     }
 }

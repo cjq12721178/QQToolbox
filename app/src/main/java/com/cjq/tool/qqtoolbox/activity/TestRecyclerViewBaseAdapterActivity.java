@@ -5,14 +5,18 @@ import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cjq.tool.qbox.ui.adapter.AdapterDelegate;
+import com.cjq.tool.qbox.ui.adapter.HeaderAndFooterWrapper;
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
 import com.cjq.tool.qbox.ui.decoration.SpaceItemDecoration;
+import com.cjq.tool.qbox.ui.gesture.SimpleRecyclerViewItemTouchListener;
 import com.cjq.tool.qbox.util.ClosableLog;
 import com.cjq.tool.qbox.util.CodeRunTimeCatcher;
 import com.cjq.tool.qqtoolbox.R;
@@ -23,8 +27,7 @@ import java.util.List;
 
 public class TestRecyclerViewBaseAdapterActivity
         extends AppCompatActivity
-        implements RecyclerViewBaseAdapter.OnItemClickListener,
-        View.OnClickListener {
+        implements View.OnClickListener {
 
     private List<City> mCities = new ArrayList<>();
     private TestRecyclerViewBaseAdapter mAdapter;
@@ -51,11 +54,41 @@ public class TestRecyclerViewBaseAdapterActivity
         linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         rvCities.setLayoutManager(linearLayoutManager);
         rvCities.addItemDecoration(new SpaceItemDecoration(getResources().getDimensionPixelSize(R.dimen.qbox_list_item_interval_vertical), true));
+        rvCities.addOnItemTouchListener(new SimpleRecyclerViewItemTouchListener(rvCities) {
+            @Override
+            public void onItemClick(View v, int position) {
+                ClosableLog.d(DebugTag.TEST_RECYCLER_VIEW_BASE_ADAPTER,
+                        "on item click position: " + position
+                                + ", city: " + mAdapter.getItemByPosition(position).getName());
+            }
+
+            @Override
+            public void onItemLongClick(View v, int position) {
+                ClosableLog.d(DebugTag.TEST_RECYCLER_VIEW_BASE_ADAPTER,
+                        "on item long click position: " + position
+                                + ", city: " + mAdapter.getItemByPosition(position).getName());
+            }
+        }.setIsLongPressEnabled(true));
+
         generateCities();
         mAdapter = new TestRecyclerViewBaseAdapter(mCities);
         mAdapter.setUpdateSelectedState(true);
-        mAdapter.setOnItemClickListener(this);
-        rvCities.setAdapter(mAdapter);
+        //mAdapter.setOnItemClickListener(this);
+
+        HeaderAndFooterWrapper wrapper = new HeaderAndFooterWrapper(mAdapter);
+        wrapper.addHeaderView(createLabelView("header1"));
+        wrapper.addHeaderView(createLabelView("header2"));
+        wrapper.addFootView(createLabelView("footer1"));
+        wrapper.addFootView(createLabelView("footer2"));
+
+        rvCities.setAdapter(wrapper);
+    }
+
+    private View createLabelView(String label) {
+        View view = LayoutInflater.from(this).inflate(R.layout.list_item_test_recycler_view_base_adapter, null);
+        TextView tvCity = view.findViewById(R.id.tv_city);
+        tvCity.setText(label);
+        return view;
     }
 
     private void generateCities() {
@@ -97,12 +130,12 @@ public class TestRecyclerViewBaseAdapterActivity
         mCities.add(new City("吉林"));
     }
 
-    @Override
-    public void onItemClick(View item, int position) {
-        ClosableLog.d(DebugTag.TEST_RECYCLER_VIEW_BASE_ADAPTER,
-                "on item click position: " + position
-                        + ", city: " + mAdapter.getItemByPosition(position).getName());
-    }
+//    @Override
+//    public void onItemClick(View item, int position) {
+//        ClosableLog.d(DebugTag.TEST_RECYCLER_VIEW_BASE_ADAPTER,
+//                "on item click position: " + position
+//                        + ", city: " + mAdapter.getItemByPosition(position).getName());
+//    }
 
     @Override
     public void onClick(View v) {

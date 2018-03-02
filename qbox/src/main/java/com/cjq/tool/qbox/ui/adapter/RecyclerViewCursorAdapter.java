@@ -136,6 +136,9 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
                         case MOTION_REMOVE:
                             notifyItemRangeRemoved(itemMotion.getPositionStart(), itemMotion.getItemCount());
                             break;
+                        case MOTION_MOVE:
+                            notifyItemMoved(itemMotion.getPositionStart(), itemMotion.getItemCount());
+                            break;
                         case MOTION_RESET:
                             notifyDataSetChanged();
                             break;
@@ -193,6 +196,12 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
         return itemMotion.getId();
     }
 
+    public int scheduleItemMove(int fromPosition, int toPosition) {
+        ItemMotion itemMotion = new ItemMotion(fromPosition, toPosition, MOTION_MOVE);
+        mItemMotions.addLast(itemMotion);
+        return itemMotion.getId();
+    }
+
     public int scheduleItemMotion(ItemMotion motion) {
         if (motion == null) {
             return -1;
@@ -218,7 +227,7 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
 
         private static int autoincrementId = 0;
 
-        @IntDef({MOTION_RESET, MOTION_CHANGE, MOTION_INSERT, MOTION_REMOVE})
+        @IntDef({MOTION_RESET, MOTION_CHANGE, MOTION_INSERT, MOTION_REMOVE, MOTION_MOVE})
         @Retention(RetentionPolicy.SOURCE)
         @interface Motion {
         }
@@ -227,6 +236,7 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
         public static final int MOTION_CHANGE = 1;
         public static final int MOTION_INSERT = 2;
         public static final int MOTION_REMOVE = 3;
+        public static final int MOTION_MOVE = 4;
 
         private final int mId;
         private final int mPositionStart;

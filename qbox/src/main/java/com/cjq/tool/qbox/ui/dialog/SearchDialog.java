@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.LinearLayoutManager;
@@ -30,6 +31,7 @@ import com.cjq.tool.qbox.ui.adapter.AdapterDelegate;
 import com.cjq.tool.qbox.ui.adapter.AdapterDelegateManager;
 import com.cjq.tool.qbox.ui.adapter.ListAdapterDelegateManager;
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
+import com.cjq.tool.qbox.ui.gesture.SimpleRecyclerViewItemTouchListener;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -113,6 +115,10 @@ public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> impleme
             RecyclerView rvRecords = (RecyclerView) vsRecords.inflate();
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
             rvRecords.setLayoutManager(linearLayoutManager);
+            rvRecords.addOnItemTouchListener(new SearchRecordTouchListener(rvRecords)
+                    .addItemChildViewTouchEnabled(decorator.getRecordItemContentViewId())
+                    .addItemChildViewTouchEnabled(decorator.getRecordItemRemoveViewId())
+                    .addItemChildViewTouchEnabled(decorator.getClearItemViewId()));
             ListAdapterDelegateManager<String> listAdapterDelegateManager = new ListAdapterDelegateManager<>();
             listAdapterDelegateManager.addAdapterDelegate(new CommonSearchRecordAdapterDelegate());
             listAdapterDelegateManager.addAdapterDelegate(new ClearSearchRecordAdapterDelegate());
@@ -188,38 +194,17 @@ public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> impleme
         @IdRes int id = v.getId();
         if (id == decorator.getCustomSearchViewId()) {
             onSearch();
-        } else if (id == decorator.getRecordItemContentViewId()) {
-            int position = getAdapterPosition(v);
-            if (position != -1) {
-                getEditText().setText(mSearchRecordAdapter.getItemByPosition(position));
-                onSearch();
-            }
-        } else if (id == decorator.getRecordItemRemoveViewId()) {
-            int position = getAdapterPosition(v);
-            if (position != -1) {
-                String selectedSearchRecord = mSearchRecordAdapter.getItemByPosition(position);
-                mSearchRecordAdapter.removeRecord(position);
-                mSearchRecords.remove(selectedSearchRecord);
-                exportSearchRecords();
-            }
-        } else if (id == decorator.getClearItemViewId()) {
-            int position = getAdapterPosition(v);
-            if (position != -1) {
-                mSearchRecordAdapter.clearRecords();
-                mSearchRecords.clear();
-                exportSearchRecords();
-            }
         }
     }
 
-    private int getAdapterPosition(View v) {
-        ViewParent parent = v.getParent();
-        if (parent instanceof View) {
-            return RecyclerViewBaseAdapter.getPositionByItemView((View) parent);
-        } else {
-            return -1;
-        }
-    }
+//    private int getAdapterPosition(View v) {
+//        ViewParent parent = v.getParent();
+//        if (parent instanceof View) {
+//            return RecyclerViewBaseAdapter.getPositionByItemView((View) parent);
+//        } else {
+//            return -1;
+//        }
+//    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -515,8 +500,7 @@ public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> impleme
                             .inflate(decorator.getClearItemViewLayoutRes(),
                                     parent,
                                     false),
-                    decorator,
-                    SearchDialog.this);
+                    decorator);
         }
 
         @Override
@@ -535,10 +519,35 @@ public class SearchDialog extends BaseEditDialog<SearchDialog.Decorator> impleme
 
         private TextView mTvClear;
 
-        public ClearViewHolder(View itemView, Decorator decorator, View.OnClickListener listener) {
+        public ClearViewHolder(View itemView, Decorator decorator) {
             super(itemView);
             mTvClear = itemView.findViewById(decorator.getClearItemViewId());
-            mTvClear.setOnClickListener(listener);
+        }
+    }
+
+    private class SearchRecordTouchListener extends SimpleRecyclerViewItemTouchListener {
+
+        public SearchRecordTouchListener(@NonNull RecyclerView rv) {
+            super(rv);
+        }
+
+        @Override
+        public void onItemClick(View v, int position) {
+            int id = v.getId();
+            Decorator decorator = getDecorator(null);
+            if (id == decorator.getRecordItemContentViewId()) {
+                getEditText().setText(mSearchRecordAdapter.getItemByPosition(position));
+                onSearch();
+            } else if (id == decorator.getRecordItemRemoveViewId()) {
+                String selectedSearchRecord = mSearchRecordAdapter.getItemByPosition(position);
+                mSearchRecordAdapter.removeRecord(position);
+                mSearchRecords.remove(selectedSearchRecord);
+                exportSearchRecords();
+            } else if (id == decorator.getClearItemViewId()) {
+                mSearchRecordAdapter.clearRecords();
+                mSearchRecords.clear();
+                exportSearchRecords();
+            }
         }
     }
 }

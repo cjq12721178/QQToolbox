@@ -14,14 +14,13 @@ import android.widget.TextView;
 import com.cjq.tool.qbox.R;
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
 import com.cjq.tool.qbox.ui.decoration.SpaceItemDecoration;
+import com.cjq.tool.qbox.ui.gesture.SimpleRecyclerViewItemTouchListener;
 
 /**
  * Created by KAT on 2017/4/11.
  */
 
-public class ListDialog
-        extends BaseDialog<ListDialog.Decorator>
-        implements RecyclerViewBaseAdapter.OnItemClickListener {
+public class ListDialog extends BaseDialog<ListDialog.Decorator> {
 
     private static final String ARGUMENT_KEY_ITEMS = "items";
     private ItemAdapter mItemAdapter;
@@ -70,8 +69,18 @@ public class ListDialog
         }
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getActivity());
         rvItems.setLayoutManager(linearLayoutManager);
+        rvItems.addOnItemTouchListener(new SimpleRecyclerViewItemTouchListener(rvItems) {
+            @Override
+            public void onItemClick(View v, int position) {
+                OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
+                if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
+                    listener.onItemSelected(ListDialog.this, mItemAdapter.getItems()[position]);
+                }
+                dismiss();
+            }
+        });
         mItemAdapter = new ItemAdapter(getArguments().getStringArray(ARGUMENT_KEY_ITEMS));
-        mItemAdapter.setOnItemClickListener(this);
+        //mItemAdapter.setOnItemClickListener(this);
         rvItems.setAdapter(mItemAdapter);
     }
 
@@ -108,14 +117,14 @@ public class ListDialog
 //        super.show(manager, tag, titleRes);
 //    }
 
-    @Override
-    public void onItemClick(View item, int position) {
-        OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
-        if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
-            listener.onItemSelected(this, mItemAdapter.getItems()[position]);
-        }
-        dismiss();
-    }
+//    @Override
+//    public void onItemClick(View item, int position) {
+//        OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
+//        if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
+//            listener.onItemSelected(this, mItemAdapter.getItems()[position]);
+//        }
+//        dismiss();
+//    }
 
     private static class ItemAdapter extends RecyclerViewBaseAdapter<String> {
 
