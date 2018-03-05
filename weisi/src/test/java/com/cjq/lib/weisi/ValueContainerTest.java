@@ -34,14 +34,15 @@ public class ValueContainerTest {
     public void addDynamicValue_outOfMaxValueSize_isLoopStored() {
         int maxValueSize = 20;
         ValueContainerImpl valueContainer = new ValueContainerImpl(maxValueSize);
-        for (int i = 0;i < 30;++i) {
+        for (int i = 0, position;i < 30;++i) {
             if (i >= maxValueSize) {
                 for (int j = 0, k = i - maxValueSize;j < maxValueSize;++j, ++k) {
                     assertEquals(k, valueContainer.getDynamicValue(j).getTimestamp());
                     assertEquals(k, valueContainer.getDynamicValue(j).getBatteryVoltage(), 0.01);
                 }
             }
-            valueContainer.addDynamicValue(i, i);
+            position = valueContainer.addDynamicValue(i, i);
+            System.out.println("i = " + i + ", position = " + position + ", result = " + valueContainer.interpretAddResult(position, true));
         }
     }
 
@@ -49,8 +50,9 @@ public class ValueContainerTest {
     public void addDynamicValue_descAdd_isLoopStored() {
         int maxValueSize = 20;
         ValueContainerImpl valueContainer = new ValueContainerImpl(maxValueSize);
-        for (int sum = 50, i = sum;i > 0;--i) {
-            valueContainer.addDynamicValue(i, i);
+        for (int sum = 50, i = sum, position;i > 0;--i) {
+            position = valueContainer.addDynamicValue(i, i);
+            System.out.println("i = " + i + ", position = " + position + ", result = " + valueContainer.interpretAddResult(position, true));
             for (int j = 0, n = valueContainer.getDynamicValueSize(), k = sum - n + 1;j < n;++j, ++k) {
                 assertEquals(k, valueContainer.getDynamicValue(j).getTimestamp());
                 assertEquals(k, valueContainer.getDynamicValue(j).getBatteryVoltage(), 0.01);

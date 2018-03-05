@@ -328,7 +328,7 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
         //获取相应测量量
         Measurement measurement = getMeasurementByDataTypeValueWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement == null) {
-            return MAX_DYNAMIC_VALUE_SIZE;
+            return Integer.MIN_VALUE;
         }
         //解析原始数据
         long correctedTimestamp = correctTimestamp(timestamp);

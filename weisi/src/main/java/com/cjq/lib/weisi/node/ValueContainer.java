@@ -344,29 +344,40 @@ public abstract class ValueContainer<V extends ValueContainer.Value, C extends V
                         return -(i - mDynamicValueHead) - 1;
                     }
                 }
-                return MAX_DYNAMIC_VALUE_SIZE;
+                return Integer.MIN_VALUE;
             }
         }
     }
 
     private void increaseDynamicValueHead() {
+        ++mDynamicValueSum;
         if (++mDynamicValueHead == MAX_DYNAMIC_VALUE_SIZE) {
             mDynamicValueHead = 0;
         }
     }
 
     public int interpretAddResult(int addMethodReturnValue, boolean isRealTime) {
+        if (addMethodReturnValue == Integer.MIN_VALUE) {
+            return ADD_VALUE_FAILED;
+        }
         if (addMethodReturnValue < 0) {
             return VALUE_UPDATED;
-        } else if (isRealTime
-                && addMethodReturnValue == MAX_DYNAMIC_VALUE_SIZE) {
-            return ADD_VALUE_FAILED;
-        } else if (isRealTime
-                && mDynamicValueSum > MAX_DYNAMIC_VALUE_SIZE) {
-            return LOOP_VALUE_ADDED;
-        } else {
-            return NEW_VALUE_ADDED;
         }
+        if (isRealTime && mDynamicValueSum > MAX_DYNAMIC_VALUE_SIZE) {
+            return LOOP_VALUE_ADDED;
+        }
+        return NEW_VALUE_ADDED;
+//        if (addMethodReturnValue < 0) {
+//            return VALUE_UPDATED;
+//        } else if (isRealTime
+//                && addMethodReturnValue == MAX_DYNAMIC_VALUE_SIZE) {
+//            return ADD_VALUE_FAILED;
+//        } else if (isRealTime
+//                && mDynamicValueSum > MAX_DYNAMIC_VALUE_SIZE) {
+//            return LOOP_VALUE_ADDED;
+//        } else {
+//            return NEW_VALUE_ADDED;
+//        }
     }
 
     public V findDynamicValue(int possiblePosition, long timestamp) {

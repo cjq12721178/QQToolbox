@@ -370,3 +370,9 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20180213-4.3.1(96):
 1. 修改Decorator接口方法名称，getCustomName()->decorateName(String name)，getCustomValue(V value, int para)->decorateValue(v value,int para)
+
+20180305-4.3.2(97):
+1. 修复ValueContainer方法addDynamicValue返回循环数据时返回值错误的问题
+2. 修改ValueContainer方法addDynamicValue添加错误时的返回值
+3. 修改ValueContainer方法interpretAddResult以适应以上两项修改
+
