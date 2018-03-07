@@ -15,4 +15,5 @@
     <dimen name="qbox_dialog_filter_label_text_size">16sp</dimen>
     <dimen name="qbox_dialog_search_remove_size">24dp</dimen>
     <dimen name="qbox_dialog_search_record_text_size">16sp</dimen>
+    <dimen name="qbox_dialog_list_item_text_size">16sp</dimen>
 </resources>

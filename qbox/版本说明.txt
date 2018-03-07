@@ -244,3 +244,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 1. 改变RecyclerView的点击事件实现方式，将RecyclerViewBaseAdapter中的接口OnItemClickListener和OnItemLongClickListener及其相关实现移除
 2. 新增gesture包，新增SimpleRecyclerViewItemTouchListener用于代替之前在RecyclerViewBaseAdapter中实现的功能，同时增加对Item子view的点击支持
 3. 新增装饰类adapter：HeaderAndFooterWrapper，用于在不影响原有功能的情况下为RecyclerView.Adapter提供提供header和footer服务
+
+20180307-1.5.1(69):
+1. 调整ListDialog的item文字大小，并增加一组decorator属性以供设置

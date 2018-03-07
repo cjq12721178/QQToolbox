@@ -6,6 +6,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -55,13 +56,24 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         final public void setItemVerticalInterval(@DimenRes int intervalRes) {
             mParameters.putInt("dp_item_view_vertical_interval", intervalRes);
         }
+
+        final public @DimenRes int getItemTextSizeDimenRes() {
+            return mParameters.getInt("dp_item_text_size", getDefaultItemTextSizeDimenRes());
+        }
+
+        public @DimenRes int getDefaultItemTextSizeDimenRes() {
+            return R.dimen.qbox_dialog_list_item_text_size;
+        }
+
+        final public void setItemTextSizeDimenRes(@DimenRes int dimenRes) {
+            mParameters.putInt("dp_item_text_size", dimenRes);
+        }
     }
 
     @Override
     protected void onSetContentView(View contentView, Decorator decorator, @Nullable Bundle savedInstanceState) {
-        setCancelable(false);
-        //setExitType(EXIT_TYPE_NULL);
-        RecyclerView rvItems = (RecyclerView) contentView.findViewById(decorator.getListId());
+        //setCancelable(false);
+        RecyclerView rvItems = contentView.findViewById(decorator.getListId());
         int itemIntervalDimenRes = decorator.getItemVerticalIntervalDimenRes();
         if (itemIntervalDimenRes != 0) {
             rvItems.addItemDecoration(new SpaceItemDecoration(getResources().
@@ -79,7 +91,8 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
                 dismiss();
             }
         });
-        mItemAdapter = new ItemAdapter(getArguments().getStringArray(ARGUMENT_KEY_ITEMS));
+        mItemAdapter = new ItemAdapter(getArguments().getStringArray(ARGUMENT_KEY_ITEMS),
+                getResources().getDimensionPixelSize(decorator.getItemTextSizeDimenRes()));
         //mItemAdapter.setOnItemClickListener(this);
         rvItems.setAdapter(mItemAdapter);
     }
@@ -97,42 +110,15 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         getArguments().putStringArray(ARGUMENT_KEY_ITEMS, items);
     }
 
-//    public int show(FragmentTransaction transaction, String tag, String title, String[] items) {
-//        setItems(items);
-//        return super.show(transaction, tag, title);
-//    }
-//
-//    public void show(FragmentManager manager, String tag, String title, String[] items) {
-//        setItems(items);
-//        super.show(manager, tag, title);
-//    }
-//
-//    public int show(FragmentTransaction transaction, String tag, @StringRes int titleRes, String[] items) {
-//        setItems(items);
-//        return super.show(transaction, tag, titleRes);
-//    }
-//
-//    public void show(FragmentManager manager, String tag, @StringRes int titleRes, String[] items) {
-//        setItems(items);
-//        super.show(manager, tag, titleRes);
-//    }
-
-//    @Override
-//    public void onItemClick(View item, int position) {
-//        OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
-//        if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
-//            listener.onItemSelected(this, mItemAdapter.getItems()[position]);
-//        }
-//        dismiss();
-//    }
-
     private static class ItemAdapter extends RecyclerViewBaseAdapter<String> {
 
         private String[] mItems;
+        private final float mItemTextSize;
 
-        public ItemAdapter(String[] items) {
+        public ItemAdapter(String[] items, float itemTextSize) {
             //super();
             mItems = items;
+            mItemTextSize = itemTextSize;
         }
 
         @Override
@@ -160,7 +146,8 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
                     .from(parent.getContext())
                     .inflate(R.layout.qbox_list_dialog_item,
                             parent,
-                            false));
+                            false),
+                    mItemTextSize);
         }
 
         @Override
@@ -174,9 +161,10 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
 
         private TextView mTvItem;
 
-        public ViewHolder(View itemView) {
+        public ViewHolder(View itemView, float textSize) {
             super(itemView);
             mTvItem = (TextView)itemView.findViewById(R.id.tv_item);
+            mTvItem.setTextSize(TypedValue.COMPLEX_UNIT_PX, textSize);
         }
     }
 
