@@ -86,7 +86,7 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
             public void onItemClick(View v, int position) {
                 OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
                 if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
-                    listener.onItemSelected(ListDialog.this, mItemAdapter.getItems()[position]);
+                    listener.onItemSelected(ListDialog.this, position);
                 }
                 dismiss();
             }
@@ -169,6 +169,6 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
     }
 
     public interface OnItemSelectedListener {
-        void onItemSelected(ListDialog dialog, String item);
+        void onItemSelected(ListDialog dialog, int position);
     }
 }

@@ -180,10 +180,10 @@ public class TestSimpleCursorLoaderActivity
     }
 
     @Override
-    public void onItemSelected(ListDialog dialog, String item) {
+    public void onItemSelected(ListDialog dialog, int position) {
         try {
             ContentValues values = new ContentValues();
-            values.put("sex", item.equals("男") ? 0 : 1);
+            values.put("sex", position);
             mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(dialog.getArguments().getInt("position"))) });
             notifyLoader();
         } catch (Exception e) {

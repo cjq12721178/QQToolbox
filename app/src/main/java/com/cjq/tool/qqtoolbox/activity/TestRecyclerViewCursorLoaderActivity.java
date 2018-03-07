@@ -34,7 +34,8 @@ public class TestRecyclerViewCursorLoaderActivity
         /* MyRecyclerViewCursorAdapter.OnContentClickListener, */
         LoaderManager.LoaderCallbacks<Cursor>,
         EditDialog.OnContentReceiver,
-        ListDialog.OnItemSelectedListener, SimpleSQLiteAsyncEventHandler.OnMissionCompleteListener {
+        ListDialog.OnItemSelectedListener,
+        SimpleSQLiteAsyncEventHandler.OnMissionCompleteListener {
 
     private static final int TOKEN_MODIFY_NAME = 1;
     private static final int TOKEN_MODIFY_SEX = 2;
@@ -306,11 +307,11 @@ public class TestRecyclerViewCursorLoaderActivity
     }
 
     @Override
-    public void onItemSelected(ListDialog dialog, String item) {
+    public void onItemSelected(ListDialog dialog, int position) {
         try {
-            int position = dialog.getArguments().getInt("position");
+            int pos = dialog.getArguments().getInt("position");
             ContentValues values = new ContentValues();
-            values.put("sex", item.equals("男") ? 0 : 1);
+            values.put("sex", position);
 
             //同步
             //mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(dialog.getArguments().getInt("position"))) });
@@ -319,10 +320,10 @@ public class TestRecyclerViewCursorLoaderActivity
 
             //异步
             mAsyncEventHandler.startUpdate(TOKEN_MODIFY_SEX,
-                    new RecyclerViewCursorAdapter.ItemMotion(position, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_CHANGE),
+                    new RecyclerViewCursorAdapter.ItemMotion(pos, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_CHANGE),
                     "student", values,
                     "_id = ?",
-                    new String[] { String.valueOf(mAdapter.getItemId(position)) },
+                    new String[] { String.valueOf(mAdapter.getItemId(pos)) },
                     SQLiteDatabase.CONFLICT_NONE);
         } catch (Exception e) {
             ExceptionLog.display(e);
