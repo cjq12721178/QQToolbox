@@ -54,6 +54,7 @@ public class SyncDataReceiver extends DataReceiver {
     public static void shutdown() {
         if (stopReadExecutor != null) {
             stopReadExecutor.shutdown();
+            stopReadExecutor = null;
         }
     }
 }

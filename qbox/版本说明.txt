@@ -247,3 +247,4 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20180307-1.5.1(69):
 1. 调整ListDialog的item文字大小，并增加一组decorator属性以供设置
+2. 修改ListDialog的OnItemSelectedListener接口，将item改为position

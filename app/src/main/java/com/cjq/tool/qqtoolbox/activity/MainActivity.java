@@ -82,6 +82,8 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
+
 //        if (savedInstanceState != null) {
 //            mFilterDialog = (FilterDialog) getSupportFragmentManager().findFragmentByTag("test_filter_dialog");
 //        }
@@ -363,6 +365,12 @@ public class MainActivity
                 break;
             case R.id.btn_open_test_recycler_view_cursor_loader_activity:
                 startActivity(new Intent(this, TestRecyclerViewCursorLoaderActivity.class));
+                break;
+            case R.id.btn_open_tcp_activity:
+                startActivity(new Intent(this, TcpDebugActivity.class));
+                break;
+            case R.id.btn_open_tcp_activity2:
+                startActivity(new Intent(this, TcpDebugActivity2.class));
                 break;
         }
     }

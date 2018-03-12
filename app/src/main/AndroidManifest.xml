@@ -43,6 +43,10 @@
         </activity>
         <activity android:name=".activity.TestRecyclerViewCursorLoaderActivity">
         </activity>
+        <activity android:name=".activity.TcpDebugActivity">
+        </activity>
+        <activity android:name=".activity.TcpDebugActivity2">
+        </activity>
     </application>
 
 </manifest>

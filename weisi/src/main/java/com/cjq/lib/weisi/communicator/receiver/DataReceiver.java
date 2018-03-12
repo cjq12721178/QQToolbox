@@ -42,15 +42,19 @@ public class DataReceiver {
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    int receivedLen = 0;
+                    int receivedLen;
                     int handledLen;
+                    int bufferLen = 0;
                     byte[] data = new byte[bufferSize];
                     while (isListening() && mCommunicator.canRead()) {
                         try {
-                            receivedLen += mCommunicator.read(data, receivedLen, data.length - receivedLen);
+                            receivedLen = mCommunicator.read(data, bufferLen, data.length - bufferLen);
                             if (receivedLen > 0) {
-                                handledLen = mListener.onDataReceived(data, receivedLen);
-                                receivedLen = saveUnhandledData(data, receivedLen, handledLen);
+                                bufferLen += receivedLen;
+                                handledLen = mListener.onDataReceived(data, bufferLen);
+                                bufferLen = saveUnhandledData(data, bufferLen, handledLen);
+                            } else if (receivedLen == -1) {
+                                throw new ReceiveException("recv len = 1");
                             }
                         } catch (IOException ioe) {
                             if (mListener.onErrorOccurred(ioe)) {
