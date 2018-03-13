@@ -376,3 +376,9 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 2. 修改ValueContainer方法addDynamicValue添加错误时的返回值
 3. 修改ValueContainer方法interpretAddResult以适应以上两项修改
 
+20180312-4.4.0(98):
+1. 新增tcp包，包括TcpSocket、TcpServer和TcpClient3个类，用于提供tcp连接服务
+2. 修复DataReceiver当读取数据发生错误时，缓冲容量计算错误的问题
+
+20180313-4.4.1(99):
+1. 将TcpSocket实现自接口Communicator的方法read改为异步，同时空实现stopRead方法

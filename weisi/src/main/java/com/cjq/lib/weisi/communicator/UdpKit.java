@@ -12,17 +12,11 @@ import java.net.UnknownHostException;
 public class UdpKit implements Communicator {
 
     private static final int MAX_BUFFER_LEN = 255;
-    private static final int MIN_SEND_DATA_TIME_INTERVAL = 10;
 
     private boolean mLaunched;
-    //private boolean mListening;
     private DatagramPacket mReceivePacket;
     private DatagramPacket mSendPacket;
     private DatagramSocket mSocket;
-    //private OnCommunicatorErrorOccurredListener mErrorOccurredListener;
-    //private Thread mSendThread;
-    //private OnSendThreadExecutor mOnSendThreadExecutor;
-    //private OnReceiveThreadExecutor mOnReceiveThreadExecutor;
 
     public boolean launch() {
         return launch(0);
@@ -45,16 +39,6 @@ public class UdpKit implements Communicator {
         }
         return mLaunched;
     }
-
-//    private void onErrorProcess(Exception e) {
-//        if (mErrorOccurredListener != null) {
-//            mErrorOccurredListener.onErrorOccurred(e);
-//        }
-//    }
-//
-//    public void setErrorOccurredListener(OnCommunicatorErrorOccurredListener listener) {
-//        mErrorOccurredListener = listener;
-//    }
 
     public void send(String targetIp, int targetPort, byte[] data) throws IOException {
         send(InetAddress.getByName(targetIp), targetPort, data);
@@ -97,31 +81,6 @@ public class UdpKit implements Communicator {
     public void setSendData(byte[] data) {
         mSendPacket.setData(data);
     }
-//    //以circulateTime为时间间隔循环发送数据
-//    public void send(String targetIp, int targetPort, byte[] data, int circulateTime) {
-//        if (!mLaunched
-//                || targetIp == null
-//                || data == null
-//                || circulateTime <= MIN_SEND_DATA_TIME_INTERVAL) {
-//            return;
-//        }
-//        if (mOnSendThreadExecutor == null) {
-//            mOnSendThreadExecutor = new OnSendThreadExecutor();
-//        }
-//        try {
-//            mOnSendThreadExecutor
-//                    .setTargetIp(targetIp)
-//                    .setTargetPort(targetPort)
-//                    .setSendData(data)
-//                    .setCirculateTime(circulateTime);
-//            if (mSendThread == null || !mSendThread.isAlive()) {
-//                mSendThread = new Thread(mOnSendThreadExecutor);
-//                mSendThread.start();
-//            }
-//        } catch (Exception e) {
-//            onErrorProcess(e);
-//        }
-//    }
 
     public int receive(byte[] dst) throws IOException {
         return receive(dst, 0, dst.length);
@@ -150,97 +109,6 @@ public class UdpKit implements Communicator {
         }
     }
 
-//    private class OnSendThreadExecutor implements Runnable {
-//
-//        private long mCirculateTime;
-//        private InetAddress mTargetAddress;
-//        private int mTargetPort;
-//        private byte[] mSendData;
-//
-//        public OnSendThreadExecutor setCirculateTime(long circulateTime) {
-//            mCirculateTime = circulateTime;
-//            return this;
-//        }
-//
-//        public OnSendThreadExecutor setTargetIp(InetAddress targetAddress) {
-//            mTargetAddress = targetAddress;
-//            return this;
-//        }
-//
-//        public OnSendThreadExecutor setTargetIp(String targetAddress)
-//                throws UnknownHostException {
-//            mTargetAddress = InetAddress.getByName(targetAddress);
-//            return this;
-//        }
-//
-//        public OnSendThreadExecutor setTargetPort(int targetPort) {
-//            mTargetPort = targetPort;
-//            return this;
-//        }
-//
-//        public OnSendThreadExecutor setSendData(byte[] send) {
-//            mSendData = send;
-//            return this;
-//        }
-//
-//        @Override
-//        public void run() {
-//            while (mLaunched) {
-//                try {
-//                    send(mTargetAddress, mTargetPort, mSendData);
-//                    Thread.sleep(mCirculateTime);
-//                } catch (Exception e) {
-//                    onErrorProcess(e);
-//                }
-//            }
-//        }
-//    }
-
-//    public void startListen(boolean isAsynchronous, OnDataReceivedListener listener) {
-//        if (mLaunched && !mListening && listener != null) {
-//            if (mOnReceiveThreadExecutor == null) {
-//                mOnReceiveThreadExecutor = new OnReceiveThreadExecutor();
-//            }
-//            mOnReceiveThreadExecutor.setOnDataReceivedListener(listener);
-//            if (isAsynchronous) {
-//                Thread receiveDataThread = new Thread(mOnReceiveThreadExecutor);
-//                receiveDataThread.start();
-//            } else {
-//                mOnReceiveThreadExecutor.run();
-//            }
-//        }
-//    }
-
-//    private class OnReceiveThreadExecutor implements Runnable {
-//
-//        private OnDataReceivedListener mOnDataReceivedListener;
-//
-//        public void setOnDataReceivedListener(OnDataReceivedListener listener) {
-//            mOnDataReceivedListener = listener;
-//        }
-//
-//        @Override
-//        public void run() {
-//            mListening = true;
-//            byte[] receiveData;
-//            while (mListening) {
-//                try {
-//                    mSocket.receive(mReceivePacket);
-//                    receiveData = mReceivePacket.getData();
-//                    if (receiveData != null) {
-//                        mOnDataReceivedListener.onDataReceived(receiveData);
-//                    }
-//                } catch (Exception e) {
-//                    onErrorProcess(e);
-//                }
-//            }
-//        }
-//    }
-//
-//    public interface OnDataReceivedListener {
-//        void onDataReceived(byte[] data);
-//    }
-
     public void close() {
         mLaunched = false;
         if (mSocket != null) {
@@ -249,26 +117,5 @@ public class UdpKit implements Communicator {
         }
         mSendPacket = null;
         mReceivePacket = null;
-//        try {
-//            stopListen();
-//            mLaunched = false;
-//            if (mOnSendThreadExecutor != null) {
-//                mOnSendThreadExecutor = null;
-//            }
-//            if (mSocket != null) {
-//                mSocket.close();
-//            }
-//            setErrorOccurredListener(null);
-//        } catch (Exception e) {
-//            onErrorProcess(e);
-//        }
     }
-
-//    public void stopListen() {
-//        mListening = false;
-//        if (mOnReceiveThreadExecutor != null) {
-//            mOnReceiveThreadExecutor.mOnDataReceivedListener = null;
-//            mOnReceiveThreadExecutor = null;
-//        }
-//    }
 }

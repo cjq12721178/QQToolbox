@@ -33,9 +33,16 @@ public class TcpSocket implements Communicator {
         mWriter.write(src, offset, length);
     }
 
+    public int receive(byte[] dst, int offset, int length) throws IOException {
+        return mReader.read(dst, offset, length);
+    }
+
     @Override
     public int read(byte[] dst, int offset, int length) throws IOException {
-        return mReader.read(dst, offset, length);
+        int expectLen = mReader.available();
+        return expectLen > 0
+                ? receive(dst, offset, length)
+                : expectLen;
     }
 
     @Override
@@ -45,7 +52,6 @@ public class TcpSocket implements Communicator {
 
     @Override
     public void stopRead() throws IOException {
-        close();
     }
 
     public void close() throws IOException {
