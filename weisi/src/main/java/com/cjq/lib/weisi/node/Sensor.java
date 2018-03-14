@@ -338,8 +338,10 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
         setRealTimeValue(correctedTimestamp, batteryVoltage);
         //将传感器实时数据添加至实时数据缓存
         int result = setDynamicValueContent(addDynamicValue(correctedTimestamp), batteryVoltage);
+        //修正原始数据
+        double correctedValue = measurement.correctRawValue(rawValue);
         //为测量量添加动态数据（包括实时数据及其缓存）
-        measurement.addDynamicValue(mRawAddress, correctedTimestamp, rawValue);
+        measurement.addDynamicValue(mRawAddress, correctedTimestamp, correctedValue);
         //传感器及其测量量实时数据捕获
         if (canValueCaptured) {
             onDynamicValueCaptureListener.onDynamicValueCapture(
@@ -347,7 +349,7 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
                     dataTypeValue, dataTypeValueIndex,
                     correctedTimestamp,
                     batteryVoltage,
-                    rawValue);
+                    correctedValue);
         }
         return result;
     }
@@ -821,6 +823,12 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
     //        return mDataType.mValue;
     //    }
 
+        private double correctRawValue(double value) {
+            return mDataType.mCorrector != null
+                    ? mDataType.mCorrector.correct(value)
+                    : value;
+        }
+
         /**
          * Created by CJQ on 2017/6/16.
          */
@@ -849,6 +857,7 @@ public class Sensor extends ValueContainer<Sensor.Value, Sensor.Configuration> {
             String mName;
             String mUnit = "";
             ValueInterpreter mInterpreter = DefaultInterpreter.getInstance();
+            ValueCorrector mCorrector;
 
             public DataType(byte value) {
                 mValue = value;

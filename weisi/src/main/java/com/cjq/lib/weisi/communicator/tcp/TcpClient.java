@@ -50,6 +50,7 @@ public class TcpClient {
         if (mSocket != null) {
             try {
                 mSocket.close();
+                mSocket = null;
             } catch (IOException e) {
                 e.printStackTrace();
             }

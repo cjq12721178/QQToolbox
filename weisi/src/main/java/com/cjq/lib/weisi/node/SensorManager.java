@@ -239,6 +239,8 @@ public class SensorManager {
         private int mValueType = -1;
         private boolean mSigned;
         private double mCoefficient;
+        private ScriptValueCorrector.Builder mScriptValueCorrectorBuilder;
+        private String mLabel;
 
         public Map<Byte, Sensor.Measurement.DataType> getDataTypeMap() {
             return mDataTypeMap;
@@ -254,6 +256,7 @@ public class SensorManager {
             mDataTypeMap = new HashMap<>();
             mTypes = new ArrayList<>();
             mMeasureParameters = new ArrayList<>();
+            mScriptValueCorrectorBuilder = new ScriptValueCorrector.Builder();
         }
 
         @Override
@@ -389,6 +392,15 @@ public class SensorManager {
                             return c1.mStartAddress - c2.mStartAddress;
                         }
                     });
+                    break;
+                case "label":
+                    mLabel = mBuilder.toString();
+                    break;
+                case "function":
+                    mScriptValueCorrectorBuilder.putScript(mLabel, mBuilder.toString());
+                    break;
+                case "ScriptValueCorrectorLabel":
+                    mDataType.mCorrector = mScriptValueCorrectorBuilder.getCorrector(mBuilder.toString());
                     break;
                 default:
                     break;
