@@ -1,6 +1,5 @@
 package com.cjq.tool.qqtoolbox.activity;
 
-import android.content.AsyncQueryHandler;
 import android.content.Intent;
 import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
@@ -19,8 +18,8 @@ import android.widget.Toast;
 
 import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.SerialPortKit;
-import com.cjq.lib.weisi.node.Sensor;
-import com.cjq.lib.weisi.node.ValueContainer;
+import com.cjq.lib.weisi.iot.LogicalSensor;
+import com.cjq.lib.weisi.iot.Warner;
 import com.cjq.lib.weisi.protocol.UdpSensorProtocol;
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
 import com.cjq.tool.qbox.ui.dialog.ConfirmDialog;
@@ -552,14 +551,14 @@ public class MainActivity
         WarnerImpl warner = new WarnerImpl();
     }
 
-    private static class Value extends ValueContainer.Value {
+    private static class Value extends com.cjq.lib.weisi.iot.Value {
 
         public Value(long timestamp) {
             super(timestamp);
         }
     }
 
-    private static class WarnerImpl implements ValueContainer.Warner<Value> {
+    private static class WarnerImpl implements Warner<Value> {
 
         @Override
         public int test(Value value) {
@@ -567,10 +566,10 @@ public class MainActivity
         }
     }
 
-    private static class SingleValueDomainWarnerImpl implements Sensor.Measurement.SingleRangeWarner {
+    private static class SingleValueDomainWarnerImpl implements LogicalSensor.SingleRangeWarner {
 
         @Override
-        public int test(Sensor.Measurement.Value value) {
+        public int test(LogicalSensor.Value value) {
             return RESULT_ABOVE_HIGH_LIMIT;
         }
     }

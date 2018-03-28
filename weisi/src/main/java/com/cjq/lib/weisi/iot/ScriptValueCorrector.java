@@ -1,4 +1,4 @@
-package com.cjq.lib.weisi.node;
+package com.cjq.lib.weisi.iot;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;

@@ -24,6 +24,10 @@ public class UdpSensorProtocol extends ControllableSensorProtocol<EsbAnalyzer> {
         super(new EsbAnalyzer());
     }
 
+    public UdpSensorProtocol(EsbAnalyzer analyzer) {
+        super(analyzer);
+    }
+
     @Override
     public byte getDataRequestCommandCode() {
         return COMMAND_CODE_REQUEST_DATA;

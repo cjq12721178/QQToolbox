@@ -382,3 +382,15 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20180313-4.4.1(99):
 1. 将TcpSocket实现自接口Communicator的方法read改为异步，同时空实现stopRead方法
+
+20180314-4.5.0(100):
+1. 新增接口ValueCorrector用于传感器测量量原始数据校正
+2. 新增ValueCorrector实现类ScriptValueCorrector，并相应修改SensorManager中功能ConfigurationImporter，以实现在配置文件中任意编写数据校正公式，程序中动态执行
+
+20180323-4.5.1(101):
+1. 新增GuomiEsbAnalyzer，用于解决国密项目在解析电压时与通用ESB解析方式存在差异的问题
+
+20180323-5.0.0(102):
+1. 重构node包，首先改名为iot（internet of thing），其次抽象出Sensor，将之前的Sensor改为PhysicalSensor，Measurement改为LogicalSensor
+2. Sensor不再继承自ValueContainer，将后者独立抽出，并创建DynamicValueContainer和HistoryValueContainer
+3. 新增SubValueContainer，用于作为原container的一个视图，与sublist的区别是其允许addValue

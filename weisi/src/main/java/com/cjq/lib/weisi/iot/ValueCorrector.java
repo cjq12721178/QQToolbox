@@ -1,4 +1,4 @@
-package com.cjq.lib.weisi.node;
+package com.cjq.lib.weisi.iot;
 
 /**
  * Created by CJQ on 2018/3/14.
