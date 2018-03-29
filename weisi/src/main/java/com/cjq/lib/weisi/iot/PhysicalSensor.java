@@ -23,7 +23,6 @@ public class PhysicalSensor extends Sensor<PhysicalSensor.Value, PhysicalSensor.
     private final Type mType;
     private final List<LogicalSensor> mMeasurementKinds;
     private List<LogicalSensor> mMeasurementCollections;
-    private long mNetInTimestamp;
 
     PhysicalSensor(int address) {
         this(new ID(address));
@@ -67,14 +66,6 @@ public class PhysicalSensor extends Sensor<PhysicalSensor.Value, PhysicalSensor.
             throw new IllegalArgumentException(String.format("this id(%016X) is not an id for physical sensor", id.getId()));
         }
         return id;
-    }
-
-    public long getNetInTimestamp() {
-        return mNetInTimestamp;
-    }
-
-    public void setNetInTimestamp(long netInTimestamp) {
-        mNetInTimestamp = netInTimestamp;
     }
 
     private void generateMeasurementCollections() {
@@ -259,6 +250,18 @@ public class PhysicalSensor extends Sensor<PhysicalSensor.Value, PhysicalSensor.
         measurement.addLogicalDynamicValue(correctedTimestamp, correctedValue);
         notifyDynamicValueCaptured(dataTypeValue, dataTypeValueIndex, batteryVoltage, correctedTimestamp, correctedValue);
         return result;
+    }
+
+    //对于接收到的动态数据，若其时间差在1秒以内，视其为相同时间戳
+    long correctTimestamp(long currentDynamicValueTimestamp) {
+        Value v = getRealTimeValue();
+        if (v == null) {
+            return currentDynamicValueTimestamp;
+        }
+        long delta = currentDynamicValueTimestamp - v.mTimestamp;
+        return delta > 0 && delta < 1000
+                ? v.mTimestamp
+                : currentDynamicValueTimestamp;
     }
 
     int addPhysicalDynamicValue(long timestamp, float batteryVoltage) {

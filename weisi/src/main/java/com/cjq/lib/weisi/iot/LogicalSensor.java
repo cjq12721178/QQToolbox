@@ -62,14 +62,16 @@ public class LogicalSensor extends Sensor<LogicalSensor.Value, LogicalSensor.Con
 
     @Override
     public int addDynamicValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, float batteryVoltage, double rawValue) {
+        //获取所属物理传感器
+        PhysicalSensor sensor = getPhysicalSensor();
         //修正时间戳
-        long correctedTimestamp = correctTimestamp(timestamp);
+        long correctedTimestamp = sensor.correctTimestamp(timestamp);
         //修正原始数据
         double correctedValue = correctRawValue(rawValue);
         //将逻辑传感器实时数据添加至实时数据缓存
         int result = addLogicalDynamicValue(correctedTimestamp, correctedValue);
         //为物理传感器添加动态数据
-        getPhysicalSensor().addPhysicalDynamicValue(timestamp, batteryVoltage);
+        sensor.addPhysicalDynamicValue(timestamp, batteryVoltage);
         notifyDynamicValueCaptured(dataTypeValue, dataTypeValueIndex, batteryVoltage, correctedTimestamp, correctedValue);
         return result;
     }

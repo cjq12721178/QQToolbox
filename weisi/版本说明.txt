@@ -394,3 +394,7 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. 重构node包，首先改名为iot（internet of thing），其次抽象出Sensor，将之前的Sensor改为PhysicalSensor，Measurement改为LogicalSensor
 2. Sensor不再继承自ValueContainer，将后者独立抽出，并创建DynamicValueContainer和HistoryValueContainer
 3. 新增SubValueContainer，用于作为原container的一个视图，与sublist的区别是其允许addValue
+
+20180329-5.0.1(103):
+1. 修复逻辑传感器添加动态数据时时间戳错位的问题
+2. 将mNetInTimestamp成员从PhysicalSensor类提升至Sensor类

@@ -15,6 +15,7 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
     private C mConfiguration;
     private ValueContainer<V> mDynamicValueContainer;
     private ValueContainer<V> mHistoryValueContainer;
+    private long mNetInTimestamp;
 
     protected Sensor(int address, byte dataTypeValue, int dataTypeValueIndex) {
         this(new ID(address, dataTypeValue, dataTypeValueIndex));
@@ -34,6 +35,14 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
 
     public ID getId() {
         return mId;
+    }
+
+    public long getNetInTimestamp() {
+        return mNetInTimestamp;
+    }
+
+    public void setNetInTimestamp(long netInTimestamp) {
+        mNetInTimestamp = netInTimestamp;
     }
 
     protected abstract @NonNull ValueContainer<V> onCreateDynamicValueContainer();
@@ -125,18 +134,6 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
             C configuration = provider.getSensorConfiguration(mId);
             setConfiguration(configuration);
         }
-    }
-
-    //对于接收到的动态数据，若其时间差在1秒以内，视其为相同时间戳
-    protected long correctTimestamp(long currentDynamicValueTimestamp) {
-        V v = getRealTimeValue();
-        if (v == null) {
-            return currentDynamicValueTimestamp;
-        }
-        long delta = currentDynamicValueTimestamp - v.mTimestamp;
-        return delta > 0 && delta < 1000
-                ? v.mTimestamp
-                : currentDynamicValueTimestamp;
     }
 
     protected void notifyDynamicValueCaptured(byte dataTypeValue, int dataTypeValueIndex, float batteryVoltage, long correctedTimestamp, double correctedValue) {
