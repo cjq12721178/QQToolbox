@@ -96,7 +96,7 @@ public class UsbDebugActivity
                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
                     openDeviceAndSetParameter(device);
                 } else {
-                    SimpleCustomizeToast.show(context, "用户不允许访问USB设备！");
+                    SimpleCustomizeToast.show("用户不允许访问USB设备！");
                 }
             }
         }
@@ -172,7 +172,7 @@ public class UsbDebugActivity
                     mSpnParity.getSelectedItemPosition());
             startListen();
         } catch (Exception e) {
-            SimpleCustomizeToast.show(this, e.getMessage());
+            SimpleCustomizeToast.show(e.getMessage());
         }
     }
 
@@ -241,7 +241,7 @@ public class UsbDebugActivity
                 mUsbSerialPort = null;
                 mUsbSerialDriver = null;
             } catch (IOException e) {
-                SimpleCustomizeToast.show(this, "usb serial port close failed");
+                SimpleCustomizeToast.show("usb serial port close failed");
             } finally {
                 stopListen();
             }
@@ -268,7 +268,7 @@ public class UsbDebugActivity
                         mUsbSerialPort.write(commandFrame, 5000);
                         //mUsbSerialPort.write(new byte[] { 0x12, (byte) 0xAA, (byte) 0xAA, (byte) 0xFF, (byte) 0xFF, 0x01, 0x6C, (byte) 0x9E, 0x1B, 0x55, 0x55 }, 1, 10, 5000);
                     } catch (IOException e) {
-                        SimpleCustomizeToast.show(this, e.getMessage());
+                        SimpleCustomizeToast.show(e.getMessage());
                     }
                 }
                 break;

@@ -57,20 +57,30 @@ public interface ValueContainer<V extends Value> {
      * @return 若返回值大于等于0，则表示数据添加成功，且其在数据容器中的位置为该返回值；
      *          若返回值 == {@link #ADD_FAILED_RETURN_VALUE}，则表示添加错误；
      *          其余情况表示该value所有时间戳已存在于数据容器中，并自动更新该条数据，返回值为-position-1，其中position为重复数据所处位置
+     *          注意，该方法返回的是逻辑位置（logicalPosition）,若要获取物理位置（physicalPosition）
+     * @see #getPhysicalPositionByLogicalPosition(int)
      */
     int addValue(long timestamp);
 
     /**
      * 解析{@link #addValue}的返回值
-     * @param addMethodReturnValue {@link #addValue}的返回值
-     * @return 若addMethodReturnValue大于等于0，返回 {@link #NEW_VALUE_ADDED}，
+     * @param logicalPosition {@link #addValue}的返回值
+     * @return 若logicalPosition大于等于0，返回 {@link #NEW_VALUE_ADDED}，
      *          此处有特殊情况，若容器采用了循环存储的方式，则返回 {@link #LOOP_VALUE_ADDED}
      * @see DynamicValueContainer
-     *          若addMethodReturnValue等于{@link #ADD_FAILED_RETURN_VALUE}，返回 {@link #ADD_VALUE_FAILED}
+     *          若logicalPosition等于{@link #ADD_FAILED_RETURN_VALUE}，返回 {@link #ADD_VALUE_FAILED}
      *          其余情况表示数据更新，返回 {@link #VALUE_UPDATED}
      * @see AddResult
      */
-    @AddResult int interpretAddResult(int addMethodReturnValue);
+    @AddResult int interpretAddResult(int logicalPosition);
+
+    /**
+     * 通过逻辑位置（通常由 {@link #addValue(long)} 得到）获取数据在容器中的物理位置
+     * @param logicalPosition 添加数据时得到的逻辑位置
+     * @return 若>=0，表示存在，返回数据在容器中的物理位置
+     *          若<0，表示不存在，返回-1
+     */
+    int getPhysicalPositionByLogicalPosition(int logicalPosition);
 
     /**
      * 获取{@link Value}数量
@@ -86,10 +96,10 @@ public interface ValueContainer<V extends Value> {
 
     /**
      * 通过位置获取相应{@link Value}
-     * @param position 待获取value在数据容器中的位置
+     * @param physicalPosition 待获取value在数据容器中的物理位置
      * @return value
      */
-    V getValue(int position);
+    V getValue(int physicalPosition);
 
     /**
      * 获取最早的一条数据
@@ -123,25 +133,25 @@ public interface ValueContainer<V extends Value> {
     /**
      * 从数据容器中的某个位置附近寻找相同时间戳的某个{@link Value}位置
      *
-     * @param start 可能存在位置，
-     *              若>=0，则在start附近寻找时间戳等于timestamp的{@link Value}
-     *              若<0，则在所有数据里面寻找
+     * @param possiblePosition 可能存在位置，
+     *              若>=0，则在possiblePosition附近寻找时间戳等于timestamp的{@link Value}
+     *              若<0，则在-possiblePosition-1附近寻找时间戳等于timestamp的{@link Value}
      * @param timestamp 待寻找value的时间戳
      * @return 若为负数表示没有找到，且其值（-position-1）表示其实际应在数据容器中的物理位置，
      *          若大于等于0表示其在数据容器中的位置
      */
-    int findValuePosition(int start, long timestamp);
+    int findValuePosition(int possiblePosition, long timestamp);
 
     /**
      * 从数据容器中的某个位置附近寻找相同时间戳的某个{@link Value}
      *
-     * @param start 可能存在位置，
-     *              若>=0，则在start附近寻找时间戳等于timestamp的{@link Value}
-     *              若<0，则在所有数据里面寻找
+     * @param possiblePosition 可能存在位置，可以直接使用 {@link #addValue(long)} 返回的逻辑位置
+     *              若>=0，则在possiblePosition附近寻找时间戳等于timestamp的{@link Value}
+     *              若<0，则在-possiblePosition-1附近寻找时间戳等于timestamp的{@link Value}
      * @param timestamp 待寻找value的时间戳
      * @return 若为null表示没有找到，否则返回该value
      */
-     V findValue(int start, long timestamp);
+     V findValue(int possiblePosition, long timestamp);
 
     /**
      * 获取某段时间范围内的子数据容器，当不需要子容器与父容器在新增数据后
@@ -178,8 +188,9 @@ public interface ValueContainer<V extends Value> {
     interface OnValueAddListener {
         /**
          * 仅当数据正确添加时调用
-         * @param position 已添加数据在数据容器中的位置
+         * @param logicalPosition {@link #addValue(long)} 返回值
+         * @param timestamp 已添加数据时间戳
          */
-         void onValueAdd(int position, long timestamp);
+         void onValueAdd(int logicalPosition, long timestamp);
     }
 }

@@ -44,7 +44,8 @@ public class ExceptionLog {
         if (TextUtils.isEmpty(logDirectory)) {
             throw new IllegalArgumentException("current app logFileDirectory in sd card is necessary");
         }
-        context = c;
+        context = c.getApplicationContext();
+        SimpleCustomizeToast.init(context);
         logFileDirectory = logDirectory;
         debuggable = (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
@@ -79,7 +80,7 @@ public class ExceptionLog {
             }
 
             if ((logType & LOG_TYPE_DISPLAY) != 0) {
-                SimpleCustomizeToast.show(context, e.getMessage());
+                SimpleCustomizeToast.show(e.getMessage());
             }
         }
 
@@ -98,7 +99,7 @@ public class ExceptionLog {
                     File.separator + logFileDirectory);
             if (!directory.exists()) {
                 if (!directory.mkdir()) {
-                    SimpleCustomizeToast.show(context, "日志文件目录创建失败，无法记录异常信息");
+                    SimpleCustomizeToast.show("日志文件目录创建失败，无法记录异常信息");
                     return;
                 }
             }
@@ -106,7 +107,7 @@ public class ExceptionLog {
                     File.separator + "ErrorInfo.txt");
             if (!file.exists()) {
                 if (!file.createNewFile()) {
-                    SimpleCustomizeToast.show(context, "日志文件创建失败，无法记录异常信息");
+                    SimpleCustomizeToast.show("日志文件创建失败，无法记录异常信息");
                     return;
                 }
             }
@@ -114,12 +115,12 @@ public class ExceptionLog {
             try {
                 writer.write(information);
             } catch (IOException ioe) {
-                SimpleCustomizeToast.show(context, "异常信息记录失败");
+                SimpleCustomizeToast.show("异常信息记录失败");
             } finally {
                 writer.close();
             }
         } catch (IOException ioe) {
-            SimpleCustomizeToast.show(context, "日志文件创建失败，无法记录异常信息");
+            SimpleCustomizeToast.show("日志文件创建失败，无法记录异常信息");
         }
     }
 

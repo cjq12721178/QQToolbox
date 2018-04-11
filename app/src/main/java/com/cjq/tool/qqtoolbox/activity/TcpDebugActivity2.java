@@ -62,7 +62,7 @@ public class TcpDebugActivity2
                 mSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                SimpleCustomizeToast.show(this, "关闭远程客户端连接失败");
+                SimpleCustomizeToast.show("关闭远程客户端连接失败");
             }
         }
         if (mReceiver != null) {
@@ -87,17 +87,17 @@ public class TcpDebugActivity2
                         mEtRemoteIp.setEnabled(false);
                         mEtRemotePort.setEnabled(false);
                         mBtnConnect.setEnabled(false);
-                        SimpleCustomizeToast.show(this, "本地服务器启动成功");
+                        SimpleCustomizeToast.show("本地服务器启动成功");
                     } else {
-                        SimpleCustomizeToast.show(this, "本地服务器启动失败");
+                        SimpleCustomizeToast.show("本地服务器启动失败");
                     }
                 } else {
-                    SimpleCustomizeToast.show(this, "本地服务器启动成功");
+                    SimpleCustomizeToast.show("本地服务器启动成功");
                 }
                 break;
             case R.id.btn_accept:
                 if (mServer == null) {
-                    SimpleCustomizeToast.show(this, "本地服务器尚未启动");
+                    SimpleCustomizeToast.show("本地服务器尚未启动");
                     return;
                 }
                 mServer.accept(this);
@@ -108,19 +108,19 @@ public class TcpDebugActivity2
                     mClient = new TcpClient();
                     mClient.connect(getRemoteIp(), getRemotePort(), this);
                 } else {
-                    SimpleCustomizeToast.show(this, "远程服务器连接成功");
+                    SimpleCustomizeToast.show("远程服务器连接成功");
                 }
                 break;
             case R.id.btn_send:
                 if (mSocket == null) {
-                    SimpleCustomizeToast.show(this, "请先启动服务器或连接服务器");
+                    SimpleCustomizeToast.show("请先启动服务器或连接服务器");
                 } else {
                     try {
                         mSocket.write(getEmission());
                         //mWriter.flush();
                         addEmission();
                     } catch (IOException e) {
-                        SimpleCustomizeToast.show(this, "发送数据失败");
+                        SimpleCustomizeToast.show("发送数据失败");
                     }
                 }
                 break;
@@ -161,7 +161,7 @@ public class TcpDebugActivity2
 
     @Override
     public boolean onErrorOccurred(Exception e) {
-        SimpleCustomizeToast.show(this, e.getMessage());
+        SimpleCustomizeToast.show(e.getMessage());
         return true;
     }
 
@@ -171,10 +171,10 @@ public class TcpDebugActivity2
             mSocket = socket;
             mReceiver = new DataReceiver(socket);
             mReceiver.startListen(this);
-            SimpleCustomizeToast.show(this, "远程客户端连接成功");
+            SimpleCustomizeToast.show("远程客户端连接成功");
             return false;
         } else {
-            SimpleCustomizeToast.show(this, "客户端连接失败");
+            SimpleCustomizeToast.show("客户端连接失败");
             return true;
         }
     }
@@ -185,9 +185,9 @@ public class TcpDebugActivity2
             mSocket = socket;
             mReceiver = new DataReceiver(socket);
             mReceiver.startListen(this);
-            SimpleCustomizeToast.show(this, "远程服务器连接成功");
+            SimpleCustomizeToast.show("远程服务器连接成功");
         } else {
-            SimpleCustomizeToast.show(this, "连接远程服务器失败");
+            SimpleCustomizeToast.show("连接远程服务器失败");
         }
     }
 }

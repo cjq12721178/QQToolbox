@@ -2,6 +2,7 @@ package com.cjq.tool.qbox.ui.toast;
 
 import android.content.Context;
 import android.os.Looper;
+import android.support.annotation.NonNull;
 import android.support.annotation.StringRes;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -18,8 +19,20 @@ import com.cjq.tool.qbox.R;
 public class SimpleCustomizeToast {
 
     private static Decorator defaultDecorator = new DefaultDecorator();
+    private static Context applicationContext;
 
     private SimpleCustomizeToast() {
+    }
+
+    private static Context getContext() {
+        if (applicationContext == null) {
+            throw new NullPointerException("init before use SimpleCustomizeToast");
+        }
+        return applicationContext;
+    }
+
+    public static void init(@NonNull Context context) {
+        applicationContext = context.getApplicationContext();
     }
 
     public static void setDefaultDecorator(Decorator decorator) {
@@ -28,15 +41,15 @@ public class SimpleCustomizeToast {
         }
     }
 
-    public static void show(Context context, String information) {
-        show(context, information, defaultDecorator);
+    public static void show(String information) {
+        show(information, defaultDecorator);
     }
 
-    public static void show(Context context, @StringRes int informationRes) {
-        show(context, informationRes, defaultDecorator);
+    public static void show(@StringRes int informationRes) {
+        show(informationRes, defaultDecorator);
     }
 
-    public static void show(Context context, String information, Decorator decorator) {
+    public static void show(String information, Decorator decorator) {
         //防止在工作线程中崩溃
         boolean needLooper = Looper.getMainLooper().getThread() != Thread.currentThread();
         if (needLooper) {
@@ -44,11 +57,11 @@ public class SimpleCustomizeToast {
         }
 
         //设置toast
-        Toast toast = new Toast(context);
+        Toast toast = new Toast(getContext());
         if (decorator == null) {
             decorator = defaultDecorator;
         }
-        toast.setView(decorator.setInformation(context, information));
+        toast.setView(decorator.setInformation(getContext(), information));
         decorator.customize(toast);
         toast.show();
 
@@ -59,8 +72,8 @@ public class SimpleCustomizeToast {
         }
     }
 
-    public static void show(Context context, @StringRes int informationRes, Decorator decorator) {
-        show(context, context.getString(informationRes), decorator);
+    public static void show(@StringRes int informationRes, Decorator decorator) {
+        show(getContext().getString(informationRes), decorator);
     }
 
     public interface Decorator {

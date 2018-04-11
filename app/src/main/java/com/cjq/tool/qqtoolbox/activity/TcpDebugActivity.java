@@ -60,21 +60,21 @@ public class TcpDebugActivity extends AppCompatActivity implements View.OnClickL
 //            try {
 //                mClient.close();
 //            } catch (IOException e) {
-//                SimpleCustomizeToast.show(this, "关闭远程客户端失败");
+//                SimpleCustomizeToast.show("关闭远程客户端失败");
 //            }
 //        }
         if (mLocalServer != null) {
             try {
                 mLocalServer.close();
             } catch (IOException e) {
-                SimpleCustomizeToast.show(this, "关闭本地服务器失败");
+                SimpleCustomizeToast.show("关闭本地服务器失败");
             }
         }
         if (mRemoteServer != null) {
             try {
                 mRemoteServer.close();
             } catch (IOException e) {
-                SimpleCustomizeToast.show(this, "断开远程服务器失败");
+                SimpleCustomizeToast.show("断开远程服务器失败");
             }
         }
     }
@@ -89,19 +89,19 @@ public class TcpDebugActivity extends AppCompatActivity implements View.OnClickL
                         mEtRemoteIp.setEnabled(false);
                         mEtRemotePort.setEnabled(false);
                         mBtnConnect.setEnabled(false);
-                        SimpleCustomizeToast.show(this, "本地服务器启动成功");
+                        SimpleCustomizeToast.show("本地服务器启动成功");
                     } catch (IOException e) {
-                        SimpleCustomizeToast.show(this, "本地服务器启动失败");
+                        SimpleCustomizeToast.show("本地服务器启动失败");
                     } catch (NumberFormatException nfe) {
-                        SimpleCustomizeToast.show(this, "本地服务器端口输入有误");
+                        SimpleCustomizeToast.show("本地服务器端口输入有误");
                     }
                 } else {
-                    SimpleCustomizeToast.show(this, "本地服务器启动成功");
+                    SimpleCustomizeToast.show("本地服务器启动成功");
                 }
                 break;
             case R.id.btn_accept:
                 if (mLocalServer == null) {
-                    SimpleCustomizeToast.show(this, "本地服务器尚未启动");
+                    SimpleCustomizeToast.show("本地服务器尚未启动");
                     return;
                 }
                 new Thread(new Runnable() {
@@ -113,9 +113,9 @@ public class TcpDebugActivity extends AppCompatActivity implements View.OnClickL
                             mWriter = client.getOutputStream();
                             mReceiver = new DataReceiver(TcpDebugActivity.this);
                             mReceiver.startListen(TcpDebugActivity.this);
-                            SimpleCustomizeToast.show(TcpDebugActivity.this, "远程客户端连接成功");
+                            SimpleCustomizeToast.show("远程客户端连接成功");
                         } catch (IOException e) {
-                            SimpleCustomizeToast.show(TcpDebugActivity.this, "客户端连接失败");
+                            SimpleCustomizeToast.show("客户端连接失败");
                         }
                     }
                 }).start();
@@ -132,28 +132,28 @@ public class TcpDebugActivity extends AppCompatActivity implements View.OnClickL
                                 mWriter = mRemoteServer.getOutputStream();
                                 mReceiver = new DataReceiver(TcpDebugActivity.this);
                                 mReceiver.startListen(TcpDebugActivity.this);
-                                SimpleCustomizeToast.show(TcpDebugActivity.this, "远程服务器连接成功");
+                                SimpleCustomizeToast.show("远程服务器连接成功");
                             } catch (IOException e) {
-                                SimpleCustomizeToast.show(TcpDebugActivity.this, "连接远程服务器失败");
+                                SimpleCustomizeToast.show("连接远程服务器失败");
                             } catch (NumberFormatException nfe) {
-                                SimpleCustomizeToast.show(TcpDebugActivity.this, "远程服务器端口输入有误");
+                                SimpleCustomizeToast.show("远程服务器端口输入有误");
                             }
                         }
                     }).start();
                 } else {
-                    SimpleCustomizeToast.show(TcpDebugActivity.this, "远程服务器连接成功");
+                    SimpleCustomizeToast.show("远程服务器连接成功");
                 }
                 break;
             case R.id.btn_send:
                 if (mWriter == null) {
-                    SimpleCustomizeToast.show(this, "请先启动服务器或连接服务器");
+                    SimpleCustomizeToast.show("请先启动服务器或连接服务器");
                 } else {
                     try {
                         mWriter.write(getEmission());
                         mWriter.flush();
                         addEmission();
                     } catch (IOException e) {
-                        SimpleCustomizeToast.show(this, "发送数据失败");
+                        SimpleCustomizeToast.show("发送数据失败");
                     }
                 }
                 break;
@@ -211,7 +211,7 @@ public class TcpDebugActivity extends AppCompatActivity implements View.OnClickL
 
     @Override
     public boolean onErrorOccurred(Exception e) {
-        SimpleCustomizeToast.show(this, e.getMessage());
+        SimpleCustomizeToast.show(e.getMessage());
         return true;
     }
 }

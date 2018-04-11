@@ -56,9 +56,9 @@ public class UdpDebugActivity
                     mUdpKit = new UdpKit();
                 }
                 if (mUdpKit.launch()) {
-                    SimpleCustomizeToast.show(this, "udp launch success");
+                    SimpleCustomizeToast.show("udp launch success");
                 } else {
-                    SimpleCustomizeToast.show(this, "udp launch failed");
+                    SimpleCustomizeToast.show("udp launch failed");
                 }
                 break;
             case R.id.btn_start_listen:
@@ -67,9 +67,9 @@ public class UdpDebugActivity
                         mDataReceiver = new SyncDataReceiver(mUdpKit);
                     }
                     if (mDataReceiver.startListen(this)) {
-                        SimpleCustomizeToast.show(this, "start udp listen");
+                        SimpleCustomizeToast.show("start udp listen");
                     } else {
-                        SimpleCustomizeToast.show(this, "udp listen failed");
+                        SimpleCustomizeToast.show("udp listen failed");
                     }
                 }
                 break;

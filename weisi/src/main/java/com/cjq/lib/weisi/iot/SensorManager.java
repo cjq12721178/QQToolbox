@@ -115,6 +115,12 @@ public class SensorManager {
     }
 
     public static synchronized LogicalSensor getLogicalSensor(
+            int address, byte dataTypeValue, int dataTypeValueIndex,
+            boolean autoCreate) {
+        return getLogicalSensor(Sensor.ID.getId(address, dataTypeValue, dataTypeValueIndex), autoCreate);
+    }
+
+    public static synchronized LogicalSensor getLogicalSensor(
             @NonNull Sensor.ID id, boolean autoCreate) {
         LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(id);
         if (sensor == null && autoCreate) {

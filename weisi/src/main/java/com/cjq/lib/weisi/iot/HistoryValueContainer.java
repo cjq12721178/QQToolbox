@@ -30,9 +30,9 @@ public abstract class HistoryValueContainer<V extends Value> extends BaseValueCo
                     int position = findValuePosition(timestamp);
                     if (position < 0) {
                         v = createValue(timestamp);
-                        mValues.add(-position - 1, v);
+                        mValues.add(decodePosition(position), v);
                     }
-                    return -position - 1;
+                    return encodePosition(position);
                 }
                 return -size;
             } else {
@@ -44,11 +44,11 @@ public abstract class HistoryValueContainer<V extends Value> extends BaseValueCo
     }
 
     @Override
-    public int interpretAddResult(int addMethodReturnValue) {
-        if (addMethodReturnValue >= 0) {
+    public int interpretAddResult(int logicalPosition) {
+        if (logicalPosition >= 0) {
             return NEW_VALUE_ADDED;
         }
-        return addMethodReturnValue == ADD_FAILED_RETURN_VALUE
+        return logicalPosition == ADD_FAILED_RETURN_VALUE
                 ? ADD_VALUE_FAILED
                 : VALUE_UPDATED;
     }
@@ -64,8 +64,8 @@ public abstract class HistoryValueContainer<V extends Value> extends BaseValueCo
     }
 
     @Override
-    public V getValue(int position) {
-        return mValues.get(position);
+    public V getValue(int physicalPosition) {
+        return mValues.get(physicalPosition);
     }
 
     @Override

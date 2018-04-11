@@ -70,7 +70,7 @@ public class BleDebugActivity
         if (EasyPermissions.hasPermissions(this, BLE_PERMS)) {
             BluetoothAdapter bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
             if (bluetoothAdapter == null) {
-                SimpleCustomizeToast.show(this, "current device not support ble");
+                SimpleCustomizeToast.show("current device not support ble");
                 return;
             }
             if (bluetoothAdapter.isEnabled()) {
@@ -98,10 +98,10 @@ public class BleDebugActivity
             mBleKit = new BleKit();
         }
         if (mBleKit.launch(this)) {
-            SimpleCustomizeToast.show(this, "ble launch success");
+            SimpleCustomizeToast.show("ble launch success");
             mBleKit.startScan(this, 5000, 10000);
         } else {
-            SimpleCustomizeToast.show(this, "ble launch failed");
+            SimpleCustomizeToast.show("ble launch failed");
         }
     }
 
@@ -134,7 +134,7 @@ public class BleDebugActivity
             if (EasyPermissions.somePermissionPermanentlyDenied(this, perms)) {
                 new AppSettingsDialog.Builder(this).build().show();
             } else {
-                SimpleCustomizeToast.show(this, "部分BLE权限未通过");
+                SimpleCustomizeToast.show("部分BLE权限未通过");
             }
         }
     }
@@ -144,7 +144,7 @@ public class BleDebugActivity
 
         if (requestCode == RC_BLE_PERM) {
             if (resultCode == RESULT_CANCELED) {
-                SimpleCustomizeToast.show(this, "ble not enabled");
+                SimpleCustomizeToast.show("ble not enabled");
             } else {
                 openAndScanBle();
             }

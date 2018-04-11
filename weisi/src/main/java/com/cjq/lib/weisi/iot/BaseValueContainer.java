@@ -66,15 +66,6 @@ public abstract class BaseValueContainer<V extends Value>
 
     protected V onCreateValue(long timestamp) {
         try {
-//            Class c = getClass();
-//            Type superClassType = c.getGenericSuperclass();
-//            while (!(superClassType instanceof ParameterizedType)) {
-//                c = c.getSuperclass();
-//                superClassType = c.getGenericSuperclass();
-//            }
-//            Constructor constructor = ((Class<V>)((ParameterizedType)superClassType).
-//                    getActualTypeArguments()[0])
-//                    .getConstructor(long.class);
             Constructor constructor = ((Class<V>) SimpleReflection.getClassParameterizedType(this, BaseValueContainer.class, 0)).getConstructor(long.class);
             if (!constructor.isAccessible()) {
                 constructor.setAccessible(true);
@@ -92,8 +83,8 @@ public abstract class BaseValueContainer<V extends Value>
     }
 
     @Override
-    public V findValue(int start, long timestamp) {
-        int position = findValuePosition(start, timestamp);
+    public V findValue(int possiblePosition, long timestamp) {
+        int position = findValuePosition(possiblePosition, timestamp);
         return position >= 0 ? getValue(position) : null;
     }
 
@@ -114,12 +105,13 @@ public abstract class BaseValueContainer<V extends Value>
     }
 
     @Override
-    public int findValuePosition(int start, long timestamp) {
+    public int findValuePosition(int possiblePosition, long timestamp) {
         synchronized (this) {
             int size = size();
-            if (start >= 0 && start < size) {
+            int position = getPhysicalPositionByLogicalPosition(possiblePosition);
+            if (position >= 0 && position < size) {
                 V value;
-                int currentPosition = start;
+                int currentPosition = position;
                 int lastPosition = currentPosition;
                 for (; currentPosition < size && currentPosition >= 0;) {
                     value = getValue(currentPosition);
@@ -128,23 +120,42 @@ public abstract class BaseValueContainer<V extends Value>
                         return currentPosition;
                     } else if (valueTimestamp > timestamp) {
                         if (currentPosition > lastPosition) {
-                            return - currentPosition - 1;
+                            return encodePosition(currentPosition);
                         }
                         lastPosition = currentPosition--;
                     } else {
                         if (currentPosition < lastPosition) {
-                            return - lastPosition - 1;
+                            return encodePosition(lastPosition);
                         }
                         lastPosition = currentPosition++;
                     }
                 }
-                return -(currentPosition > lastPosition
+                return encodePosition((currentPosition > lastPosition
                         ? currentPosition
-                        : lastPosition) - 1;
+                        : lastPosition));
             } else {
                 return findValuePosition(timestamp);
             }
         }
+    }
+
+    @Override
+    public int getPhysicalPositionByLogicalPosition(int logicalPosition) {
+        if (logicalPosition >= 0) {
+            return logicalPosition;
+        }
+        if (logicalPosition == ADD_FAILED_RETURN_VALUE) {
+            return -1;
+        }
+        return decodePosition(logicalPosition);
+    }
+
+    protected int decodePosition(int src) {
+        return - src - 1;
+    }
+
+    protected int encodePosition(int src) {
+        return - src - 1;
     }
 
     @Override

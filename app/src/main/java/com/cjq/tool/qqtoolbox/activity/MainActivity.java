@@ -192,7 +192,7 @@ public class MainActivity
                 decorator4.setCancelLabel(R.string.custom_cancel);
                 break;
             case R.id.btn_show_simple_toast_in_main_thread:
-                SimpleCustomizeToast.show(this, "simple toast在主线程中弹出");
+                SimpleCustomizeToast.show("simple toast在主线程中弹出");
                 break;
             case R.id.btn_show_normal_toast_in_other_thread:
                 new Thread(new Runnable() {
@@ -210,7 +210,7 @@ public class MainActivity
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        SimpleCustomizeToast.show(MainActivity.this, "simple toast在其他线程中弹出");
+                        SimpleCustomizeToast.show("simple toast在其他线程中弹出");
                     }
                 }).start();
                 break;
@@ -260,7 +260,7 @@ public class MainActivity
                 mSortDialog.show(getSupportFragmentManager(), "sort dialog");
                 break;
             case R.id.tv_text_view_on_click:
-                SimpleCustomizeToast.show(this, "when you see me, it means CustomDrawableSizeTextView can be clicked");
+                SimpleCustomizeToast.show("when you see me, it means CustomDrawableSizeTextView can be clicked");
                 break;
             case R.id.btn_test_dialog_fragment_constraint_layout_match_parent:
                 NoTitleConstraintLayoutDialog dialog3 = new NoTitleConstraintLayoutDialog();
@@ -286,7 +286,7 @@ public class MainActivity
                     }
                     String serialPortName = mEtSerialPortName.getText().toString();
                     if (TextUtils.isEmpty(serialPortName)) {
-                        SimpleCustomizeToast.show(this, "serial port name can not be empty");
+                        SimpleCustomizeToast.show("serial port name can not be empty");
                     } else {
                         //powerOnSerialPort();
                         if (mSerialPortKit.launch(serialPortName,
@@ -296,9 +296,9 @@ public class MainActivity
                             //mSerialPortKit.startListen(this);
                             mSerialPortDataReceiver = new DataReceiver(mSerialPortKit);
                             mSerialPortDataReceiver.startListen(this);
-                            SimpleCustomizeToast.show(this, serialPortName + " opened");
+                            SimpleCustomizeToast.show(serialPortName + " opened");
                         } else {
-                            SimpleCustomizeToast.show(this, "open serial port failed");
+                            SimpleCustomizeToast.show("open serial port failed");
                         }
                     }
                 } else {
@@ -371,6 +371,9 @@ public class MainActivity
             case R.id.btn_open_tcp_activity2:
                 startActivity(new Intent(this, TcpDebugActivity2.class));
                 break;
+            case R.id.btn_test_recycler_view_inconsistency:
+                startActivity(new Intent(this, TestRecyclerViewInconsistencyActivity.class));
+                break;
         }
     }
 
@@ -384,7 +387,7 @@ public class MainActivity
         if (mSerialPortKit != null) {
             mSerialPortDataReceiver.stopListen();
             mSerialPortKit.shutdown();
-            SimpleCustomizeToast.show(this, mEtSerialPortName.getText() + " closed");
+            SimpleCustomizeToast.show(mEtSerialPortName.getText() + " closed");
             //powerOffSerialPort();
         }
     }
@@ -396,7 +399,7 @@ public class MainActivity
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_gpio_112"});
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_a"});
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_b"});
-            SimpleCustomizeToast.show(this, "power on");
+            SimpleCustomizeToast.show("power on");
         } catch (IOException e) {
             ExceptionLog.display(e);
         }
@@ -408,18 +411,18 @@ public class MainActivity
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_vbat_out_en"});
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_a"});
             Runtime.getRuntime().exec(new String[]{"sh", "-c", "echo 0 > /sys/devices/soc.0/xt_dev.68/xt_uart_b"});
-            SimpleCustomizeToast.show(this, "power off");
+            SimpleCustomizeToast.show("power off");
         } catch (IOException e) {
             ExceptionLog.display(e);
         }
     }
 
     public void onNormalTextViewClick(View v) {
-        SimpleCustomizeToast.show(this, "when you see me, it means normal TextView can be clicked");
+        SimpleCustomizeToast.show("when you see me, it means normal TextView can be clicked");
     }
 
     public void onCustomTextViewClick(View v) {
-        SimpleCustomizeToast.show(this, "when you see me, it means CustomDrawableSizeTextView can be clicked");
+        SimpleCustomizeToast.show("when you see me, it means CustomDrawableSizeTextView can be clicked");
     }
 
     @Override

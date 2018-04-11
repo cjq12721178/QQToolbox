@@ -60,8 +60,31 @@ public class SubValueContainer<V extends Value>
     }
 
     @Override
-    public int interpretAddResult(int addMethodReturnValue) {
-        return mParent.interpretAddResult(addMethodReturnValue);
+    public int interpretAddResult(int logicalPosition) {
+        int addResult = mParent.interpretAddResult(logicalPosition);
+        switch (addResult) {
+            case NEW_VALUE_ADDED:
+            case VALUE_UPDATED:
+            case LOOP_VALUE_ADDED:
+                if (contains(mParent.getValue(mParent.getPhysicalPositionByLogicalPosition(logicalPosition)).mTimestamp)) {
+                    return addResult;
+                } else {
+                    return ADD_VALUE_FAILED;
+                }
+            default:
+                return ADD_VALUE_FAILED;
+        }
+    }
+
+    @Override
+    public int getPhysicalPositionByLogicalPosition(int logicalPosition) {
+        if (logicalPosition == ADD_FAILED_RETURN_VALUE) {
+            return -1;
+        }
+        int position = getRealPositionByParentPosition(logicalPosition);
+        return position >= 0
+                ? position
+                : -1;
     }
 
     @Override
@@ -75,8 +98,8 @@ public class SubValueContainer<V extends Value>
     }
 
     @Override
-    public V getValue(int position) {
-        return mParent.getValue(mOffset + position);
+    public V getValue(int physicalPosition) {
+        return mParent.getValue(mOffset + physicalPosition);
     }
 
     @Override
@@ -106,8 +129,8 @@ public class SubValueContainer<V extends Value>
     }
 
     @Override
-    public int findValuePosition(int start, long timestamp) {
-        return getRealPositionByParentPosition(mParent.findValuePosition(start, timestamp));
+    public int findValuePosition(int possiblePosition, long timestamp) {
+        return getRealPositionByParentPosition(mParent.findValuePosition(possiblePosition, timestamp));
     }
 
     private int getRealPositionByParentPosition(int position) {
@@ -134,9 +157,9 @@ public class SubValueContainer<V extends Value>
     }
 
     @Override
-    public V findValue(int start, long timestamp) {
+    public V findValue(int possiblePosition, long timestamp) {
         return contains(timestamp)
-                ? mParent.findValue(start, timestamp)
+                ? mParent.findValue(possiblePosition, timestamp)
                 : null;
     }
 
@@ -161,8 +184,8 @@ public class SubValueContainer<V extends Value>
     }
 
     @Override
-    public void onValueAdd(int position, long timestamp) {
-        switch (interpretAddResult(position)) {
+    public void onValueAdd(int logicalPosition, long timestamp) {
+        switch (mParent.interpretAddResult(logicalPosition)) {
             case NEW_VALUE_ADDED:
                 if (timestamp < mStartTime) {
                     ++mOffset;

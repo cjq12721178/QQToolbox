@@ -46,7 +46,7 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                         mValues.add(i + 1, v);
                         return i + 1;
                     } else if (timestamp == v.mTimestamp) {
-                        return -i - 1;
+                        return encodePosition(i);
                     }
                 }
                 v = createValue(timestamp);
@@ -67,8 +67,8 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                         increaseDynamicValueHead();
                         return position;
                     } else if (timestamp == v.mTimestamp) {
-                        return -(MAX_VALUE_SIZE - 1
-                                - (mValueHead - 1 - i)) - 1;
+                        return encodePosition(MAX_VALUE_SIZE - 1
+                                - (mValueHead - 1 - i));
                     }
                 }
                 for (int i = MAX_VALUE_SIZE - 1; i >= mValueHead; --i) {
@@ -86,7 +86,7 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                         v.mTimestamp = timestamp;
                         return position;
                     } else if (timestamp == v.mTimestamp) {
-                        return -(i - mValueHead) - 1;
+                        return encodePosition(i - mValueHead);
                     }
                 }
                 return ADD_FAILED_RETURN_VALUE;
@@ -112,9 +112,9 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
     }
 
     @Override
-    public int interpretAddResult(int addMethodReturnValue) {
-        if (addMethodReturnValue < 0) {
-            return -addMethodReturnValue-1 >= MAX_VALUE_SIZE
+    public int interpretAddResult(int logicalPosition) {
+        if (logicalPosition < 0) {
+            return decodePosition(logicalPosition) >= MAX_VALUE_SIZE
                     ? ADD_VALUE_FAILED
                     : VALUE_UPDATED;
         }
@@ -135,11 +135,11 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
     }
 
     @Override
-    public V getValue(int position) {
-        int pos = mValueHead + position - MAX_VALUE_SIZE;
+    public V getValue(int physicalPosition) {
+        int pos = mValueHead + physicalPosition - MAX_VALUE_SIZE;
         return pos >= 0
                 ? mValues.get(pos)
-                : mValues.get(mValueHead + position);
+                : mValues.get(mValueHead + physicalPosition);
     }
 
     @Override
@@ -160,7 +160,7 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                         SEARCH_HELPER);
                 return position >= 0
                         ? MAX_VALUE_SIZE - mValueHead + position
-                        : -(MAX_VALUE_SIZE - mValueHead - position - 1) - 1;
+                        : encodePosition(MAX_VALUE_SIZE - mValueHead + decodePosition(position));
             } else {
                 position = ExpandCollections.binarySearch(
                         mValues,
@@ -170,7 +170,7 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                         SEARCH_HELPER);
                 return position >= 0
                         ? position - mValueHead
-                        : -(-position - 1 - mValueHead) - 1;
+                        : encodePosition(decodePosition(position) - mValueHead);
             }
         }
     }
