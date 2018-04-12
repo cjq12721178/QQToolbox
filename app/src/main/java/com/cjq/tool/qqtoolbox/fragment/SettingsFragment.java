@@ -58,6 +58,7 @@ public class SettingsFragment extends PreferenceFragmentCompat implements Prefer
         ListPreference listPreference = (ListPreference) findPreference(getString(R.string.preference_key_serial_port_baud_rate));
         listPreference.setOnPreferenceChangeListener(this);
         onPreferenceChange(listPreference, "115200");
+        findPreference(getString(R.string.preference_key_switch)).setOnPreferenceChangeListener(this);
     }
 
     @Override

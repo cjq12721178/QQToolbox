@@ -1,5 +1,7 @@
 package com.cjq.lib.weisi.communicator.tcp;
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -8,7 +10,7 @@ import java.net.Socket;
  * Created by CJQ on 2018/3/9.
  */
 
-public class TcpServer {
+public class TcpServer extends Tcp {
 
     private ServerSocket mSocket;
 
@@ -27,31 +29,31 @@ public class TcpServer {
         return mSocket != null;
     }
 
-    public void accept(final OnClientAcceptListener listener) {
-        if (listener == null) {
-            return;
-        }
-        if (!isLaunched()) {
-            return;
-        }
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (isLaunched()) {
-                    TcpSocket socket = null;
-                    try {
-                        Socket client = mSocket.accept();
-                        socket = new TcpSocket(client);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (!listener.onClientAccept(socket)) {
-                            break;
+    public void accept(@NonNull final OnClientAcceptListener listener) {
+        if (listener != null && isLaunched() && mState != CONNECTING) {
+            mState = CONNECTING;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (isLaunched() && mState == CONNECTING) {
+                        TcpSocket socket = null;
+                        try {
+                            Socket client = mSocket.accept();
+                            socket = new TcpSocket(client);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            mState = socket != null ? CONNECTED : UNCONNECTED;
+                            if (listener.onClientAccept(mState, socket)) {
+                                mState = CONNECTING;
+                            }
                         }
                     }
                 }
-            }
-        }).start();
+            }).start();
+        } else {
+            listener.onClientAccept(mState, null);
+        }
     }
 
     public void shutdown() {
@@ -60,6 +62,8 @@ public class TcpServer {
                 mSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                mState = UNCONNECTED;
             }
         }
     }
@@ -69,6 +73,6 @@ public class TcpServer {
      */
     public interface OnClientAcceptListener {
         //返回true将继续等待客户端连接
-        boolean onClientAccept(TcpSocket socket);
+        boolean onClientAccept(@ConnectState int state, TcpSocket socket);
     }
 }

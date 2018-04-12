@@ -21,7 +21,8 @@ public class TcpDebugActivity2
         extends AppCompatActivity
         implements View.OnClickListener,
         DataReceiver.Listener,
-        TcpServer.OnClientAcceptListener, TcpClient.OnServerConnectListener {
+        TcpServer.OnClientAcceptListener,
+        TcpClient.OnServerConnectListener {
 
     private TcpServer mServer;
     private TcpSocket mSocket;
@@ -166,7 +167,7 @@ public class TcpDebugActivity2
     }
 
     @Override
-    public boolean onClientAccept(TcpSocket socket) {
+    public boolean onClientAccept(int state, TcpSocket socket) {
         if (socket != null) {
             mSocket = socket;
             mReceiver = new DataReceiver(socket);
@@ -180,7 +181,7 @@ public class TcpDebugActivity2
     }
 
     @Override
-    public void onServerConnect(TcpSocket socket) {
+    public void onServerConnect(int state, TcpSocket socket) {
         if (socket != null) {
             mSocket = socket;
             mReceiver = new DataReceiver(socket);

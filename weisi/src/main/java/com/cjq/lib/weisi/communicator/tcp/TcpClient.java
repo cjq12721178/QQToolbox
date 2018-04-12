@@ -1,27 +1,29 @@
 package com.cjq.lib.weisi.communicator.tcp;
 
+import android.support.annotation.NonNull;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.net.SocketTimeoutException;
 
 /**
  * Created by CJQ on 2018/3/12.
  */
 
-public class TcpClient {
+public class TcpClient extends Tcp {
 
     private TcpSocket mSocket;
 
-    public void connect(final String serverIp, final int serverPort,
-                        final OnServerConnectListener listener) {
+    public void connect(@NonNull final String serverIp, final int serverPort,
+                        @NonNull final OnServerConnectListener listener) {
         connect(serverIp, serverPort, listener, 0);
     }
 
-    public void connect(final String serverIp, final int serverPort,
-                        final OnServerConnectListener listener,
+    public void connect(@NonNull final String serverIp, final int serverPort,
+                        @NonNull final OnServerConnectListener listener,
                         final int timeout) {
-        if (mSocket == null) {
+        if (mSocket == null && mState != CONNECTING) {
+            mState = CONNECTING;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
@@ -30,15 +32,19 @@ public class TcpClient {
                         socket.connect(new InetSocketAddress(serverIp, serverPort), timeout);
                         if (socket.isConnected()) {
                             mSocket = new TcpSocket(socket);
+                            mState = CONNECTED;
                         }
                     } catch (IOException e) {
                         mSocket = null;
+                        mState = UNCONNECTED;
                         e.printStackTrace();
                     } finally {
-                        listener.onServerConnect(mSocket);
+                        listener.onServerConnect(mState, mSocket);
                     }
                 }
             }).start();
+        } else {
+            listener.onServerConnect(mState, mSocket);
         }
     }
 
@@ -53,11 +59,13 @@ public class TcpClient {
                 mSocket = null;
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                mState = UNCONNECTED;
             }
         }
     }
 
     public interface OnServerConnectListener {
-        void onServerConnect(TcpSocket socket);
+        void onServerConnect(@ConnectState int state, TcpSocket socket);
     }
 }
