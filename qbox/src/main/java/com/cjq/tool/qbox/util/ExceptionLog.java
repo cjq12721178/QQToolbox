@@ -2,15 +2,18 @@ package com.cjq.tool.qbox.util;
 
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Looper;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -29,6 +32,7 @@ public class ExceptionLog {
     public static final int LOG_TYPE_RECORD = 1 << 2;
 
     private static final String LOG_TAG = "log_debug";
+    private static final String DEFAULT_LOG_FILE_NAME = "ErrorInfo.txt";
 
     private static Context context;
     private static String logFileDirectory;
@@ -89,29 +93,44 @@ public class ExceptionLog {
         }
     }
 
+    public static boolean exportErrorInfo(String targetPath) {
+        String dst;
+        if (TextUtils.isEmpty(targetPath)) {
+            File directory = getErrorInfoDirectory();
+            if (directory == null) {
+                return false;
+            }
+            dst = directory.getAbsolutePath() + File.separator + DEFAULT_LOG_FILE_NAME;
+        } else {
+            dst = targetPath;
+        }
+        return FileUtil.copyOnlyFile(context.getFilesDir() + File.separator + DEFAULT_LOG_FILE_NAME, dst);
+    }
+
     private static boolean isDebuggable() {
         return debuggable;
     }
 
     private static void saveInLocalFile(String information) {
         try {
-            File directory = new File(Environment.getExternalStorageDirectory() +
-                    File.separator + logFileDirectory);
-            if (!directory.exists()) {
-                if (!directory.mkdir()) {
-                    SimpleCustomizeToast.show("日志文件目录创建失败，无法记录异常信息");
+            FileWriter writer;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                writer = new FileWriter(context.getFileStreamPath(DEFAULT_LOG_FILE_NAME));
+            } else {
+                File directory = getErrorInfoDirectory();
+                if (directory == null) {
                     return;
                 }
-            }
-            File file = new File(directory.getAbsolutePath() +
-                    File.separator + "ErrorInfo.txt");
-            if (!file.exists()) {
-                if (!file.createNewFile()) {
-                    SimpleCustomizeToast.show("日志文件创建失败，无法记录异常信息");
-                    return;
+                File file = new File(directory.getAbsolutePath() +
+                        File.separator + DEFAULT_LOG_FILE_NAME);
+                if (!file.exists()) {
+                    if (!file.createNewFile()) {
+                        SimpleCustomizeToast.show("日志文件创建失败，无法记录异常信息");
+                        return;
+                    }
                 }
+                writer = new FileWriter(file, true);
             }
-            FileWriter writer = new FileWriter(file, true);
             try {
                 writer.write(information);
             } catch (IOException ioe) {
@@ -122,6 +141,19 @@ public class ExceptionLog {
         } catch (IOException ioe) {
             SimpleCustomizeToast.show("日志文件创建失败，无法记录异常信息");
         }
+    }
+
+    @Nullable
+    private static File getErrorInfoDirectory() {
+        File directory = new File(Environment.getExternalStorageDirectory() +
+                File.separator + logFileDirectory);
+        if (!directory.exists()) {
+            if (!directory.mkdir()) {
+                SimpleCustomizeToast.show("日志文件目录创建失败，无法记录异常信息");
+                return null;
+            }
+        }
+        return directory;
     }
 
     @NonNull

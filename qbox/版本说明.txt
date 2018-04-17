@@ -251,3 +251,7 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20180411-1.5.2(70):
 1. 修改SimpleCustomizeToast.show参数，去掉context，改为使用之前用init初始化，方便使用
+
+20180417-1.6.0(71):
+1. 新增FileUtil类，主要用于文档移动
+2. 修改ExceptionLog类的日志存储方式，在Android API 6.0以下存在内置SD卡中，6.0以上因权限问题存在data/data/XXX/file中

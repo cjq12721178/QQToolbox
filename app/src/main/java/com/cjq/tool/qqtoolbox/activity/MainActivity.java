@@ -1,7 +1,10 @@
 package com.cjq.tool.qqtoolbox.activity;
 
+import android.Manifest;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -34,6 +37,7 @@ import com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView;
 import com.cjq.tool.qbox.util.ClosableLog;
 import com.cjq.tool.qbox.util.ExceptionLog;
 import com.cjq.lib.weisi.util.NumericConverter;
+import com.cjq.tool.qbox.util.FileUtil;
 import com.cjq.tool.qqtoolbox.R;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleConstraintLayoutDialog;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleLinearLayoutDialog;
@@ -45,8 +49,12 @@ import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
 import com.cjq.tool.qqtoolbox.util.CrashHandler;
 import com.cjq.tool.qqtoolbox.util.DebugTag;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
 
 public class MainActivity
         extends AppCompatActivity
@@ -58,6 +66,7 @@ public class MainActivity
         DataReceiver.Listener,
         SearchDialog.OnSearchListener {
 
+    private static final int RC_WRITE_EXTERNAL_STORAGE = 1;
     private SwitchableFragmentManager mSwitchableFragmentManager;
     private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
     private SizeSelfAdaptionTextView mSizeSelfAdaptionTextView;
@@ -374,7 +383,34 @@ public class MainActivity
             case R.id.btn_test_recycler_view_inconsistency:
                 startActivity(new Intent(this, TestRecyclerViewInconsistencyActivity.class));
                 break;
+            case R.id.btn_test_permission_write_external_storage:
+                try {
+                    Byte.parseByte("A8", 16);
+                } catch (Exception e) {
+                    ExceptionLog.record(e);
+                }
+                break;
+            case R.id.btn_export_inner_error_info:
+                exportInnerErrorInfo();
+                break;
         }
+    }
+
+    @AfterPermissionGranted(RC_WRITE_EXTERNAL_STORAGE)
+    private void exportInnerErrorInfo() {
+        if (EasyPermissions.hasPermissions(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            //FileUtil.copyOnlyFile(getFilesDir() + File.separator + "ErrorInfo.txt", Environment.getExternalStorageDirectory() + File.separator + "ErrorInfo_copy.txt");
+            ExceptionLog.exportErrorInfo(null);
+        } else {
+            EasyPermissions.requestPermissions(this, "我要写文件", RC_WRITE_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     private void sendCommand(byte[] command) {
