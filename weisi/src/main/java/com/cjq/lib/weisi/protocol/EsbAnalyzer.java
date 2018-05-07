@@ -68,7 +68,7 @@ public class EsbAnalyzer implements Analyzable {
     }
 
     public float analyzeBatteryVoltage(byte voltage, int sensorAddress) {
-        return sensorAddress < VOLTAGE_DIVIDE_VALUE
+        return sensorAddress >= VOLTAGE_DIVIDE_VALUE
                 ? voltage * BATTERY_VOLTAGE_COEFFICIENT
                 : (voltage != 0
                 ? VOLTAGE_UP_CONVERSION_VALUE / voltage
