@@ -3,6 +3,7 @@ package com.cjq.tool.qbox.ui.manager;
 import android.os.Handler;
 import android.os.Message;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
@@ -23,10 +24,10 @@ public class SwitchableFragmentManager<F extends Fragment & OnDataSetChangedList
     private final String[] mFragmentTags;
     private final Class<F>[] mFragmentClasses;
 
-    public SwitchableFragmentManager(FragmentManager fragmentManager,
-                                     int parentViewId,
-                                     String[] fragmentTags,
-                                     Class<F>[] fragmentClasses) {
+    public SwitchableFragmentManager(@NonNull FragmentManager fragmentManager,
+                                     @IdRes int parentViewId,
+                                     @NonNull String[] fragmentTags,
+                                     @NonNull Class[] fragmentClasses) {
         if (fragmentManager == null) {
             throw new NullPointerException("fragment manager can not be null");
         }
@@ -54,7 +55,7 @@ public class SwitchableFragmentManager<F extends Fragment & OnDataSetChangedList
         return false;
     }
 
-    private boolean isClassesNullOrIllegal(Class<F>[] classes) {
+    private boolean isClassesNullOrIllegal(Class[] classes) {
         if (classes == null) {
             return true;
         }
