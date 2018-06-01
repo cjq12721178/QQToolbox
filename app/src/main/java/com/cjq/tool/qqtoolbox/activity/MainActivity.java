@@ -2,7 +2,9 @@ package com.cjq.tool.qqtoolbox.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.nfc.Tag;
 import android.os.Environment;
+import android.os.PersistableBundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +23,10 @@ import android.widget.Toast;
 
 import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.SerialPortKit;
+import com.cjq.lib.weisi.data.FilterCollection;
+import com.cjq.lib.weisi.data.Storage;
 import com.cjq.lib.weisi.iot.LogicalSensor;
+import com.cjq.lib.weisi.iot.PhysicalSensor;
 import com.cjq.lib.weisi.iot.Warner;
 import com.cjq.lib.weisi.protocol.UdpSensorProtocol;
 import com.cjq.tool.qbox.ui.dialog.BaseDialog;
@@ -39,6 +44,11 @@ import com.cjq.tool.qbox.util.ExceptionLog;
 import com.cjq.lib.weisi.util.NumericConverter;
 import com.cjq.tool.qbox.util.FileUtil;
 import com.cjq.tool.qqtoolbox.R;
+import com.cjq.tool.qqtoolbox.bean.Person;
+import com.cjq.tool.qqtoolbox.bean.PhysicalSensorProvider;
+import com.cjq.tool.qqtoolbox.bean.filter.BleProtocolFilter;
+import com.cjq.tool.qqtoolbox.bean.filter.SensorUseForRealTimeFilter;
+import com.cjq.tool.qqtoolbox.bean.sorter.SensorAddressSorter;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleConstraintLayoutDialog;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleLinearLayoutDialog;
 import com.cjq.tool.qqtoolbox.fragment.NoTitleRelativeLayoutDialog;
@@ -56,6 +66,8 @@ import java.util.List;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
+import static com.cjq.tool.qqtoolbox.util.DebugTag.GENERAL_LOG_TAG;
+
 public class MainActivity
         extends AppCompatActivity
         implements View.OnClickListener,
@@ -64,7 +76,7 @@ public class MainActivity
         CompoundButton.OnCheckedChangeListener,
         TextView.OnEditorActionListener,
         DataReceiver.Listener,
-        SearchDialog.OnSearchListener {
+        SearchDialog.OnSearchListener, Storage.ElementsProvider<PhysicalSensor> {
 
     private static final int RC_WRITE_EXTERNAL_STORAGE = 1;
     private SwitchableFragmentManager mSwitchableFragmentManager;
@@ -84,13 +96,38 @@ public class MainActivity
     private String mReceptionTextCopy;
     private FilterDialog mFilterDialog;
     private SearchDialog mSearchDialog;
+    //private FilterCollection<PhysicalSensor> mFilterCollection;
+    //private Storage<PhysicalSensor> mPhysicalSensorStorage;
+    //private Person mCjq;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
+//        if (savedInstanceState != null) {
+//            mFilterCollection = savedInstanceState.getParcelable("filters");
+//
+//            mPhysicalSensorStorage = savedInstanceState.getParcelable("storage");
+//
+//            mCjq = savedInstanceState.getParcelable("person");
+//        } else {
+//            mFilterCollection = new FilterCollection<>();
+//            mFilterCollection.add(new BleProtocolFilter<PhysicalSensor>());
+//            mFilterCollection.add(new SensorUseForRealTimeFilter<PhysicalSensor>());
+//
+//            mPhysicalSensorStorage = new Storage<>(new Storage.ElementsProvider<PhysicalSensor>() {
+//                @Override
+//                public void onProvideElements(@NonNull List<PhysicalSensor> elements, FilterCollection<PhysicalSensor> filters) {
+//
+//                }
+//            });
+//            mPhysicalSensorStorage.setSorter(new SensorAddressSorter<PhysicalSensor>(), true);
+//            mPhysicalSensorStorage.addFilter(new BleProtocolFilter<PhysicalSensor>());
+//            mPhysicalSensorStorage.addFilter(new SensorUseForRealTimeFilter<PhysicalSensor>());
+//
+//            mCjq = new Person("cjq", 29);
+//        }
 
 //        if (savedInstanceState != null) {
 //            mFilterDialog = (FilterDialog) getSupportFragmentManager().findFragmentByTag("test_filter_dialog");
@@ -113,6 +150,14 @@ public class MainActivity
         mSpnBaudRate.setSelection(16);
         EditText etEmission = (EditText) findViewById(R.id.et_emission);
         etEmission.setOnEditorActionListener(this);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        //outState.putParcelable("filters", mFilterCollection);
+        //outState.putParcelable("storage", mPhysicalSensorStorage);
+        //outState.putParcelable("person", mCjq);
     }
 
     @Override
@@ -210,7 +255,7 @@ public class MainActivity
                         try {
                             Toast.makeText(MainActivity.this, "normal toast在其他线程中弹出", Toast.LENGTH_SHORT).show();
                         } catch (Exception e) {
-                            ClosableLog.d(DebugTag.GENERAL_LOG_TAG, "normal toast 果然不靠谱啊!");
+                            ClosableLog.d(GENERAL_LOG_TAG, "normal toast 果然不靠谱啊!");
                         }
                     }
                 }).start();
@@ -393,6 +438,23 @@ public class MainActivity
             case R.id.btn_export_inner_error_info:
                 exportInnerErrorInfo();
                 break;
+            case R.id.btn_test_parcel_invoke:
+                Intent intent = new Intent(this, TestParcelableActivity.class);
+                Storage<PhysicalSensor> physicalSensorStorage = new Storage<>(new Storage.ElementsProvider<PhysicalSensor>() {
+                    @Override
+                    public void onProvideElements(@NonNull List<PhysicalSensor> elements, FilterCollection<PhysicalSensor> filters) {
+
+                    }
+                });
+                physicalSensorStorage.setSorter(new SensorAddressSorter<PhysicalSensor>(), true);
+                physicalSensorStorage.addFilter(new BleProtocolFilter<PhysicalSensor>());
+                physicalSensorStorage.addFilter(new SensorUseForRealTimeFilter<PhysicalSensor>());
+                //FilterCollection<PhysicalSensor> filterCollection = new FilterCollection<>();
+                //filterCollection.add(new BleProtocolFilter<PhysicalSensor>());
+                //filterCollection.add(new SensorUseForRealTimeFilter<PhysicalSensor>().setType(7));
+                intent.putExtra("storage", physicalSensorStorage);
+                startActivity(intent);
+                break;
         }
     }
 
@@ -559,7 +621,7 @@ public class MainActivity
 
     @Override
     public void onFilterChange(FilterDialog dialog, boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues) {
-        Log.d(DebugTag.GENERAL_LOG_TAG, generateFilterChangeMsg(hasFilters, checkedFilterEntryValues));
+        Log.d(GENERAL_LOG_TAG, generateFilterChangeMsg(hasFilters, checkedFilterEntryValues));
     }
 
     private String generateFilterChangeMsg(boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues) {
@@ -583,11 +645,16 @@ public class MainActivity
 
     @Override
     public void onSearch(String target) {
-        Log.d(DebugTag.GENERAL_LOG_TAG, "search content: " + target);
+        Log.d(GENERAL_LOG_TAG, "search content: " + target);
     }
 
     public void test() {
         WarnerImpl warner = new WarnerImpl();
+    }
+
+    @Override
+    public void onProvideElements(@NonNull List<PhysicalSensor> elements, FilterCollection<PhysicalSensor> filters) {
+
     }
 
     private static class Value extends com.cjq.lib.weisi.iot.Value {

@@ -49,6 +49,8 @@
         </activity>
         <activity android:name=".activity.TestRecyclerViewInconsistencyActivity">
         </activity>
+        <activity android:name=".activity.TestParcelableActivity">
+        </activity>
     </application>
 
 </manifest>

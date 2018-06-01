@@ -3,6 +3,8 @@ package com.cjq.lib.weisi.iot;
 
 import android.support.annotation.NonNull;
 
+import com.cjq.lib.weisi.data.Filter;
+
 /**
  * Created by CJQ on 2017/11/3.
  */
@@ -171,14 +173,6 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
                                    long timestamp,
                                    float batteryVoltage,
                                    double rawValue);
-    }
-
-    /**
-     * Created by CJQ on 2017/9/13.
-     */
-
-    public interface Filter<S extends Sensor> {
-        boolean isMatch(@NonNull S sensor);
     }
 
     protected static class EmptyConfiguration<V extends Value> implements Configuration<V> {

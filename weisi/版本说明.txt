@@ -405,3 +405,14 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20180507-5.0.4(106):
 1. 修复ESB协议族电压解析错误的问题
+
+20180528-5.1.0(107):
+1. 新增data包（其实一直没想好要叫啥。。）
+2. data包新增Filter接口，用于筛选对象
+3. data包新增FilterCollection类，用于容纳多种不同的filter
+4. data包新增Sorter类，用于实现模板化的元素排序及查找
+5. data包新增Storage类，用于对ElementsProvider提供的元素进行筛选之后排序并存储，之后可以提供插入和查找功能，当其Sorter和Filter改变时会触发监听接口
+
+20180601-5.2.0(108):
+1. util包新增SimpleCustomClassParcel类，用于对自定义类在实现Parcelable接口时提供帮助
+2. 使FilterCollection和Storage类实现Parcelable接口

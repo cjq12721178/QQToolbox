@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.cjq.lib.weisi.data.Filter;
 import com.cjq.lib.weisi.protocol.EsbAnalyzer;
 import com.cjq.lib.weisi.util.ExpandCollections;
 import com.cjq.lib.weisi.util.ExpandComparator;
@@ -189,58 +190,21 @@ public class SensorManager {
         SENSOR_MAP.put(sensor.getId().getId(), sensor);
     }
 
-//    public static synchronized <S extends Sensor> List<S> getSensors(Class<S> sClass) {
-//        if (sClass == Sensor.class) {
-//            return (List<S>) new ArrayList<>(SENSOR_MAP.values());
-//        }
-//        List<S> sensors = new ArrayList<>();
-//        for (Sensor sensor :
-//                SENSOR_MAP.values()) {
-//            if (sClass.isInstance(sensor)) {
-//                sensors.add((S) sensor);
-//            }
-//        }
-//        return sensors;
-//    }
-
     public static synchronized <S extends Sensor> void getSensors(
             @NonNull List<S> sensorCarrier,
-            Sensor.Filter<S> filter,
+            Filter<S> filter,
             @NonNull Class<S> sClass) {
         S s;
         for (Sensor sensor :
                 SENSOR_MAP.values()) {
             if (sClass.isInstance(sensor)) {
                 s = (S) sensor;
-                if (filter == null || filter.isMatch(s)) {
+                if (filter == null || filter.match(s)) {
                     sensorCarrier.add(s);
                 }
             }
         }
     }
-
-//    public static synchronized void getPhysicalSensors(@NonNull List<PhysicalSensor> sensorCarrier,
-//                                                       Sensor.Filter<PhysicalSensor> filter) {
-//        for (Sensor sensor :
-//                SENSOR_MAP.values()) {
-//            if (sensor instanceof PhysicalSensor
-//                    && (filter == null || filter.isMatch((PhysicalSensor) sensor))) {
-//                sensorCarrier.add((PhysicalSensor) sensor);
-//            }
-//        }
-//    }
-//
-//    public static synchronized void getLogicalSensors(
-//            @NonNull List<LogicalSensor> sensorCarrier,
-//            Sensor.Filter<LogicalSensor> filter) {
-//        for (Sensor sensor :
-//                SENSOR_MAP.values()) {
-//            if (sensor instanceof LogicalSensor
-//                    && (filter == null || filter.isMatch((LogicalSensor) sensor))) {
-//                sensorCarrier.add((LogicalSensor) sensor);
-//            }
-//        }
-//    }
 
     public static synchronized <S extends Sensor> int getSensorWithHistoryValuesCount(Class<S> sClass) {
         int count = 0;
@@ -348,8 +312,6 @@ public class SensorManager {
 
     public interface SensorConfigurationProvider {
         <C extends Sensor.Configuration> C getSensorConfiguration(Sensor.ID id);
-//        PhysicalSensor.Configuration getPhysicalSensorConfiguration(Sensor.ID id);
-//        LogicalSensor.Configuration getLogicalConfiguration(Sensor.ID id);
     }
 
     private static class ConfigurationImporter extends DefaultHandler {
