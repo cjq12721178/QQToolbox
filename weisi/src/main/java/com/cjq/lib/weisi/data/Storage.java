@@ -103,17 +103,17 @@ public class Storage<E> implements Parcelable {
         }
     }
 
-    public void addFilter(Filter<E> filter) {
-        addFilter(filter, null);
+    public void addFilter(int id, Filter<E> filter) {
+        addFilter(id, filter, null);
     }
 
-    public void addFilter(Filter<E> filter, OnFilterChangeListener listener) {
-        addFilter(filter, listener, listener != null);
+    public void addFilter(int id, Filter<E> filter, OnFilterChangeListener listener) {
+        addFilter(id, filter, listener, listener != null);
     }
 
-    public void addFilter(Filter<E> filter, OnFilterChangeListener listener, boolean commit) {
+    public void addFilter(int id, Filter<E> filter, OnFilterChangeListener listener, boolean commit) {
         int filterSize = mFilters.size();
-        mFilters.add(filter);
+        mFilters.put(id, filter);
         if (commit && filterSize != mFilters.size()) {
             reFiltrate(listener);
         }
@@ -133,20 +133,40 @@ public class Storage<E> implements Parcelable {
         }
     }
 
-    public void removeFilter(Filter<E> filter) {
-        removeFilter(filter, null);
+    public void removeFilter(int filterId) {
+        removeFilter(filterId, null);
     }
 
-    public void removeFilter(Filter<E> filter, OnFilterChangeListener listener) {
-        removeFilter(filter, listener, listener != null);
+    public void removeFilter(int filterId, OnFilterChangeListener listener) {
+        removeFilter(filterId, listener, listener != null);
     }
 
-    public void removeFilter(Filter<E> filter, OnFilterChangeListener listener, boolean commit) {
+    public void removeFilter(int filterId, OnFilterChangeListener listener, boolean commit) {
         int filterSize = mFilters.size();
-        mFilters.remove(filter);
+        mFilters.remove(filterId);
         if (commit && filterSize != mFilters.size()) {
             reFiltrate(listener);
         }
+    }
+
+    public void clearFilters() {
+        clearFilters(null);
+    }
+
+    public void clearFilters(OnFilterChangeListener listener) {
+        clearFilters(listener, listener != null);
+    }
+
+    public void clearFilters(OnFilterChangeListener listener, boolean commit) {
+        int filterSize = mFilters.size();
+        mFilters.clear();
+        if (commit && filterSize != mFilters.size()) {
+            reFiltrate(listener);
+        }
+    }
+
+    public Filter<E> getFilter(int filterId) {
+        return mFilters.get(filterId);
     }
 
     public void refresh(OnSortChangeListener<E> onSortChangeListener,
@@ -189,10 +209,6 @@ public class Storage<E> implements Parcelable {
 
     public boolean isDescend() {
         return mDescend;
-    }
-
-    public List<Filter<E>> getFilters() {
-        return mFilters.getFilters();
     }
 
     public interface ElementsProvider<E> {

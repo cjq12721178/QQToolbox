@@ -447,8 +447,8 @@ public class MainActivity
                     }
                 });
                 physicalSensorStorage.setSorter(new SensorAddressSorter<PhysicalSensor>(), true);
-                physicalSensorStorage.addFilter(new BleProtocolFilter<PhysicalSensor>());
-                physicalSensorStorage.addFilter(new SensorUseForRealTimeFilter<PhysicalSensor>());
+                physicalSensorStorage.addFilter(1, new BleProtocolFilter<PhysicalSensor>());
+                physicalSensorStorage.addFilter(2, new SensorUseForRealTimeFilter<PhysicalSensor>());
                 //FilterCollection<PhysicalSensor> filterCollection = new FilterCollection<>();
                 //filterCollection.add(new BleProtocolFilter<PhysicalSensor>());
                 //filterCollection.add(new SensorUseForRealTimeFilter<PhysicalSensor>().setType(7));

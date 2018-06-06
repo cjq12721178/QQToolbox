@@ -17,7 +17,6 @@ import java.util.List;
 public class PhysicalSensor extends Sensor<PhysicalSensor.Value, PhysicalSensor.Configuration> {
 
     private static final int MEASUREMENT_SEARCH_THRESHOLD = 3;
-    private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
     private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
 
     private final Type mType;
@@ -304,21 +303,6 @@ public class PhysicalSensor extends Sensor<PhysicalSensor.Value, PhysicalSensor.
             return ValueContainer.ADD_FAILED_RETURN_VALUE;
         }
         return measurement.addLogicalHistoryValue(timestamp, rawValue);
-    }
-
-    public State getState() {
-        if (!hasRealTimeValue()) {
-            return State.NEVER_CONNECTED;
-        }
-        return System.currentTimeMillis() - getRealTimeValue().getTimestamp() < MAX_COMMUNICATION_BREAK_TIME
-                ? State.ON_LINE
-                : State.OFF_LINE;
-    }
-
-    public enum State {
-        NEVER_CONNECTED,
-        ON_LINE,
-        OFF_LINE
     }
 
     private static final ExpandComparator<LogicalSensor, Byte> MEASUREMENT_SEARCH_HELPER = new ExpandComparator<LogicalSensor, Byte>() {

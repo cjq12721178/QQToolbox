@@ -2,6 +2,7 @@ package com.cjq.lib.weisi.util;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.SparseArray;
 
 import java.util.List;
 
@@ -59,6 +60,22 @@ public class SimpleCustomClassParcel {
         int n = in.readInt();
         for (int i = 0;i < n;++i) {
             l.add(readFromParcel(in, owner));
+        }
+    }
+
+    public static void writeToParcel(Parcel dst, SparseArray array, int flags) {
+        int n = array != null ? array.size() : 0;
+        dst.writeInt(n);
+        for (int i = 0;i < n;++i) {
+            dst.writeInt(array.keyAt(i));
+            writeToParcel(dst, array.valueAt(i), flags);
+        }
+    }
+
+    public static void readFromParcel(Parcel in, SparseArray array, Object owner) {
+        int n = in.readInt();
+        for (int i = 0;i < n;++i) {
+            array.put(in.readInt(), readFromParcel(in, owner));
         }
     }
 }

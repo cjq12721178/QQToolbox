@@ -1,9 +1,13 @@
 package com.cjq.lib.weisi.iot;
 
 
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
 import com.cjq.lib.weisi.data.Filter;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 /**
  * Created by CJQ on 2017/11/3.
@@ -11,6 +15,7 @@ import com.cjq.lib.weisi.data.Filter;
 
 public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>> {
 
+    private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
     private static OnDynamicValueCaptureListener onDynamicValueCaptureListener;
 
     private final ID mId;
@@ -150,6 +155,30 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
         }
     }
 
+    public @State int getState() {
+        if (!hasRealTimeValue()) {
+            return NEVER_CONNECTED;
+        }
+        return System.currentTimeMillis() - getRealTimeValue().getTimestamp() < MAX_COMMUNICATION_BREAK_TIME
+                ? ON_LINE
+                : OFF_LINE;
+    }
+
+    @IntDef({NEVER_CONNECTED, ON_LINE, OFF_LINE})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface State {
+    }
+
+    public static final int NEVER_CONNECTED = 0;
+    public static final int ON_LINE = 1;
+    public static final int OFF_LINE = 2;
+
+//    public enum State {
+//        NEVER_CONNECTED,
+//        ON_LINE,
+//        OFF_LINE
+//    }
+
     public static void setOnDynamicValueCaptureListener(OnDynamicValueCaptureListener listener) {
         onDynamicValueCaptureListener = listener;
     }
@@ -192,7 +221,7 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
      * Created by CJQ on 2017/11/29.
      */
 
-    public static class ID {
+    public static class ID implements Comparable<ID> {
 
         private static final long ADDRESS_MASK = 0xffffff00000000L;
         private static final long DATA_TYPE_MASK = 0xff000000;
@@ -222,9 +251,6 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
             return ((((long) address) << ADDRESS_START_BIT) & ADDRESS_MASK)
                     | ((((long) dataTypeValue) << DATA_TYPE_START_BIT) & DATA_TYPE_MASK)
                     | (((long) dataTypeValueIndex) & DATA_TYPE_INDEX_MASK);
-//            return ((long) (address & ADDRESS_MASK) << 32)
-//                    | ((long) (dataTypeValue & DATA_TYPE_MASK) << 24)
-//                    | (dataTypeValueIndex & DATA_TYPE_INDEX_MASK);
         }
 
         public static boolean isBleProtocolFamily(int address) {
@@ -251,7 +277,6 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
 
         public static int getAddress(long id) {
             return (int) ((id & ADDRESS_MASK) >> ADDRESS_START_BIT);
-            //return (int) (id >> 32) & 0xffffff;
         }
 
         public static String getFormatAddress(long id) {
@@ -266,7 +291,6 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
 
         public static byte getDataTypeValue(long id) {
             return (byte) ((id & DATA_TYPE_MASK) >> DATA_TYPE_START_BIT);
-            //return (byte) (id >> 24);
         }
 
         public int getDataTypeValueIndex() {
@@ -275,7 +299,6 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
 
         public static int getDataTypeValueIndex(long id) {
             return (int) (id & DATA_TYPE_INDEX_MASK);
-            //return (int) (id & 0xffffff);
         }
 
         public boolean isLogical() {
@@ -299,6 +322,16 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
                 return mId == ((Long)o).longValue();
             }
             return false;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%6X-%2X-%X", getAddress(), getDataTypeValue(), getDataTypeValueIndex());
+        }
+
+        @Override
+        public int compareTo(@NonNull ID o) {
+            return (mId < o.mId) ? -1 : (mId == o.mId ? 0 : 1);
         }
     }
 

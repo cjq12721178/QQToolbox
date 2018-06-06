@@ -416,3 +416,18 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 20180601-5.2.0(108):
 1. util包新增SimpleCustomClassParcel类，用于对自定义类在实现Parcelable接口时提供帮助
 2. 使FilterCollection和Storage类实现Parcelable接口
+
+20180604-5.2.1(109):
+1. storage类增加clearFilters方法
+
+20180604-5.2.2(110):
+1. 修改FilterCollection存储方式，改ArrayList为SparseArray
+2. 为storage类增加获取Filter的方法
+
+20180605-5.2.3
+1. 将方法getState从PhysicalSensor类移至Sensor类
+2. 将PhysicalSensor类中的State枚举改为@IntDef，并移至Sensor类
+3. 为Sensor.ID重载toString()方法
+4. 为Sensor.ID实现Comparable接口
+
+
