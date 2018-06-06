@@ -223,7 +223,7 @@ public class LogicalSensor extends Sensor<LogicalSensor.Value, LogicalSensor.Con
         }
 
         public String getDefaultName() {
-            return TextUtils.isEmpty(mName) ? String.valueOf(mValue) : mName;
+            return TextUtils.isEmpty(mName) ? "未知测量量" : mName;
         }
 
         public String getUnit() {

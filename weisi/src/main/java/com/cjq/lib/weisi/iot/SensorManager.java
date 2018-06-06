@@ -274,6 +274,14 @@ public class SensorManager {
         return Collections.unmodifiableList(ESB_SENSOR_TYPES);
     }
 
+    public static List<LogicalSensor.DataType> getBleDataTypes() {
+        return new ArrayList<>(BLE_DATA_TYPES.values());
+    }
+
+    public static List<LogicalSensor.DataType> getEsbDataTypes() {
+        return new ArrayList<>(ESB_DATA_TYPES.values());
+    }
+
     private static List<PhysicalSensor.Type> getSensorTypes(int address) {
         return Sensor.ID.isBleProtocolFamily(address) ? BLE_SENSOR_TYPES : ESB_SENSOR_TYPES;
     }
