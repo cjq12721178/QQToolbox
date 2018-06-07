@@ -434,3 +434,7 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. SensorManager新增方法getBleDataTypes和getEsbDataTypes
 2. 修改LogicalSensor.DataType类的方法getDefaultName，当name为空时为“未知测量量”
 
+20180607-5.2.5(113):
+1. 修改Sensor.ID类的toString方法
+2. 为Sensor.ID类增加静态方法correct，用于杜绝id前两位非0的问题
+

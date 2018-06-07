@@ -76,9 +76,10 @@ public class SensorManager {
     }
 
     public static synchronized Sensor getSensor(long id, boolean autoCreate) {
-        Sensor sensor = SENSOR_MAP.get(id);
+        long correctId = Sensor.ID.correct(id);
+        Sensor sensor = SENSOR_MAP.get(correctId);
         if (sensor == null && autoCreate) {
-            sensor = createSensor(id);
+            sensor = createSensor(correctId);
         }
         return sensor;
     }
@@ -108,9 +109,10 @@ public class SensorManager {
 
     public static synchronized LogicalSensor getLogicalSensor(
             long id, boolean autoCreate) {
-        LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(id);
+        long correctId = Sensor.ID.correct(id);
+        LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(correctId);
         if (sensor == null && autoCreate) {
-            sensor = createLogicalSensor(id);
+            sensor = createLogicalSensor(correctId);
         }
         return sensor;
     }

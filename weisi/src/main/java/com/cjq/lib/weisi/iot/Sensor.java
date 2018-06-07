@@ -224,15 +224,15 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
     public static class ID implements Comparable<ID> {
 
         private static final long ADDRESS_MASK = 0xffffff00000000L;
-        private static final long DATA_TYPE_MASK = 0xff000000;
-        private static final long DATA_TYPE_INDEX_MASK = 0xffffff;
+        private static final long DATA_TYPE_MASK = 0xff000000L;
+        private static final long DATA_TYPE_INDEX_MASK = 0xffffffL;
         private static final int PROTOCOL_FAMILY_MASK = 0xff0000;
         private static final int ADDRESS_START_BIT = 32;
         private static final int DATA_TYPE_START_BIT = 24;
         private final long mId;
 
         public ID(long id) {
-            mId = id;
+            mId = correct(id);
         }
 
         public ID(int address) {
@@ -241,6 +241,10 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
 
         public ID(int address, byte dataTypeValue, int dataTypeValueIndex) {
             mId = getId(address, dataTypeValue, dataTypeValueIndex);
+        }
+
+        public static long correct(long id) {
+            return id & (ADDRESS_MASK | DATA_TYPE_MASK | DATA_TYPE_INDEX_MASK);
         }
 
         public static long getId(int address) {
@@ -326,7 +330,7 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
 
         @Override
         public String toString() {
-            return String.format("%6X-%2X-%X", getAddress(), getDataTypeValue(), getDataTypeValueIndex());
+            return String.format("%6X-%02X-%d", getAddress(), getDataTypeValue(), getDataTypeValueIndex());
         }
 
         @Override
