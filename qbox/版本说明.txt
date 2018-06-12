@@ -258,3 +258,10 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20180509-1.6.1(72):
 1. 修改SwitchableFragmentManager类构造函数参数
+
+20180611-1.6.2(73):
+1. 新增MapAdapterDelegateManager类，用于更方便地管理AdapterDelegate
+
+20180612-1.6.3(74):
+1. SimpleRecyclerViewItemTouchListener类新增方法setMinRangeEnable，用于点击时返回最直接接触的view
+

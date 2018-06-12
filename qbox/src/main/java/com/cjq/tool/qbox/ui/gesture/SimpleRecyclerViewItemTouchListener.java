@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 
 import com.cjq.tool.qbox.ui.adapter.HeaderAndFooterWrapper;
 import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
@@ -25,6 +26,7 @@ public abstract class SimpleRecyclerViewItemTouchListener
     private final RecyclerView mRecyclerView;
     private final GestureDetectorCompat mDetector;
     private Set<Integer> mChildViewIds;
+    private boolean mMinRangeEnable;
 
     public SimpleRecyclerViewItemTouchListener(@NonNull RecyclerView rv) {
         this(rv, false);
@@ -46,6 +48,11 @@ public abstract class SimpleRecyclerViewItemTouchListener
             mChildViewIds = new HashSet<>();
         }
         mChildViewIds.add(id);
+        return this;
+    }
+
+    public SimpleRecyclerViewItemTouchListener setMinRangeEnable(boolean enable) {
+        mMinRangeEnable = enable;
         return this;
     }
 
@@ -121,16 +128,37 @@ public abstract class SimpleRecyclerViewItemTouchListener
     }
 
     private View correctView(View vItem, MotionEvent e) {
-        if (mChildViewIds == null) {
-            return vItem;
-        }
-        for (int id : mChildViewIds) {
-            View vChild = vItem.findViewById(id);
-            if (vChild != null && inRangeOfView(vChild, e)) {
-                return vChild;
+        if (mMinRangeEnable) {
+            if (vItem instanceof ViewGroup) {
+                View target = findTouchedView((ViewGroup) vItem, e);
+                if (target != null) {
+                    return target;
+                }
+            }
+        } else if (mChildViewIds != null) {
+            for (int id : mChildViewIds) {
+                View vChild = vItem.findViewById(id);
+                if (vChild != null && inRangeOfView(vChild, e)) {
+                    return vChild;
+                }
             }
         }
         return vItem;
+    }
+
+    private View findTouchedView(ViewGroup parent, MotionEvent e) {
+        View child;
+        for (int i = 0, size = parent.getChildCount();i < size;++i) {
+            child = parent.getChildAt(i);
+            if (inRangeOfView(child, e)) {
+                if (child instanceof ViewGroup) {
+                    return findTouchedView((ViewGroup) child, e);
+                } else {
+                    return child;
+                }
+            }
+        }
+        return null;
     }
 
     private boolean inRangeOfView(View view, MotionEvent ev){
