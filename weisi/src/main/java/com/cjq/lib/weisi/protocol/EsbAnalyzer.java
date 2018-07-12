@@ -43,7 +43,7 @@ public class EsbAnalyzer implements Analyzable {
             long lastTime, currTime;
             lastTime = TIMESTAMP_BUILDER.getTimeInMillis();
             TIMESTAMP_BUILDER.set(ADJUSTED_YEAR,
-                    src[calendarPos] & 0x0f,
+                    (src[calendarPos] & 0x0f) - 1,
                     src[++calendarPos],
                     src[++calendarPos],
                     src[++calendarPos],

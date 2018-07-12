@@ -438,3 +438,5 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. 修改Sensor.ID类的toString方法
 2. 为Sensor.ID类增加静态方法correct，用于杜绝id前两位非0的问题
 
+20180712-5.2.6(114):
+1. 修复EsbAnalyzer类analyzeTimestamp方法月份解析多一个月的问题
