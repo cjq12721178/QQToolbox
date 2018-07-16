@@ -3,6 +3,8 @@ package com.cjq.lib.weisi.protocol;
 
 import com.cjq.lib.weisi.util.NumericConverter;
 
+import java.util.Calendar;
+
 /**
  * Created by CJQ on 2018/1/10.
  */
@@ -58,7 +60,9 @@ public abstract class UsbSensorProtocol<A extends Analyzable> extends Controllab
 
         @Override
         protected void fillDataZone(byte[] frame, int offset) {
-            int time = (int) (System.currentTimeMillis() / 1000);
+            Calendar c = Calendar.getInstance();
+            c.add(Calendar.MONTH, -1);
+            int time = (int) (c.getTimeInMillis() / 1000);
             frame[offset] = (byte) (time >> 24);
             frame[++offset] = (byte) ((time >> 16) & 0xff);
             frame[++offset] = (byte) ((time >> 8) & 0xff);

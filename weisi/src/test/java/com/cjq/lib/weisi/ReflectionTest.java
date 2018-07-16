@@ -2,6 +2,7 @@ package com.cjq.lib.weisi;
 
 import android.support.annotation.NonNull;
 
+import com.cjq.lib.weisi.data.Filter;
 import com.cjq.lib.weisi.iot.LogicalSensor;
 import com.cjq.lib.weisi.iot.PhysicalSensor;
 import com.cjq.lib.weisi.iot.Sensor;
@@ -23,21 +24,21 @@ public class ReflectionTest {
 
     @Test
     public void getInterfaceParameterizedType() {
-        assertEquals(Sensor.class, getFilterParameterizedType(new Sensor.Filter<Sensor>() {
+        assertEquals(Sensor.class, getFilterParameterizedType(new Filter<Sensor>() {
             @Override
-            public boolean isMatch(@NonNull Sensor sensor) {
+            public boolean match(@NonNull Sensor sensor) {
                 return false;
             }
         }));
-        assertEquals(PhysicalSensor.class, getFilterParameterizedType(new Sensor.Filter<PhysicalSensor>() {
+        assertEquals(PhysicalSensor.class, getFilterParameterizedType(new Filter<PhysicalSensor>() {
             @Override
-            public boolean isMatch(@NonNull PhysicalSensor sensor) {
+            public boolean match(@NonNull PhysicalSensor sensor) {
                 return false;
             }
         }));
-        assertEquals(LogicalSensor.class, getFilterParameterizedType(new Sensor.Filter<LogicalSensor>() {
+        assertEquals(LogicalSensor.class, getFilterParameterizedType(new Filter<LogicalSensor>() {
             @Override
-            public boolean isMatch(@NonNull LogicalSensor sensor) {
+            public boolean match(@NonNull LogicalSensor sensor) {
                 return false;
             }
         }));
@@ -49,10 +50,10 @@ public class ReflectionTest {
 
     }
 
-    private static class PhysicalSensorFilter implements FirstInterface, Sensor.Filter<PhysicalSensor> {
+    private static class PhysicalSensorFilter implements FirstInterface, Filter<PhysicalSensor> {
 
         @Override
-        public boolean isMatch(@NonNull PhysicalSensor sensor) {
+        public boolean match(@NonNull PhysicalSensor sensor) {
             return false;
         }
     }
@@ -61,8 +62,8 @@ public class ReflectionTest {
 
     }
 
-    public <S extends Sensor> Class<S> getFilterParameterizedType(Sensor.Filter<S> filter) {
-        return (Class<S>) SimpleReflection.getInterfaceParameterizedType(filter, Sensor.Filter.class, 0);
+    public <S extends Sensor> Class<S> getFilterParameterizedType(Filter<S> filter) {
+        return (Class<S>) SimpleReflection.getInterfaceParameterizedType(filter, Filter.class, 0);
     }
 
     @Test
