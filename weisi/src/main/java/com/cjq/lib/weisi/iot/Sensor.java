@@ -257,12 +257,16 @@ public abstract class Sensor<V extends Value, C extends Sensor.Configuration<V>>
                     | (((long) dataTypeValueIndex) & DATA_TYPE_INDEX_MASK);
         }
 
+        public static boolean isBleProtocolFamily(long id) {
+            return (getAddress(id) & PROTOCOL_FAMILY_MASK) != 0;
+        }
+
         public static boolean isBleProtocolFamily(int address) {
             return (address & PROTOCOL_FAMILY_MASK) != 0;
         }
 
         public boolean isBleProtocolFamily() {
-            return (getAddress() & PROTOCOL_FAMILY_MASK) != 0;
+            return isBleProtocolFamily(mId);
         }
 
         public long getId() {
