@@ -52,7 +52,7 @@ public class EditDialog extends BaseEditDialog<EditDialog.Decorator> {
 //    protected void onSetContentView(View contentView,
 //                                    Decorator decorator,
 //                                    @Nullable Bundle savedInstanceState) {
-//        mEtText = contentView.findViewById(decorator.getEditId());
+//        mEtText = contentView.findViewById(decorator.getTextId());
 //        mEtText.setText(getContent());
 //        mEtText.setHint(getSummary());
 //        int textSizeRes = decorator.getEditTextSizeDimenRes();

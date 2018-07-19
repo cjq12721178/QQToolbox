@@ -265,3 +265,5 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20180612-1.6.3(74):
 1. SimpleRecyclerViewItemTouchListener类新增方法setMinRangeEnable，用于点击时返回最直接接触的view
 
+20180719-1.6.4(75):
+1. ConfirmDialog类新增内容设置功能，并赋予相关参数设置

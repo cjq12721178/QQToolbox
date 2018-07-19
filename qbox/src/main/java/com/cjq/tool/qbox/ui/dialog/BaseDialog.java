@@ -47,6 +47,8 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     private static final String ARGUMENT_KEY_DRAW_TITLE = "in_draw_title";
     private static final String ARGUMENT_KEY_EXIT_TYPE = "in_exit_type";
     private static final String ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS = "in_custom_decorator_paras";
+    protected static final String ARGUMENT_KEY_CONTENT_STRING = "in_content_str";
+    protected static final String ARGUMENT_KEY_CONTENT_RESOURCE = "in_content_res";
     private static final String FLAG_SEPARATION_LINE = "line";
 
     private static final Map<String, Decorator> overallDecorator = new HashMap<>();

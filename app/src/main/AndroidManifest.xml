@@ -51,6 +51,8 @@
         </activity>
         <activity android:name=".activity.TestParcelableActivity">
         </activity>
+        <activity android:name=".activity.TestUpdateVersionActivity">
+        </activity>
     </application>
 
 </manifest>

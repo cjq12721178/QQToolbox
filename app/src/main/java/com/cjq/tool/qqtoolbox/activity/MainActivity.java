@@ -105,39 +105,11 @@ public class MainActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-//        if (savedInstanceState != null) {
-//            mFilterCollection = savedInstanceState.getParcelable("filters");
-//
-//            mPhysicalSensorStorage = savedInstanceState.getParcelable("storage");
-//
-//            mCjq = savedInstanceState.getParcelable("person");
-//        } else {
-//            mFilterCollection = new FilterCollection<>();
-//            mFilterCollection.add(new BleProtocolFilter<PhysicalSensor>());
-//            mFilterCollection.add(new SensorUseForRealTimeFilter<PhysicalSensor>());
-//
-//            mPhysicalSensorStorage = new Storage<>(new Storage.ElementsProvider<PhysicalSensor>() {
-//                @Override
-//                public void onProvideElements(@NonNull List<PhysicalSensor> elements, FilterCollection<PhysicalSensor> filters) {
-//
-//                }
-//            });
-//            mPhysicalSensorStorage.setSorter(new SensorAddressSorter<PhysicalSensor>(), true);
-//            mPhysicalSensorStorage.addFilter(new BleProtocolFilter<PhysicalSensor>());
-//            mPhysicalSensorStorage.addFilter(new SensorUseForRealTimeFilter<PhysicalSensor>());
-//
-//            mCjq = new Person("cjq", 29);
-//        }
-
-//        if (savedInstanceState != null) {
-//            mFilterDialog = (FilterDialog) getSupportFragmentManager().findFragmentByTag("test_filter_dialog");
-//        }
         ExceptionLog.initialize(this, "QQToolBox");
         ClosableLog.setEnablePrint(true);
         Thread.setDefaultUncaughtExceptionHandler(new CrashHandler(this));
         mSizeSelfAdaptionTextView = (SizeSelfAdaptionTextView) findViewById(R.id.tv_fix_size);
         mEtSetText = (EditText) findViewById(R.id.et_set_text);
-        //findViewById(R.id.tv_text_view_on_click).setOnClickListener(this);
 
         mEtSerialPortName = (EditText) findViewById(R.id.et_serial_port_name);
         mTvEmission = (TextView) findViewById(R.id.tv_emission_content);
@@ -169,13 +141,16 @@ public class MainActivity
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.btn_confirm_default_overall_decorator:
+            case R.id.btn_confirm_default_overall_decorator: {
                 ConfirmDialog dialog = new ConfirmDialog();
                 dialog.setTitle("use default overall decorator");
                 dialog.setDrawCancelButton(false);
+                dialog.setContent("this is content");
+                ConfirmDialog.Decorator decorator = dialog.getCustomDecorator();
+                decorator.setDrawSeparationLine(false);
                 dialog.show(getSupportFragmentManager(),
                         "test_confirm");
-                break;
+            } break;
             case R.id.btn_confirm_new_overall_decorator:
                 ConfirmDialog.Decorator decorator = ConfirmDialog.getOverallDecorator(ConfirmDialog.class);
                 decorator.reset();
@@ -454,6 +429,9 @@ public class MainActivity
                 //filterCollection.add(new SensorUseForRealTimeFilter<PhysicalSensor>().setType(7));
                 intent.putExtra("storage", physicalSensorStorage);
                 startActivity(intent);
+                break;
+            case R.id.btn_test_update_version:
+                startActivity(new Intent(this, TestUpdateVersionActivity.class));
                 break;
         }
     }

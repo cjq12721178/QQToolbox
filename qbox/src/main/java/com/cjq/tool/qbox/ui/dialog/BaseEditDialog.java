@@ -22,8 +22,6 @@ import com.cjq.tool.qbox.R;
 
 public abstract class BaseEditDialog<D extends BaseEditDialog.Decorator> extends BaseDialog<D> {
 
-    private static final String ARGUMENT_KEY_CONTENT_STRING = "in_content_str";
-    private static final String ARGUMENT_KEY_CONTENT_RESOURCE = "in_content_res";
     private static final String ARGUMENT_KEY_SUMMARY_STRING = "in_summary_str";
     private static final String ARGUMENT_KEY_SUMMARY_RESOURCE = "in_summary_res";
     private EditText mEtText;
