@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
 import android.os.Environment;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
@@ -13,7 +12,6 @@ import android.util.Log;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -114,7 +112,7 @@ public class ExceptionLog {
     private static void saveInLocalFile(String information) {
         try {
             FileWriter writer;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !debuggable) {
                 writer = new FileWriter(context.getFileStreamPath(DEFAULT_LOG_FILE_NAME));
             } else {
                 File directory = getErrorInfoDirectory();

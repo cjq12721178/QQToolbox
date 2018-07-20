@@ -267,3 +267,7 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20180719-1.6.4(75):
 1. ConfirmDialog类新增内容设置功能，并赋予相关参数设置
+
+20180720-1.6.5(76):
+1. ExceptionLog在Debug模式下将错误信息输出至SD卡指定目录,而非data中
+
