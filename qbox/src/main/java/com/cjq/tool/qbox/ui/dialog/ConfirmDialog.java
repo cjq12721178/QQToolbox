@@ -71,6 +71,11 @@ public class ConfirmDialog extends BaseDialog<ConfirmDialog.Decorator> {
         final public void setDefaultContentPadding(@DimenRes int padding) {
             mParameters.putInt("dp_con_padding", padding);
         }
+
+        @Override
+        public boolean isDefaultDrawSeparationLine() {
+            return false;
+        }
     }
 
     @Override
