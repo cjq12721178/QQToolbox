@@ -9,6 +9,7 @@ import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.support.v4.app.DialogFragment;
@@ -522,7 +523,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                                      LinearLayout baseView,
                                      D decorator,
                                      @Nullable Bundle savedInstanceState) {
-        int contentLayoutRes = decorator.getContentLayoutRes();
+        int contentLayoutRes = getContentLayoutRes(decorator);
         if (contentLayoutRes != 0) {
             inflater.inflate(contentLayoutRes, baseView);
             onSetContentView(baseView, decorator, savedInstanceState);
@@ -537,6 +538,10 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                 }
             }
         }
+    }
+
+    protected @LayoutRes int getContentLayoutRes(@NonNull D decorator) {
+        return decorator.getContentLayoutRes();
     }
 
     private void onCreateTitle(LinearLayout baseView,

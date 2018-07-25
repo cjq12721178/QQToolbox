@@ -271,3 +271,9 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20180720-1.6.5(76):
 1. ExceptionLog在Debug模式下将错误信息输出至SD卡指定目录,而非data中
 
+20180724-1.6.6(77):
+1. ConfirmDialog默认无分隔线
+
+20180725-1.6.7(78):
+1. ConfirmDialog当content为空时，不inflate该content所在layout
+

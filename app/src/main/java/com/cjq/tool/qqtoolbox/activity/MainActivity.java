@@ -145,9 +145,9 @@ public class MainActivity
                 ConfirmDialog dialog = new ConfirmDialog();
                 dialog.setTitle("use default overall decorator");
                 dialog.setDrawCancelButton(false);
-                dialog.setContent("this is content");
-                ConfirmDialog.Decorator decorator = dialog.getCustomDecorator();
-                decorator.setDrawSeparationLine(false);
+                //dialog.setContent("this is content");
+                //ConfirmDialog.Decorator decorator = dialog.getCustomDecorator();
+                //decorator.setDrawSeparationLine(false);
                 dialog.show(getSupportFragmentManager(),
                         "test_confirm");
             } break;
