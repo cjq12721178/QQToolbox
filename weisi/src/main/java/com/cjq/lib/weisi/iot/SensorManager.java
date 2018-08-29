@@ -352,6 +352,8 @@ public class SensorManager {
         private double mCoefficient;
         private ScriptValueCorrector.Builder mScriptValueCorrectorBuilder;
         private String mLabel;
+        private ErrorStateInterpreter mErrorStateInterpreter;
+        private int mErrorPos;
 
         public Map<Byte, LogicalSensor.DataType> getDataTypeMap() {
             return mDataTypeMap;
@@ -512,6 +514,19 @@ public class SensorManager {
                     break;
                 case "ScriptValueCorrectorLabel":
                     mDataType.mCorrector = mScriptValueCorrectorBuilder.getCorrector(mBuilder.toString());
+                    break;
+                case "pos":
+                    mErrorPos = Integer.parseInt(mBuilder.toString());
+                    break;
+                case "state":
+                    if (mErrorStateInterpreter == null) {
+                        mErrorStateInterpreter = new ErrorStateInterpreter();
+                    }
+                    mErrorStateInterpreter.setState(mErrorPos, mBuilder.toString());
+                    break;
+                case "ErrorState":
+                    mDataType.mInterpreter = mErrorStateInterpreter;
+                    mErrorStateInterpreter = null;
                     break;
                 default:
                     break;

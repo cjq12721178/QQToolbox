@@ -1023,5 +1023,24 @@
 				</measurement>
 			</measurements>
 		</SensorType>
+		<SensorType>
+			<SensorName>智能避雷器</SensorName>
+			<start>CA0000</start>
+			<end>CDFFFF</end>
+			<measurements>
+				<measurement>
+					<DataTypeValue>05</DataTypeValue>
+				</measurement>
+				<measurement>
+					<DataTypeValue>11</DataTypeValue>
+				</measurement>
+				<measurement>
+					<DataTypeValue>1A</DataTypeValue>
+				</measurement>
+				<measurement>
+					<DataTypeValue>FC</DataTypeValue>
+				</measurement>
+			</measurements>
+		</SensorType>
 	</SensorTypes>
 </Sensor>
