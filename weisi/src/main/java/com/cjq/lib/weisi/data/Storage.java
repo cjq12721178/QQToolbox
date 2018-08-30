@@ -15,14 +15,14 @@ import java.util.List;
 
 public class Storage<E> implements Parcelable {
 
-    private static final int VAL_PARCELABLE = 0;
-    private static final int VAL_CLASS_NAME = 1;
+    //private static final int VAL_PARCELABLE = 0;
+    //private static final int VAL_CLASS_NAME = 1;
 
     private final List<E> mElements = new ArrayList<>();
     private final FilterCollection<E> mFilters;
     private ElementsProvider<E> mElementsProvider;
     private Sorter<E> mSorter;
-    private boolean mDescend;
+    private boolean mAscending = true;
 
     public Storage(@NonNull ElementsProvider<E> provider) {
         mFilters = new FilterCollection<>();
@@ -57,33 +57,32 @@ public class Storage<E> implements Parcelable {
     }
 
     public E get(int position) {
-        return mElements.get(getPhysicalPosition(position));
+        return mElements.get(getOrderPosition(position));
+    }
+    
+    private int getOrderPosition(int position) {
+        return mAscending
+                ? position
+                : size() - 1 - position;
     }
 
-    //逻辑位置转物理（指list中的）位置
-    private int getPhysicalPosition(int logicalPosition) {
-        return mDescend
-                ? size() - 1 - logicalPosition
-                : logicalPosition;
+    public void setSorter(Sorter<E> sorter, boolean ascending) {
+        setSorter(sorter, ascending, null);
     }
 
-    public void setSorter(Sorter<E> sorter, boolean descend) {
-        setSorter(sorter, descend, null);
+    public void setSorter(Sorter<E> sorter, boolean ascending, OnSortChangeListener<E> listener) {
+        setSorter(sorter, ascending, listener, listener != null);
     }
 
-    public void setSorter(Sorter<E> sorter, boolean descend, OnSortChangeListener<E> listener) {
-        setSorter(sorter, descend, listener, listener != null);
-    }
-
-    public void setSorter(Sorter<E> sorter, boolean descend, OnSortChangeListener<E> listener, boolean commit) {
+    public void setSorter(Sorter<E> sorter, boolean ascending, OnSortChangeListener<E> listener, boolean commit) {
         if (mSorter != sorter) {
             mSorter = sorter;
-            mDescend = descend;
+            mAscending = ascending;
             if (commit) {
                 resort(listener);
             }
-        } else if (mDescend != descend) {
-            mDescend = descend;
+        } else if (mAscending != ascending) {
+            mAscending = ascending;
             if (commit) {
                 notifySortChangeListener(listener);
             }
@@ -99,7 +98,7 @@ public class Storage<E> implements Parcelable {
 
     private void notifySortChangeListener(OnSortChangeListener<E> listener) {
         if (listener != null) {
-            listener.onSortChange(mSorter, mDescend);
+            listener.onSortChange(mSorter, mAscending);
         }
     }
 
@@ -184,7 +183,7 @@ public class Storage<E> implements Parcelable {
                 position = mSorter.add(mElements, e);
             } else {
                 if (mElements.add(e)) {
-                    position = getPhysicalPosition(size() - 1);
+                    position = getOrderPosition(size() - 1);
                 } else {
                     position = -1;
                 }
@@ -196,19 +195,21 @@ public class Storage<E> implements Parcelable {
     }
 
     public int find(E e) {
+        int position;
         if (mSorter != null) {
-            return mSorter.find(mElements, e);
+            position = mSorter.find(mElements, e);
         } else {
-            return mElements.indexOf(e);
+            position = mElements.indexOf(e);
         }
+        return getOrderPosition(position);
     }
 
     public Sorter<E> getSorter() {
         return mSorter;
     }
 
-    public boolean isDescend() {
-        return mDescend;
+    public boolean isAscending() {
+        return mAscending;
     }
 
     public interface ElementsProvider<E> {
@@ -233,14 +234,14 @@ public class Storage<E> implements Parcelable {
         dest.writeParcelable(mFilters, flags);
         SimpleCustomClassParcel.writeToParcel(dest, mElementsProvider, flags);
         SimpleCustomClassParcel.writeToParcel(dest, mSorter, flags);
-        dest.writeByte(mDescend ? (byte) 1 : (byte) 0);
+        dest.writeByte(mAscending ? (byte) 1 : (byte) 0);
     }
 
     protected Storage(Parcel in) {
         mFilters = in.readParcelable(getClass().getClassLoader());
         mElementsProvider = SimpleCustomClassParcel.readFromParcel(in, this);
         mSorter = SimpleCustomClassParcel.readFromParcel(in, this);
-        mDescend = in.readByte() != 0;
+        mAscending = in.readByte() != 0;
     }
 
     public static final Creator<Storage> CREATOR = new Creator<Storage>() {

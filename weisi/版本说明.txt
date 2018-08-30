@@ -451,3 +451,7 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. 新增ErrorStateInterpreter类用以解析传感器错误状态
 2. 修改EsbSensorConfiguration.xml配置文件，增加新的数据类型和传感器类型
 3. 修改传感器配置导入模块
+
+20180830-5.3.1(118):
+1. 将Storage属性mDescend改为mAscending，并修改相应方法
+2. 修复Storage类find方法在降序时返回错误位置的问题
