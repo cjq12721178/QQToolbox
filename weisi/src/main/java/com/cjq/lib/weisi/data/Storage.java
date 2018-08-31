@@ -183,7 +183,7 @@ public class Storage<E> implements Parcelable {
                 position = mSorter.add(mElements, e);
             } else {
                 if (mElements.add(e)) {
-                    position = getOrderPosition(size() - 1);
+                    position = size() - 1;
                 } else {
                     position = -1;
                 }
@@ -191,17 +191,21 @@ public class Storage<E> implements Parcelable {
         } else {
             position = -1;
         }
-        return position;
+        return position != -1 ? getOrderPosition(position) : -1;
     }
 
     public int find(E e) {
         int position;
-        if (mSorter != null) {
-            position = mSorter.find(mElements, e);
+        if (mFilters.match(e)) {
+            if (mSorter != null) {
+                position = mSorter.find(mElements, e);
+            } else {
+                position = mElements.indexOf(e);
+            }
         } else {
-            position = mElements.indexOf(e);
+            position = -1;
         }
-        return getOrderPosition(position);
+        return position != -1 ? getOrderPosition(position) : -1;
     }
 
     public Sorter<E> getSorter() {

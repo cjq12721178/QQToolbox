@@ -455,3 +455,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 20180830-5.3.1(118):
 1. 将Storage属性mDescend改为mAscending，并修改相应方法
 2. 修复Storage类find方法在降序时返回错误位置的问题
+
+20180831-5.3.2(119):
+1. 修复Storage类add、find方法返回值有误的问题
