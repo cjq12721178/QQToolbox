@@ -46,17 +46,14 @@ public class UdpSensorProtocol extends ControllableSensorProtocol<EsbAnalyzer> {
         byte dataTypeValue;
         int address;
         for (int start = realDataZoneStart,
-             end = realDataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH,
+             end = start + realDataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH,
              sensorValuePos,
              calendarPos,
              voltagePos;
              start < end;
              start += SENSOR_DATA_LENGTH) {
-            if (getCrc().calc8(data, start, SENSOR_DATA_LENGTH - 1)
-                    != data[start + SENSOR_DATA_LENGTH - 1]) {
-                continue;
-            }
-//            if (CrcClass.calc8(data, start, SENSOR_DATA_LENGTH - 1) != data[start + SENSOR_DATA_LENGTH - 1]) {
+//            if (getCrc().calc8(data, start, SENSOR_DATA_LENGTH - 1)
+//                    != data[start + SENSOR_DATA_LENGTH - 1]) {
 //                continue;
 //            }
             address = NumericConverter.int8ToUInt16(data[start], data[start + 1]);

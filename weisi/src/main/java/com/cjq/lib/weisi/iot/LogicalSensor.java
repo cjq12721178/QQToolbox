@@ -214,6 +214,10 @@ public class LogicalSensor extends Sensor<LogicalSensor.Value, LogicalSensor.Con
             return mValue;
         }
 
+        public int getAbsValue() {
+            return mValue & 0xff;
+        }
+
         public String getFormattedValue() {
             return String.format("%02X", mValue);
         }

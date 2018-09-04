@@ -536,30 +536,33 @@ public class SensorManager {
         private int findMeasureParameter(
                 List<PhysicalSensor.Type.MeasureParameter> measureParameters,
                 PhysicalSensor.Type.MeasureParameter parameterGetter) {
-            int index, size = measureParameters.size();
-            final int threshold = 3;
-            if (size > threshold) {
-                index = Collections.binarySearch(measureParameters,
-                        parameterGetter,
-                        MEASURE_PARAMETER_COMPARATOR);
-            } else {
-                byte dataTypeValue = parameterGetter.mInvolvedDataType.mValue;
-                for (index = 0;index < size;++index) {
-                    if (measureParameters.get(index).mInvolvedDataType.mValue == dataTypeValue) {
-                        break;
-                    }
-                }
-                if (index == size) {
-                    index = -(index + 1);
-                }
-            }
-            return index;
+            return Collections.binarySearch(measureParameters,
+                    parameterGetter,
+                    MEASURE_PARAMETER_COMPARATOR);
+//            int index, size = measureParameters.size();
+//            final int threshold = 3;
+//            if (size > threshold) {
+//                index = Collections.binarySearch(measureParameters,
+//                        parameterGetter,
+//                        MEASURE_PARAMETER_COMPARATOR);
+//            } else {
+//                byte dataTypeValue = parameterGetter.mInvolvedDataType.mValue;
+//                for (index = 0;index < size;++index) {
+//                    if (measureParameters.get(index).mInvolvedDataType.mValue == dataTypeValue) {
+//                        break;
+//                    }
+//                }
+//                if (index == size) {
+//                    index = -(index + 1);
+//                }
+//            }
+//            return index;
         }
 
         private static final Comparator<PhysicalSensor.Type.MeasureParameter> MEASURE_PARAMETER_COMPARATOR = new Comparator<PhysicalSensor.Type.MeasureParameter>() {
             @Override
             public int compare(PhysicalSensor.Type.MeasureParameter mp1, PhysicalSensor.Type.MeasureParameter mp2) {
-                return mp1.mInvolvedDataType.mValue - mp2.mInvolvedDataType.mValue;
+                return mp1.mInvolvedDataType.getAbsValue() - mp2.mInvolvedDataType.getAbsValue();
             }
         };
     }

@@ -182,12 +182,12 @@ public class PhysicalSensor extends Sensor<PhysicalSensor.Value, PhysicalSensor.
                         dataTypeValue,
                         MEASUREMENT_SEARCH_HELPER);
             } else {
-                byte currentValue;
+                int currentValue, targetValue = dataTypeValue & 0xff;
                 for (position = 0;position < size;++position) {
-                    currentValue = mMeasurementKinds.get(position).getDataType().getValue();
-                    if (currentValue == dataTypeValue) {
+                    currentValue = mMeasurementKinds.get(position).getDataType().getAbsValue();
+                    if (currentValue == targetValue) {
                         return position;
-                    } else if (dataTypeValue < currentValue) {
+                    } else if (targetValue < currentValue) {
                         return -(position + 1);
                     }
                 }
@@ -251,14 +251,14 @@ public class PhysicalSensor extends Sensor<PhysicalSensor.Value, PhysicalSensor.
         return result;
     }
 
-    //对于接收到的动态数据，若其时间差在1秒以内，视其为相同时间戳
+    //对于接收到的动态数据，若其时间差在2秒以内，视其为相同时间戳
     long correctTimestamp(long currentDynamicValueTimestamp) {
         Value v = getRealTimeValue();
         if (v == null) {
             return currentDynamicValueTimestamp;
         }
         long delta = currentDynamicValueTimestamp - v.mTimestamp;
-        return delta > 0 && delta < 1000
+        return delta > 0 && delta < 2000
                 ? v.mTimestamp
                 : currentDynamicValueTimestamp;
     }
@@ -308,7 +308,7 @@ public class PhysicalSensor extends Sensor<PhysicalSensor.Value, PhysicalSensor.
     private static final ExpandComparator<LogicalSensor, Byte> MEASUREMENT_SEARCH_HELPER = new ExpandComparator<LogicalSensor, Byte>() {
         @Override
         public int compare(LogicalSensor measurement, Byte targetDataTypeValue) {
-            return measurement.getDataType().mValue - targetDataTypeValue;
+            return measurement.getDataType().getAbsValue() - (targetDataTypeValue.intValue() & 0xff);
         }
     };
 

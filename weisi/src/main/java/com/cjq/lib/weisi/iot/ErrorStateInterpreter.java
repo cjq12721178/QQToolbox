@@ -15,7 +15,7 @@ public class ErrorStateInterpreter implements ValueInterpreter {
     @Override
     public String interpret(double value) {
         int rawValue = (int) value;
-        if ((rawValue & 0xff) != 0) {
+        if ((rawValue & 0xff) == 0) {
             return "正常";
         }
         byte dataType = (byte) (rawValue & 0xff00);
