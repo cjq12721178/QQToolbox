@@ -13,8 +13,8 @@ public class SensorIdTest {
     @Test
     public void idEquals() {
         int address = 0x80FF06;
-        Long idValue = Sensor.ID.getId(address);
-        Sensor.ID id = new Sensor.ID(address);
+        Long idValue = ID.getId(address);
+        ID id = new ID(address);
         boolean expect = true;
         boolean actual = idValue.equals(id);
         //boolean actual = id.equals(idValue);

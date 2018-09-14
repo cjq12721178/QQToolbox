@@ -219,6 +219,8 @@ public class RecyclerViewCursorAdapter extends RecyclerViewBaseAdapter<Cursor> {
         }
     }
 
+    //public boolean
+
     /**
      * Created by CJQ on 2018/2/26.
      */

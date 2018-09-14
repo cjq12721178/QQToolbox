@@ -45,7 +45,7 @@ public class SQLiteResolverDelegate implements SQLiteResolver {
         return mDatabase != null
                 ? mDatabase.insertWithOnConflict(table,
                 null, values, conflictAlgorithm)
-                : -1;
+                : -1L;
     }
 
     @Override
@@ -66,7 +66,7 @@ public class SQLiteResolverDelegate implements SQLiteResolver {
                       @Nullable String[] selectionArgs) {
         return mDatabase != null
                 ? mDatabase.delete(table, selection, selectionArgs)
-                : null;
+                : -1;
     }
 
     @Override
@@ -82,7 +82,7 @@ public class SQLiteResolverDelegate implements SQLiteResolver {
                         @Nullable ContentValues values) {
         return mDatabase != null
                 ? mDatabase.replace(table, null, values)
-                : 0;
+                : -1L;
     }
 
     @Override

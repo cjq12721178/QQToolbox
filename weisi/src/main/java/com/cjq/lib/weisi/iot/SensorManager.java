@@ -8,7 +8,6 @@ import com.cjq.lib.weisi.data.Filter;
 import com.cjq.lib.weisi.protocol.EsbAnalyzer;
 import com.cjq.lib.weisi.util.ExpandCollections;
 import com.cjq.lib.weisi.util.ExpandComparator;
-import com.cjq.lib.weisi.util.SimpleReflection;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -30,12 +29,13 @@ import javax.xml.parsers.SAXParserFactory;
 
 public class SensorManager {
 
+    private static final Map<Long, Measurement> MEASUREMENT_MAP = new HashMap<>();
     private static final Map<Long, Sensor> SENSOR_MAP = new HashMap<>();
-    private static final Map<Byte, LogicalSensor.DataType> BLE_DATA_TYPES = new HashMap<>();
-    private static final Map<Byte, LogicalSensor.DataType> ESB_DATA_TYPES = new HashMap<>();
+    private static final Map<Byte, PracticalMeasurement.DataType> BLE_DATA_TYPES = new HashMap<>();
+    private static final Map<Byte, PracticalMeasurement.DataType> ESB_DATA_TYPES = new HashMap<>();
     private static final List<PhysicalSensor.Type> BLE_SENSOR_TYPES = new ArrayList<>();
     private static final List<PhysicalSensor.Type> ESB_SENSOR_TYPES = new ArrayList<>();
-    private static SensorConfigurationProvider configurationProvider;
+    private static MeasurementConfigurationProvider configurationProvider;
 
     private static final ExpandComparator<PhysicalSensor.Type, Integer> SENSOR_TYPE_SEARCH_COMPARATOR = new ExpandComparator<PhysicalSensor.Type, Integer>() {
         @Override
@@ -53,156 +53,582 @@ public class SensorManager {
     private SensorManager() {
     }
 
-    public static synchronized Sensor getSensor(@NonNull Sensor.ID id, boolean autoCreate) {
-        Sensor sensor = SENSOR_MAP.get(id);
-        if (sensor == null && autoCreate) {
-            sensor = createSensor(id);
+    //
+    //  获取Sensor.Info的相关方法
+    //
+
+    public static @Nullable Sensor.Info findSensorInfo(@NonNull ID id) {
+        return findSensorInfo(id.getId());
+    }
+
+    public static @Nullable Sensor.Info findSensorInfo(long id) {
+        return getSensorInfo(id, false);
+    }
+
+    public static @Nullable Sensor.Info findSensorInfo(int address) {
+        return findSensorInfo(ID.getId(address));
+    }
+
+    public static @NonNull Sensor.Info getSensorInfo(@NonNull ID id) {
+        return getSensorInfo(id.getId());
+    }
+
+    public static @NonNull Sensor.Info getSensorInfo(long id) {
+        return getSensorInfo(id, true);
+    }
+
+    public static @NonNull Sensor.Info getSensorInfo(int address) {
+        return getSensorInfo(ID.getId(address));
+    }
+
+    private static Sensor.Info getSensorInfo(long id, boolean autoCreate) {
+        return getSensorInfo(id, autoCreate, autoCreate ? findSensorType(ID.getAddress(id)) : null);
+    }
+
+    private static Sensor.Info getSensorInfo(long id, boolean autoCreate, @Nullable PhysicalSensor.Type type) {
+        long correctId = ID.ensureSensorInfo(id);
+        synchronized (MEASUREMENT_MAP) {
+            Measurement measurement = MEASUREMENT_MAP.get(correctId);
+            if (measurement == null) {
+                if (!autoCreate) {
+                    return null;
+                }
+                Sensor.Info info = createSensorInfo(new ID(correctId), type);
+                MEASUREMENT_MAP.put(correctId, info);
+                return info;
+            }
+            return (Sensor.Info) measurement;
         }
-        return sensor;
     }
 
-    private static Sensor createSensor(long id) {
-        return createSensor(new Sensor.ID(id));
+    private static @NonNull Sensor.Info createSensorInfo(@NonNull ID id, PhysicalSensor.Type type) {
+        return new Sensor.Info(id, type != null ? type.mSensorGeneralName : null);
     }
 
-    private static Sensor createSensor(@NonNull Sensor.ID id) {
-        Sensor sensor;
-        if (id.isLogical()) {
-            sensor = createLogicalSensor(id);
-        } else {
-            sensor = createPhysicalSensor(id);
-        }
-        return sensor;
+    //
+    //  获取PracticalMeasurement的相关方法
+    //
+
+    public static @Nullable PracticalMeasurement findPracticalMeasurement(@NonNull ID id) {
+        return findPracticalMeasurement(id.getId());
     }
 
-    public static synchronized Sensor getSensor(long id, boolean autoCreate) {
-        long correctId = Sensor.ID.correct(id);
-        Sensor sensor = SENSOR_MAP.get(correctId);
-        if (sensor == null && autoCreate) {
-            sensor = createSensor(correctId);
-        }
-        return sensor;
+    public static @Nullable PracticalMeasurement findPracticalMeasurement(long id) {
+        return getPracticalMeasurement(id, false);
     }
 
-    static LogicalSensor getLogicalSensor(int address,
-                                          int dataTypeValueIndex,
-                                          @NonNull PhysicalSensor.Type.MeasureParameter parameter) {
-        return getLogicalSensor(address, parameter.mInvolvedDataType.mValue, dataTypeValueIndex, parameter);
+    public static @Nullable PracticalMeasurement findPracticalMeasurement(int address, byte dataTypeValue, int dataTypeValueIndex) {
+        return findPracticalMeasurement(ID.getId(address, dataTypeValue, dataTypeValueIndex));
     }
 
-    static LogicalSensor getLogicalSensor(int address,
-                                          byte dataType,
-                                          int dataTypeValueIndex) {
-        return getLogicalSensor(address, dataType, dataTypeValueIndex, null);
+    public static @Nullable PracticalMeasurement findPracticalMeasurement(int address, byte dataTypeValue) {
+        return findPracticalMeasurement(address, dataTypeValue, 0);
     }
 
-    private static synchronized LogicalSensor getLogicalSensor(
-            int address, byte dataTypeValue, int dataTypeValueIndex,
-            @Nullable PhysicalSensor.Type.MeasureParameter parameter) {
-        long id = Sensor.ID.getId(address, dataTypeValue, dataTypeValueIndex);
-        LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(id);
-        if (sensor == null) {
-            sensor = createLogicalSensor(new Sensor.ID(id), parameter);
-        }
-        return sensor;
+    public static @NonNull PracticalMeasurement getPracticalMeasurement(@NonNull ID id) {
+        return getPracticalMeasurement(id.getId());
     }
 
-    public static synchronized LogicalSensor getLogicalSensor(
-            long id, boolean autoCreate) {
-        long correctId = Sensor.ID.correct(id);
-        LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(correctId);
-        if (sensor == null && autoCreate) {
-            sensor = createLogicalSensor(correctId);
-        }
-        return sensor;
+    public static @NonNull PracticalMeasurement getPracticalMeasurement(int address, byte dataTypeValue, int dataTypeValueIndex) {
+        return getPracticalMeasurement(ID.getId(address, dataTypeValue, dataTypeValueIndex));
     }
 
-    public static synchronized LogicalSensor getLogicalSensor(
-            int address, byte dataTypeValue, int dataTypeValueIndex,
-            boolean autoCreate) {
-        return getLogicalSensor(Sensor.ID.getId(address, dataTypeValue, dataTypeValueIndex), autoCreate);
+    public static @NonNull PracticalMeasurement getPracticalMeasurement(int address, byte dataTypeValue) {
+        return getPracticalMeasurement(address, dataTypeValue, 0);
     }
 
-    public static synchronized LogicalSensor getLogicalSensor(
-            @NonNull Sensor.ID id, boolean autoCreate) {
-        LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(id);
-        if (sensor == null && autoCreate) {
-            sensor = createLogicalSensor(id);
-        }
-        return sensor;
+    public static @NonNull PracticalMeasurement getPracticalMeasurement(long id) {
+        return getPracticalMeasurement(id, true);
     }
 
-    private static LogicalSensor createLogicalSensor(long id) {
-        return createLogicalSensor(new Sensor.ID(id));
+    private static PracticalMeasurement getPracticalMeasurement(long id, boolean autoCreate) {
+        return getPracticalMeasurement(id, autoCreate, autoCreate ? findSensorType(ID.getAddress(id)) : null);
     }
 
-    private static LogicalSensor createLogicalSensor(@NonNull Sensor.ID id) {
-        //生成逻辑传感器（即之前的测量量Measurement）
-        PhysicalSensor.Type type = findSensorType(id.getAddress());
+    private static @Nullable PhysicalSensor.Type.MeasureParameter findMeasureParameter(long id, @Nullable PhysicalSensor.Type type) {
         PhysicalSensor.Type.MeasureParameter parameter = null;
         if (type != null) {
+            byte dataTypeValue = ID.getDataTypeValue(id);
+            int dataTypeValueIndex = ID.getDataTypeValueIndex(id);
             for (int i = 0;i < type.mMeasureParameters.length;++i) {
                 parameter = type.mMeasureParameters[i];
-                if (parameter.mInvolvedDataType.mValue == id.getDataTypeValue()) {
-                    for (int j = 0;j < id.getDataTypeValueIndex() && parameter != null;++j) {
+                if (parameter.mInvolvedDataType.mValue == dataTypeValue) {
+                    for (int j = 0;j < dataTypeValueIndex && parameter != null;++j) {
                         parameter = parameter.mNext;
                     }
                     break;
                 }
             }
         }
-        return createLogicalSensor(id, parameter);
+        return parameter;
     }
 
-    private static synchronized LogicalSensor createLogicalSensor(
-            @NonNull Sensor.ID id,
-            @Nullable PhysicalSensor.Type.MeasureParameter parameter) {
-        LogicalSensor sensor;
+    private static PracticalMeasurement getPracticalMeasurement(long id, boolean autoCreate, @Nullable PhysicalSensor.Type type) {
+        return getPracticalMeasurement(id, autoCreate, autoCreate ? findMeasureParameter(id, type) : null);
+    }
+
+    private static PracticalMeasurement getPracticalMeasurement(long id, boolean autoCreate, @Nullable PhysicalSensor.Type.MeasureParameter parameter) {
+        if (!ID.isPracticalMeasurement(id)) {
+            if (autoCreate) {
+                throw new IllegalArgumentException("id of target practical measurement is abnormal");
+            }
+            return null;
+        }
+        synchronized (MEASUREMENT_MAP) {
+            Measurement measurement = MEASUREMENT_MAP.get(id);
+            if (measurement == null) {
+                if (!autoCreate) {
+                    return null;
+                }
+                PracticalMeasurement practicalMeasurement = createPracticalMeasurement(new ID(id), parameter);
+                MEASUREMENT_MAP.put(id, practicalMeasurement);
+                return practicalMeasurement;
+            }
+            return (PracticalMeasurement) measurement;
+        }
+    }
+
+    private static PracticalMeasurement createPracticalMeasurement(@NonNull ID id, @Nullable PhysicalSensor.Type.MeasureParameter parameter) {
         if (parameter != null) {
-            sensor = new LogicalSensor(id,
+            return new PracticalMeasurement(id,
                     parameter.mInvolvedDataType,
                     parameter.mDataTypeAccurateName);
         } else {
-            sensor = new LogicalSensor(id, getDataType(id.getAddress(),
-                    id.getDataTypeValue(), true));
+            return new PracticalMeasurement(id,
+                    getDataType(id.getAddress(),
+                            id.getDataTypeValue(),
+                            true),
+                    null);
         }
-        putSensor(sensor);
-        return sensor;
     }
 
-    public static synchronized PhysicalSensor getPhysicalSensor(int address, boolean autoCreate) {
-        PhysicalSensor sensor = (PhysicalSensor) SENSOR_MAP.get(Sensor.ID.getId(address));
-        if (sensor == null && autoCreate) {
-            sensor = createPhysicalSensor(address);
+    public static @Nullable DisplayMeasurement findVirtualMeasurement(@NonNull ID id) {
+        return findVirtualMeasurement(id.getId());
+    }
+
+    public static @Nullable DisplayMeasurement findVirtualMeasurement(long id) {
+        return getVirtualMeasurement(id, null);
+    }
+
+    public static @Nullable DisplayMeasurement getVirtualMeasurement(long id) {
+        return getVirtualMeasurement(id, configurationProvider);
+    }
+
+    public static @Nullable DisplayMeasurement getVirtualMeasurement(long id, VirtualMeasurementBuilder builder) {
+        if (!ID.isVirtualMeasurement(id)) {
+            return null;
         }
-        return sensor;
+        synchronized (MEASUREMENT_MAP) {
+            Measurement measurement = MEASUREMENT_MAP.get(id);
+            if (measurement == null && builder != null) {
+                DisplayMeasurement displayMeasurement = builder.build(new ID(id));
+                MEASUREMENT_MAP.put(id, displayMeasurement);
+                return displayMeasurement;
+            }
+            return (DisplayMeasurement) measurement;
+        }
     }
 
-    private static synchronized PhysicalSensor createPhysicalSensor(int address) {
-        return createPhysicalSensor(new Sensor.ID(address));
+    public static Measurement getMeasurement(int address) {
+        return getMeasurement(address, (byte) 0);
     }
 
-    private static synchronized PhysicalSensor createPhysicalSensor(@NonNull Sensor.ID id) {
-        PhysicalSensor sensor = new PhysicalSensor(id);
-        putSensor(sensor);
-        return sensor;
+    public static Measurement getMeasurement(int address, byte dataTypeValue) {
+        return getMeasurement(address, dataTypeValue, 0);
     }
 
-    private static synchronized void putSensor(@NonNull Sensor sensor) {
-        SENSOR_MAP.put(sensor.getId().getId(), sensor);
+    public static Measurement getMeasurement(int address, byte dataTypeValue, int dataTypeValueIndex) {
+        return getMeasurement(ID.getId(address, dataTypeValue, dataTypeValueIndex));
     }
 
-    public static synchronized <S extends Sensor> void getSensors(
+    public static Measurement getMeasurement(@NonNull ID id) {
+        return getMeasurement(id.getId());
+    }
+
+    public static Measurement getMeasurement(long id) {
+        return getMeasurement(id, true);
+    }
+
+    private static Measurement getMeasurement(long id, boolean autoCreate) {
+        if (ID.isPracticalMeasurement(id)) {
+            return getPracticalMeasurement(id, autoCreate);
+        }
+        if (ID.isSensorInfo(id)) {
+            return getSensorInfo(id, autoCreate);
+        }
+        if (ID.isVirtualMeasurement(id)) {
+            return getVirtualMeasurement(id, autoCreate ? configurationProvider : null);
+        }
+        return null;
+    }
+
+//    public static synchronized @Nullable Measurement getMeasurement(long id, boolean autoCreate) {
+//        Measurement measurement = MEASUREMENT_MAP.get(id);
+//        if (measurement == null && autoCreate) {
+//            measurement = createMeasurement(new ID(id));
+//            if (measurement != null) {
+//                MEASUREMENT_MAP.put(id, measurement);
+//            }
+//        }
+//        return measurement;
+//    }
+
+//    private static @Nullable Measurement createMeasurement(@NonNull ID id) {
+//        PhysicalSensor.Type type = findSensorType(id.getAddress());
+//        if (id.isSensorInfo()) {
+//            return new Sensor.Info(id,
+//                    type != null ? type.mSensorGeneralName : null);
+//        }
+//        if (id.isPracticalMeasurement()) {
+//            PhysicalSensor.Type.MeasureParameter parameter = null;
+//            if (type != null) {
+//                byte dataTypeValue = id.getDataTypeValue();
+//                for (int i = 0;i < type.mMeasureParameters.length;++i) {
+//                    parameter = type.mMeasureParameters[i];
+//                    if (parameter.mInvolvedDataType.mValue == dataTypeValue) {
+//                        int dataTypeValueIndex = id.getDataTypeValueIndex();
+//                        for (int j = 0;j < dataTypeValueIndex && parameter != null;++j) {
+//                            parameter = parameter.mNext;
+//                        }
+//                        break;
+//                    }
+//                }
+//            }
+//            if (parameter != null) {
+//                return new PracticalMeasurement(id,
+//                        parameter.mInvolvedDataType,
+//                        parameter.mDataTypeAccurateName);
+//            } else {
+//                return new PracticalMeasurement(id,
+//                        getDataType(id.getAddress(),
+//                                id.getDataTypeValue(),
+//                                true),
+//                        null);
+//            }
+//        }
+//        if (configurationProvider != null) {
+//            return configurationProvider.build(id);
+//        }
+//        return null;
+//    }
+
+    //
+    //  获取PhysicalSensor的相关方法
+    //
+
+    public static @Nullable PhysicalSensor findPhysicalSensor(@NonNull ID id) {
+        return findPhysicalSensor(id.getId());
+    }
+
+    public static @Nullable PhysicalSensor findPhysicalSensor(long id) {
+        return getPhysicalSensor(ID.ensureSensor(id), false);
+    }
+
+    public static @Nullable PhysicalSensor findPhysicalSensor(int address) {
+        return findPhysicalSensor(ID.getId(address));
+    }
+
+    public static @NonNull PhysicalSensor getPhysicalSensor(@NonNull ID id) {
+        return getPhysicalSensor(id.getId());
+    }
+
+    public static @NonNull PhysicalSensor getPhysicalSensor(long id) {
+        return getPhysicalSensor(ID.ensureSensor(id), true);
+    }
+
+    public static @NonNull PhysicalSensor getPhysicalSensor(int address) {
+        return getPhysicalSensor(ID.getId(address));
+    }
+
+    private static PhysicalSensor getPhysicalSensor(long id, boolean autoCreate) {
+        synchronized (SENSOR_MAP) {
+            if (autoCreate) {
+                long correctId = ID.ensurePhysicalSensor(id);
+                Sensor sensor = SENSOR_MAP.get(correctId);
+                if (sensor == null) {
+                    PhysicalSensor physicalSensor = createPhysicalSensor(new ID(correctId));
+                    SENSOR_MAP.put(correctId, physicalSensor);
+                    return physicalSensor;
+                }
+                return (PhysicalSensor) sensor;
+            } else {
+                return ID.isPhysicalSensor(id)
+                        ? (PhysicalSensor) SENSOR_MAP.get(id)
+                        : null;
+            }
+        }
+    }
+
+    private static @NonNull PhysicalSensor createPhysicalSensor(@NonNull ID id) {
+        int address = id.getAddress();
+        PhysicalSensor.Type type = findSensorType(address);
+        Sensor.Info info = getSensorInfo(id.getId(), true, type);
+        List<DisplayMeasurement> measurements;
+        if (type != null) {
+            PhysicalSensor.Type.MeasureParameter parameter;
+            measurements = new ArrayList<>(type.getMeasureParameterSize());
+            for (int i = 0;i < type.mMeasureParameters.length;++i) {
+                parameter = type.mMeasureParameters[i];
+                byte dataTypeValue = parameter.mInvolvedDataType.mValue;
+                int dataTypeValueIndex = 0;
+                do {
+                    measurements.add(getPracticalMeasurement(ID.getId(address, dataTypeValue, dataTypeValueIndex++), true, parameter));
+                    parameter = parameter.mNext;
+                } while (parameter != null);
+            }
+        } else {
+            measurements = new ArrayList<>();
+        }
+        return new PhysicalSensor(info, type, measurements);
+    }
+
+    private static @Nullable LogicalSensor getLogicalSensor(long id, boolean autoCreate) {
+        if (!ID.isLogicalSensor(id)) {
+            return null;
+        }
+        synchronized (SENSOR_MAP) {
+            Sensor sensor = SENSOR_MAP.get(id);
+            if (sensor == null && autoCreate) {
+                LogicalSensor logicalSensor = createLogicalSensor(new ID(id));
+                SENSOR_MAP.put(id, logicalSensor);
+                return logicalSensor;
+            }
+            return (LogicalSensor) sensor;
+        }
+    }
+
+    private static @NonNull LogicalSensor createLogicalSensor(@NonNull ID id) {
+        int address = id.getAddress();
+        PhysicalSensor.Type type = findSensorType(address);
+        Sensor.Info info = getSensorInfo(id.getId(), true, type);
+        PracticalMeasurement measurement = getPracticalMeasurement(id.getId(), true, type);
+        return new LogicalSensor(info, measurement);
+    }
+
+//    private static @NonNull PracticalMeasurement createPracticalMeasurement(@NonNull ID id) {
+//        PhysicalSensor.Type type = findSensorType(id.getAddress());
+//    }
+//    private static synchronized Measurement createLogicalSensor(
+//            @NonNull ID id,
+//            @Nullable PhysicalSensor.Type.MeasureParameter parameter) {
+//        LogicalSensor sensor;
+//        if (parameter != null) {
+//            sensor = new LogicalSensor(id,
+//                    parameter.mInvolvedDataType,
+//                    parameter.mDataTypeAccurateName);
+//        } else {
+//            sensor = new LogicalSensor(id, getDataType(id.getAddress(),
+//                    id.getDataTypeValue(), true));
+//        }
+//        putSensor(sensor);
+//        return sensor;
+//    }
+
+//    public static synchronized Sensor getSensor(@NonNull ID id, boolean autoCreate) {
+//        Sensor sensor = SENSOR_MAP.get(id);
+//        if (sensor == null && autoCreate) {
+//            sensor = createSensor(id);
+//        }
+//        return sensor;
+//    }
+
+//    private static Sensor createSensor(long id) {
+//        return createSensor(new ID(id));
+//    }
+
+//    private static Sensor createSensor(@NonNull ID id) {
+//        Sensor sensor;
+//        if (id.isLogicalSensor()) {
+//            sensor = createLogicalSensor(id);
+//        } else {
+//            sensor = createPhysicalSensor(id);
+//        }
+//        return sensor;
+//    }
+
+//    public static synchronized Sensor getSensor(long id, boolean autoCreate) {
+//        long correctId = ID.ensureSensor(id);
+//        Sensor sensor = SENSOR_MAP.get(correctId);
+//        if (sensor == null && autoCreate) {
+//            sensor = createSensor(correctId);
+//        }
+//        return sensor;
+//    }
+
+//    static LogicalSensor getLogicalSensor(int address,
+//                                          int dataTypeValueIndex,
+//                                          @NonNull PhysicalSensor.Type.MeasureParameter parameter) {
+//        return getLogicalSensor(address, parameter.mInvolvedDataType.mValue, dataTypeValueIndex, parameter);
+//    }
+//
+//    static LogicalSensor getLogicalSensor(int address,
+//                                          byte dataType,
+//                                          int dataTypeValueIndex) {
+//        return getLogicalSensor(address, dataType, dataTypeValueIndex, null);
+//    }
+
+//    private static synchronized LogicalSensor getLogicalSensor(
+//            int address, byte dataTypeValue, int dataTypeValueIndex,
+//            @Nullable PhysicalSensor.Type.MeasureParameter parameter) {
+//        long id = ID.getId(address, dataTypeValue, dataTypeValueIndex);
+//        LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(id);
+//        if (sensor == null) {
+//            sensor = createLogicalSensor(new ID(id), parameter);
+//        }
+//        return sensor;
+//    }
+
+//    public static synchronized LogicalSensor getLogicalSensor(
+//            long id, boolean autoCreate) {
+//        long correctId = ID.ensureSensor(id);
+//        LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(correctId);
+//        if (sensor == null && autoCreate) {
+//            sensor = createLogicalSensor(correctId);
+//        }
+//        return sensor;
+//    }
+//
+//    public static synchronized LogicalSensor getLogicalSensor(
+//            int address, byte dataTypeValue, int dataTypeValueIndex,
+//            boolean autoCreate) {
+//        return getLogicalSensor(ID.getId(address, dataTypeValue, dataTypeValueIndex), autoCreate);
+//    }
+//
+//    public static synchronized LogicalSensor getLogicalSensor(
+//            @NonNull ID id, boolean autoCreate) {
+//        LogicalSensor sensor = (LogicalSensor) SENSOR_MAP.get(id);
+//        if (sensor == null && autoCreate) {
+//            sensor = createLogicalSensor(id);
+//        }
+//        return sensor;
+//    }
+//
+//    private static LogicalSensor createLogicalSensor(long id) {
+//        return createLogicalSensor(new ID(id));
+//    }
+
+//    private static LogicalSensor createLogicalSensor(@NonNull ID id) {
+//        //生成逻辑传感器（即之前的测量量Measurement）
+//        PhysicalSensor.Type type = findSensorType(id.getAddress());
+//        PhysicalSensor.Type.MeasureParameter parameter = null;
+//        if (type != null) {
+//            for (int i = 0;i < type.mMeasureParameters.length;++i) {
+//                parameter = type.mMeasureParameters[i];
+//                if (parameter.mInvolvedDataType.mValue == id.getDataTypeValue()) {
+//                    for (int j = 0;j < id.getDataTypeValueIndex() && parameter != null;++j) {
+//                        parameter = parameter.mNext;
+//                    }
+//                    break;
+//                }
+//            }
+//        }
+//        return createLogicalSensor(id, parameter);
+//    }
+//
+//    private static synchronized LogicalSensor createLogicalSensor(
+//            @NonNull ID id,
+//            @Nullable PhysicalSensor.Type.MeasureParameter parameter) {
+//        LogicalSensor sensor;
+//        if (parameter != null) {
+//            sensor = new LogicalSensor(id,
+//                    parameter.mInvolvedDataType,
+//                    parameter.mDataTypeAccurateName);
+//        } else {
+//            sensor = new LogicalSensor(id, getDataType(id.getAddress(),
+//                    id.getDataTypeValue(), true));
+//        }
+//        putSensor(sensor);
+//        return sensor;
+//    }
+//
+//    public static synchronized PhysicalSensor getPhysicalSensor(int address, boolean autoCreate) {
+//        PhysicalSensor sensor = (PhysicalSensor) SENSOR_MAP.get(ID.getId(address));
+//        if (sensor == null && autoCreate) {
+//            sensor = createPhysicalSensor(address);
+//        }
+//        return sensor;
+//    }
+//
+//    private static synchronized PhysicalSensor createPhysicalSensor(int address) {
+//        return createPhysicalSensor(new ID(address));
+//    }
+//
+//    private static synchronized PhysicalSensor createPhysicalSensor(@NonNull ID id) {
+//        PhysicalSensor sensor = new PhysicalSensor(id, type, displayMeasurements);
+//        putSensor(sensor);
+//        return sensor;
+//    }
+//
+//    private static synchronized void putSensor(@NonNull Sensor sensor) {
+//        SENSOR_MAP.put(sensor.getId().getId(), sensor);
+//    }
+
+    public static Sensor findSensor(@NonNull ID id) {
+        return findSensor(id.getId());
+    }
+
+    public static Sensor findSensor(int address) {
+        return findSensor(address, (byte) 0);
+    }
+
+    public static Sensor findSensor(int address, byte dataTypeValue) {
+        return findSensor(address, dataTypeValue, 0);
+    }
+
+    public static Sensor findSensor(int address, byte dataTypeValue, int dataTypeValueIndex) {
+        return findSensor(ID.getId(address, dataTypeValue, dataTypeValueIndex));
+    }
+
+    public static Sensor findSensor(long id) {
+        return getSensor(id, false);
+    }
+
+    public static Sensor getSensor(@NonNull ID id) {
+        return getSensor(id.getId());
+    }
+
+    public static Sensor getSensor(int address) {
+        return getSensor(address, (byte) 0);
+    }
+
+    public static Sensor getSensor(int address, byte dataTypeValue) {
+        return getSensor(address, dataTypeValue, 0);
+    }
+
+    public static Sensor getSensor(int address, byte dataTypeValue, int dataTypeValueIndex) {
+        return getSensor(ID.getId(address, dataTypeValue, dataTypeValueIndex));
+    }
+
+    public static Sensor getSensor(long id) {
+        return getSensor(id, true);
+    }
+
+    private static Sensor getSensor(long id, boolean autoCreate) {
+        if (ID.isPhysicalSensor(id)) {
+            return getPhysicalSensor(id, autoCreate);
+        }
+        if (ID.isLogicalSensor(id)) {
+            return getLogicalSensor(id, autoCreate);
+        }
+        if (autoCreate) {
+            throw new IllegalArgumentException("id of target sensor may be abnormal");
+        }
+        return null;
+    }
+
+    public static <S extends Sensor> void getSensors(
             @NonNull List<S> sensorCarrier,
             Filter<S> filter,
             @NonNull Class<S> sClass) {
         S s;
-        for (Sensor sensor :
-                SENSOR_MAP.values()) {
-            if (sClass.isInstance(sensor)) {
-                s = (S) sensor;
-                if (filter == null || filter.match(s)) {
-                    sensorCarrier.add(s);
+        synchronized (SENSOR_MAP) {
+            for (Sensor sensor :
+                    SENSOR_MAP.values()) {
+                if (sClass.isInstance(sensor)) {
+                    s = (S) sensor;
+                    if (filter == null || filter.match(s)) {
+                        sensorCarrier.add(s);
+                    }
                 }
             }
         }
@@ -210,10 +636,12 @@ public class SensorManager {
 
     public static synchronized <S extends Sensor> int getSensorWithHistoryValuesCount(Class<S> sClass) {
         int count = 0;
-        for (Sensor sensor :
-                SENSOR_MAP.values()) {
-            if (sClass.isInstance(sensor) && sensor.hasHistoryValue()) {
-                ++count;
+        synchronized (SENSOR_MAP) {
+            for (Sensor sensor :
+                    SENSOR_MAP.values()) {
+                if (sClass.isInstance(sensor) && sensor.getInfo().hasHistoryValue()) {
+                    ++count;
+                }
             }
         }
         return count;
@@ -233,7 +661,7 @@ public class SensorManager {
                 "EsbSensorConfiguration.xml");
     }
 
-    private static boolean importConfiguration(Map<Byte, LogicalSensor.DataType> dataTypes,
+    private static boolean importConfiguration(Map<Byte, PracticalMeasurement.DataType> dataTypes,
                                                List<PhysicalSensor.Type> types,
                                                Context context,
                                                String configFileName) {
@@ -258,11 +686,11 @@ public class SensorManager {
         return position >= 0 ? types.get(position) : null;
     }
 
-    public static LogicalSensor.DataType getDataType(int address, byte dataTypeValue, boolean autoCreate) {
-        Map<Byte, LogicalSensor.DataType> dataTypeMap = getDataTypes(address);
-        LogicalSensor.DataType dataType = dataTypeMap.get(dataTypeValue);
+    public static PracticalMeasurement.DataType getDataType(int address, byte dataTypeValue, boolean autoCreate) {
+        Map<Byte, PracticalMeasurement.DataType> dataTypeMap = getDataTypes(address);
+        PracticalMeasurement.DataType dataType = dataTypeMap.get(dataTypeValue);
         if (autoCreate && dataType == null) {
-            dataType = new LogicalSensor.DataType(dataTypeValue);
+            dataType = new PracticalMeasurement.DataType(dataTypeValue);
             dataTypeMap.put(dataTypeValue, dataType);
         }
         return dataType;
@@ -276,20 +704,20 @@ public class SensorManager {
         return Collections.unmodifiableList(ESB_SENSOR_TYPES);
     }
 
-    public static List<LogicalSensor.DataType> getBleDataTypes() {
+    public static List<PracticalMeasurement.DataType> getBleDataTypes() {
         return new ArrayList<>(BLE_DATA_TYPES.values());
     }
 
-    public static List<LogicalSensor.DataType> getEsbDataTypes() {
+    public static List<PracticalMeasurement.DataType> getEsbDataTypes() {
         return new ArrayList<>(ESB_DATA_TYPES.values());
     }
 
     private static List<PhysicalSensor.Type> getSensorTypes(int address) {
-        return Sensor.ID.isBleProtocolFamily(address) ? BLE_SENSOR_TYPES : ESB_SENSOR_TYPES;
+        return ID.isBleProtocolFamily(address) ? BLE_SENSOR_TYPES : ESB_SENSOR_TYPES;
     }
 
-    private static Map<Byte, LogicalSensor.DataType> getDataTypes(int address) {
-        return Sensor.ID.isBleProtocolFamily(address) ? BLE_DATA_TYPES : ESB_DATA_TYPES;
+    private static Map<Byte, PracticalMeasurement.DataType> getDataTypes(int address) {
+        return ID.isBleProtocolFamily(address) ? BLE_DATA_TYPES : ESB_DATA_TYPES;
     }
 
     private static ConfigurationImporter getConfigurationImporter(Context context, String fileName) {
@@ -304,7 +732,7 @@ public class SensorManager {
         }
     }
 
-    public static synchronized void setValueContainerConfigurationProvider(SensorConfigurationProvider provider, boolean isResetConfigurations) {
+    public static synchronized void setValueContainerConfigurationProvider(MeasurementConfigurationProvider provider, boolean isResetConfigurations) {
         if (configurationProvider != provider) {
             configurationProvider = provider;
             if (isResetConfigurations) {
@@ -316,12 +744,12 @@ public class SensorManager {
         }
     }
 
-    static SensorConfigurationProvider getConfigurationProvider() {
+    static MeasurementConfigurationProvider getConfigurationProvider() {
         return configurationProvider;
     }
 
-    public interface SensorConfigurationProvider {
-        <C extends Sensor.Configuration> C getSensorConfiguration(Sensor.ID id);
+    public interface MeasurementConfigurationProvider extends VirtualMeasurementBuilder {
+        <C extends Configuration> C getConfiguration(ID id);
     }
 
     private static class ConfigurationImporter extends DefaultHandler {
@@ -331,8 +759,8 @@ public class SensorManager {
         private static final String SENSOR_TYPE = "SensorType";
         private static final String DATA_TYPE_CUSTOM_NAME = "DataTypeCustomName";
 
-        private Map<Byte, LogicalSensor.DataType> mDataTypeMap;
-        private LogicalSensor.DataType mDataType;
+        private Map<Byte, PracticalMeasurement.DataType> mDataTypeMap;
+        private PracticalMeasurement.DataType mDataType;
         private StringBuilder mBuilder;
         private Map<Double, String> mParaphrases;
         private Double mNumber;
@@ -355,7 +783,7 @@ public class SensorManager {
         private ErrorStateInterpreter mErrorStateInterpreter;
         private int mErrorPos;
 
-        public Map<Byte, LogicalSensor.DataType> getDataTypeMap() {
+        public Map<Byte, PracticalMeasurement.DataType> getDataTypeMap() {
             return mDataTypeMap;
         }
 
@@ -393,7 +821,7 @@ public class SensorManager {
         public void endElement(String uri, String localName, String qName) throws SAXException {
             switch (localName) {
                 case "value":
-                    mDataType = new LogicalSensor.DataType((byte)Integer.parseInt(mBuilder.toString(), 16));
+                    mDataType = new PracticalMeasurement.DataType((byte)Integer.parseInt(mBuilder.toString(), 16));
                     break;
                 case "name":
                     mDataType.mName = mBuilder.toString();
@@ -441,7 +869,7 @@ public class SensorManager {
                     //获取数据类型
                     mDataType = mDataTypeMap.get(mDataTypeValue);
                     if (mDataType == null) {
-                        mDataType = new LogicalSensor.DataType(mDataTypeValue);
+                        mDataType = new PracticalMeasurement.DataType(mDataTypeValue);
                         mDataTypeMap.put(mDataTypeValue, mDataType);
                     }
                     //生成测量参数

@@ -127,7 +127,7 @@ public class SimpleSQLiteAsyncEventHandler extends Handler {
                                 insertArgs.values, insertArgs.conflictAlgorithm);
                     } catch (Exception e) {
                         Log.w(TAG, "Exception thrown during handling EVENT_ARG_INSERT", e);
-                        insertArgs.result = -1;
+                        insertArgs.result = -1L;
                     }
                     break;
                 case EVENT_ARG_UPDATE:
@@ -138,6 +138,7 @@ public class SimpleSQLiteAsyncEventHandler extends Handler {
                                 updateArgs.selectionArgs, updateArgs.conflictAlgorithm);
                     } catch (Exception e) {
                         Log.w(TAG, "Exception thrown during handling EVENT_ARG_UPDATE", e);
+                        updateArgs.result = -1;
                     }
                     break;
                 case EVENT_ARG_DELETE:
@@ -147,6 +148,7 @@ public class SimpleSQLiteAsyncEventHandler extends Handler {
                                 deleteArgs.selection, deleteArgs.selectionArgs);
                     } catch (Exception e) {
                         Log.w(TAG, "Exception thrown during handling EVENT_ARG_DELETE", e);
+                        deleteArgs.result = -1;
                     }
                     break;
                 case EVENT_ARG_RAW_QUERY:
@@ -174,7 +176,7 @@ public class SimpleSQLiteAsyncEventHandler extends Handler {
                                 replaceArgs.values);
                     } catch (Exception e) {
                         Log.w(TAG, "Exception thrown during handling EVENT_ARG_REPLACE", e);
-                        replaceArgs.result = -1;
+                        replaceArgs.result = -1L;
                     }
                     break;
                 case EVENT_ARG_RAW_SQL:

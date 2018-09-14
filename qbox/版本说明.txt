@@ -277,3 +277,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20180725-1.6.7(78):
 1. ConfirmDialog当content为空时，不inflate该content所在layout
 
+20180911-1.6.8(79)：
+1. 修复SQLiteResolverDelegate类insert、delete和replace方法部分返回值有误的问题
+2. 修复SimpleSQLiteAsyncEventHandler.WorkerHandler类handleMessage方法在处理EVENT_ARG_INSERT、EVENT_ARG_UPDATE、EVENT_ARG_DELETE和EVENT_ARG_REPLACE这个事件时，Args.result设置错误的问题
