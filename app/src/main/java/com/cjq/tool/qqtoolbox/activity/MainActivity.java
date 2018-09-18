@@ -2,9 +2,6 @@ package com.cjq.tool.qqtoolbox.activity;
 
 import android.Manifest;
 import android.content.Intent;
-import android.nfc.Tag;
-import android.os.Environment;
-import android.os.PersistableBundle;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -25,6 +22,7 @@ import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.SerialPortKit;
 import com.cjq.lib.weisi.data.FilterCollection;
 import com.cjq.lib.weisi.data.Storage;
+import com.cjq.lib.weisi.iot.DisplayMeasurement;
 import com.cjq.lib.weisi.iot.LogicalSensor;
 import com.cjq.lib.weisi.iot.PhysicalSensor;
 import com.cjq.lib.weisi.iot.Warner;
@@ -42,10 +40,7 @@ import com.cjq.tool.qbox.ui.view.SizeSelfAdaptionTextView;
 import com.cjq.tool.qbox.util.ClosableLog;
 import com.cjq.tool.qbox.util.ExceptionLog;
 import com.cjq.lib.weisi.util.NumericConverter;
-import com.cjq.tool.qbox.util.FileUtil;
 import com.cjq.tool.qqtoolbox.R;
-import com.cjq.tool.qqtoolbox.bean.Person;
-import com.cjq.tool.qqtoolbox.bean.PhysicalSensorProvider;
 import com.cjq.tool.qqtoolbox.bean.filter.BleProtocolFilter;
 import com.cjq.tool.qqtoolbox.bean.filter.SensorUseForRealTimeFilter;
 import com.cjq.tool.qqtoolbox.bean.sorter.SensorAddressSorter;
@@ -57,9 +52,7 @@ import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment1;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
 import com.cjq.tool.qqtoolbox.util.CrashHandler;
-import com.cjq.tool.qqtoolbox.util.DebugTag;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -635,7 +628,7 @@ public class MainActivity
 
     }
 
-    private static class Value extends com.cjq.lib.weisi.iot.Value {
+    private static class Value extends com.cjq.lib.weisi.iot.container.Value {
 
         public Value(long timestamp) {
             super(timestamp);
@@ -650,10 +643,10 @@ public class MainActivity
         }
     }
 
-    private static class SingleValueDomainWarnerImpl implements LogicalSensor.SingleRangeWarner {
+    private static class SingleValueDomainWarnerImpl implements DisplayMeasurement.SingleRangeWarner {
 
         @Override
-        public int test(LogicalSensor.Value value) {
+        public int test(DisplayMeasurement.Value value) {
             return RESULT_ABOVE_HIGH_LIMIT;
         }
     }

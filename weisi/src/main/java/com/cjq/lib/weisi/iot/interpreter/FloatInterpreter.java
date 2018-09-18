@@ -1,4 +1,4 @@
-package com.cjq.lib.weisi.iot;
+package com.cjq.lib.weisi.iot.interpreter;
 
 /**
  * Created by KAT on 2016/11/23.
@@ -14,10 +14,11 @@ public class FloatInterpreter implements ValueInterpreter {
         }
     }
 
-    private String mFormat;
+    private final String mFormat;
 
-    public FloatInterpreter(int decimals) {
-        mFormat = FORMATS[Math.min(MAX_DECIMALS, Math.max(decimals, 0))];
+    public FloatInterpreter(int decimals, String unit) {
+        mFormat = FORMATS[Math.min(MAX_DECIMALS, Math.max(decimals, 0))]
+                + (unit != null ? unit : "");
     }
 
     @Override

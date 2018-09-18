@@ -2,7 +2,10 @@ package com.cjq.lib.weisi.iot;
 
 import android.support.annotation.NonNull;
 
-public abstract class Measurement<V extends Value, C extends Configuration<V>> {
+import com.cjq.lib.weisi.iot.container.Value;
+import com.cjq.lib.weisi.iot.container.ValueContainer;
+
+public abstract class Measurement<V extends Value, C extends Configuration<V>> implements Comparable<Measurement<V, C>> {
 
     private final ID mId;
     private final String mDefaultName;
@@ -10,13 +13,13 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> {
     private ValueContainer<V> mDynamicValueContainer;
     private ValueContainer<V> mHistoryValueContainer;
 
-    protected Measurement(int address, byte dataTypeValue, int dataTypeValueIndex, String name) {
-        this(new ID(address, dataTypeValue, dataTypeValueIndex), name);
-    }
-
-    protected Measurement(long id, String name) {
-        this(new ID(id), name);
-    }
+//    protected Measurement(int address, byte dataTypeValue, int dataTypeValueIndex, String name) {
+//        this(new ID(address, dataTypeValue, dataTypeValueIndex), name);
+//    }
+//
+//    protected Measurement(long id, String name) {
+//        this(new ID(id), name);
+//    }
 
     protected Measurement(@NonNull ID id, String name) {
         mId = id;
@@ -38,13 +41,27 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> {
     protected abstract @NonNull C getEmptyConfiguration();
 
     public boolean setConfiguration(C configuration) {
-        C oldConfiguration = mConfiguration;
+        boolean changed = false;
         if (configuration != null) {
-            mConfiguration = configuration;
+            if (mConfiguration != configuration) {
+                mConfiguration = configuration;
+                changed = true;
+            }
         } else {
-            mConfiguration = getEmptyConfiguration();
+            if (mConfiguration == null) {
+                mConfiguration = getEmptyConfiguration();
+            } else if (mConfiguration != getEmptyConfiguration()) {
+                mConfiguration = getEmptyConfiguration();
+                changed = true;
+            }
         }
-        return oldConfiguration != mConfiguration;
+        if (changed) {
+            onConfigurationChanged();
+        }
+        return changed;
+    }
+
+    protected void onConfigurationChanged() {
     }
 
     public @NonNull C getConfiguration() {
@@ -117,13 +134,18 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> {
     }
 
     public boolean resetConfiguration() {
-        SensorManager.MeasurementConfigurationProvider provider = SensorManager.getConfigurationProvider();
+        SensorManager.MeasurementConfigurationProvider provider = SensorManager.getMeasurementConfigurationProvider();
         if (provider == null) {
             return setConfiguration(null);
         } else {
             C configuration = provider.getConfiguration(mId);
             return setConfiguration(configuration);
         }
+    }
+
+    @Override
+    public int compareTo(@NonNull Measurement<V, C> o) {
+        return mId.compareTo(o.mId);
     }
 
     protected static class EmptyConfiguration<V extends Value> implements Configuration<V> {

@@ -1,12 +1,10 @@
-package com.cjq.lib.weisi.iot;
+package com.cjq.lib.weisi.iot.container;
 
 import android.support.annotation.NonNull;
 
 import com.cjq.lib.weisi.util.SimpleReflection;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 

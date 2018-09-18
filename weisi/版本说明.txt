@@ -476,3 +476,10 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 7. 新增VirtualMeasurementBuilder接口用于自定义虚拟测量量，即只用于显示，并不实际存取数据
 8. Sensor.Info.Configuration接口新增方法List<ID> getVirtualMeasurementIdList()用于获取自定义虚拟测量量信息
 
+20180918-6.1.0(122):
+1. 移除PracticalMeasurement.DataType类mUnit属性及相应方法
+2. 修改FloatInterpreter构造方法，加入unit参数，其解释值将带有单位
+3. 新增ValueContainerWrapper类，提供对某些依赖于其他测量量的虚拟测量量进行取值操作
+4. 新增VirtualMeasurement类，用于对某些仅作界面显示用的测量量进行设置
+5. 新增RatchetWheelMeasurement、RatchetWheelMeasurementA、RatchetWheelMeasurementB类，提供对棘轮检测装置a值和b值的显示支持
+6. 调整包结构，在iot包下新建container、corrector和interpreter三个包，并分别将相应类移入

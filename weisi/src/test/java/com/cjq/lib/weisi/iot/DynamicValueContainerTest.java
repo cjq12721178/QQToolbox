@@ -1,8 +1,11 @@
 package com.cjq.lib.weisi.iot;
 
+import com.cjq.lib.weisi.iot.container.DynamicValueContainer;
+import com.cjq.lib.weisi.iot.container.Value;
+
 import org.junit.Test;
 
-import static com.cjq.lib.weisi.iot.ValueContainer.*;
+import static com.cjq.lib.weisi.iot.container.ValueContainer.*;
 import static org.junit.Assert.*;
 
 /**

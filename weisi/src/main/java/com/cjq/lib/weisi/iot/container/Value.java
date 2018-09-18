@@ -1,4 +1,4 @@
-package com.cjq.lib.weisi.iot;
+package com.cjq.lib.weisi.iot.container;
 
 import com.cjq.lib.weisi.util.ExpandComparator;
 
@@ -10,7 +10,7 @@ import java.lang.reflect.Constructor;
  */
 public class Value implements Cloneable {
 
-    long mTimestamp;
+    protected long mTimestamp;
 
     public Value(long timestamp) {
         mTimestamp = timestamp;

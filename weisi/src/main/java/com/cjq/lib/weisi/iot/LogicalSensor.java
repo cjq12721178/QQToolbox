@@ -196,7 +196,7 @@ public class LogicalSensor extends Sensor {
      * Created by CJQ on 2017/6/16.
      */
 
-//    public static class Value extends com.cjq.lib.weisi.iot.Value {
+//    public static class Value extends com.cjq.lib.weisi.iot.container.Value {
 //
 //        double mRawValue;
 //

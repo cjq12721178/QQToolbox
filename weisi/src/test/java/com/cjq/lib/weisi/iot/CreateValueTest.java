@@ -1,9 +1,10 @@
 package com.cjq.lib.weisi.iot;
 
-import org.junit.Test;
+import com.cjq.lib.weisi.iot.container.DynamicValueContainer;
+import com.cjq.lib.weisi.iot.container.Value;
+import com.cjq.lib.weisi.iot.container.ValueContainer;
 
-import java.util.ArrayList;
-import java.util.List;
+import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 

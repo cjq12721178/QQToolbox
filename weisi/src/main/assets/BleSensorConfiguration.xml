@@ -13,212 +13,282 @@
 		<DataType>
 			<value>05</value>
 			<name>温度</name>
-			<decimal>1</decimal>
-			<unit>℃</unit>
+			<float>
+				<decimal>1</decimal>
+				<unit>℃</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>06</value>
 			<name>最高温度</name>
-			<decimal>1</decimal>
-			<unit>℃</unit>
+			<float>
+				<decimal>1</decimal>
+				<unit>℃</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>07</value>
 			<name>最低温度</name>
-			<decimal>1</decimal>
-			<unit>℃</unit>
+			<float>
+				<decimal>1</decimal>
+				<unit>℃</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>08</value>
 			<name>平均温度</name>
-			<decimal>1</decimal>
-			<unit>℃</unit>
+			<float>
+				<decimal>1</decimal>
+				<unit>℃</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>11</value>
 			<name>动作次数</name>
-			<decimal>0</decimal>
-			<unit>次</unit>
+			<float>
+				<decimal>0</decimal>
+				<unit>次</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>18</value>
 			<name>阻性电流</name>
-			<decimal>3</decimal>
-			<unit>μA</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>μA</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>1A</value>
 			<name>泄露电流</name>
-			<decimal>3</decimal>
-			<unit>μA</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>μA</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>1B</value>
 			<name>电流</name>
-			<decimal>3</decimal>
-			<unit>A</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>A</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>1D</value>
 			<name>电压</name>
-			<decimal>2</decimal>
-			<unit>V</unit>
+			<float>
+				<decimal>2</decimal>
+				<unit>V</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>20</value>
 			<name>有功功率</name>
-			<decimal>1</decimal>
-			<unit>W</unit>
+			<float>
+				<decimal>1</decimal>
+				<unit>W</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>21</value>
 			<name>无功功率</name>
-			<decimal>1</decimal>
-			<unit>Var</unit>
+			<float>
+				<decimal>1</decimal>
+				<unit>Var</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>22</value>
 			<name>视在功率</name>
-			<decimal>1</decimal>
-			<unit>VA</unit>
+			<float>
+				<decimal>1</decimal>
+				<unit>VA</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>23</value>
 			<name>功率因素</name>
-			<decimal>3</decimal>
-			<unit>°</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>°</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>24</value>
 			<name>相电流</name>
-			<decimal>3</decimal>
-			<unit>A</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>A</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>25</value>
 			<name>相电压</name>
-			<decimal>3</decimal>
-			<unit>V</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>V</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>26</value>
 			<name>相能耗</name>
-			<decimal>3</decimal>
-			<unit>kwh</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>kwh</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>27</value>
 			<name>相频率</name>
-			<decimal>3</decimal>
-			<unit>Hz</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>Hz</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>28</value>
 			<name>电流三次谐波</name>
-			<decimal>3</decimal>
-			<unit>A</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>A</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>29</value>
 			<name>电流五次谐波</name>
-			<decimal>3</decimal>
-			<unit>A</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>A</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>2A</value>
 			<name>电流七次谐波</name>
-			<decimal>3</decimal>
-			<unit>A</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>A</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>2B</value>
 			<name>电流九次谐波</name>
-			<decimal>3</decimal>
-			<unit>A</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>A</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>2C</value>
 			<name>电压三次谐波</name>
-			<decimal>3</decimal>
-			<unit>V</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>V</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>2D</value>
 			<name>电压五次谐波</name>
-			<decimal>3</decimal>
-			<unit>V</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>V</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>2E</value>
 			<name>电压七次谐波</name>
-			<decimal>3</decimal>
-			<unit>V</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>V</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>2F</value>
 			<name>电压九次谐波</name>
-			<decimal>3</decimal>
-			<unit>V</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>V</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>40</value>
 			<name>相对湿度</name>
-			<decimal>3</decimal>
-			<unit>%RH</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>%RH</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>41</value>
 			<name>露点温度</name>
-			<decimal>2</decimal>
-			<unit>℃</unit>
+			<float>
+				<decimal>2</decimal>
+				<unit>℃</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>42</value>
 			<name>液位高度</name>
-			<decimal>3</decimal>
-			<unit>m</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>m</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>45</value>
 			<name>雨量</name>
-			<decimal>3</decimal>
-			<unit>m</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>m</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>46</value>
 			<name>风速</name>
-			<decimal>3</decimal>
-			<unit>m/s</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>m/s</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>47</value>
 			<name>风向</name>
-			<decimal>3</decimal>
-			<unit>°</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>°</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>48</value>
 			<name>气压</name>
-			<decimal>3</decimal>
-			<unit>Pa</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>Pa</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>4A</value>
 			<name>光照度</name>
-			<decimal>3</decimal>
-			<unit>Lux</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>Lux</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>4C</value>
 			<name>声强</name>
-			<decimal>3</decimal>
-			<unit>dB</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>dB</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>4E</value>
 			<name>容积含水率</name>
-			<decimal>3</decimal>
-			<unit>%RH</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>%RH</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>50</value>
@@ -271,68 +341,90 @@
 		<DataType>
 			<value>5F</value>
 			<name>开关次数</name>
-			<decimal>0</decimal>
-			<unit>次</unit>
+			<float>
+				<decimal>0</decimal>
+				<unit>次</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>60</value>
 			<name>拉力</name>
-			<decimal>3</decimal>
-			<unit>kg</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>kg</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>62</value>
 			<name>形变</name>
-			<decimal>3</decimal>
-			<unit>με</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>με</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>65</value>
 			<name>重力加速度</name>
-			<decimal>3</decimal>
-			<unit>mg</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>mg</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>66</value>
 			<name>振动加速度</name>
-			<decimal>3</decimal>
-			<unit>G</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>G</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>67</value>
 			<name>振动速率</name>
-			<decimal>3</decimal>
-			<unit>m/s</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>m/s</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>68</value>
 			<name>振动位移</name>
-			<decimal>3</decimal>
-			<unit>m</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>m</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>69</value>
 			<name>振动频率</name>
-			<decimal>3</decimal>
-			<unit>Hz</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>Hz</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>6A</value>
 			<name>位移</name>
-			<decimal>3</decimal>
-			<unit>mm</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>mm</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>6B</value>
 			<name>距离</name>
-			<decimal>3</decimal>
-			<unit>m</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>m</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>6D</value>
 			<name>角度</name>
-			<decimal>3</decimal>
-			<unit>°</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>°</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>6E</value>
@@ -416,32 +508,42 @@
 		<DataType>
 			<value>80</value>
 			<name>氧气浓度</name>
-			<decimal>3</decimal>
-			<unit>%VOL</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>%VOL</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>81</value>
 			<name>一氧化碳浓度</name>
-			<decimal>3</decimal>
-			<unit>ppm</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>ppm</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>82</value>
 			<name>二氧化碳浓度</name>
-			<decimal>3</decimal>
-			<unit>ppm</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>ppm</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>A1</value>
 			<name>温度系数</name>
-			<decimal>3</decimal>
-			<unit>mm/℃</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>mm/℃</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>A8</value>
 			<name>指示范围</name>
-			<decimal>3</decimal>
-			<unit>mm</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>mm</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>F8</value>
@@ -452,20 +554,26 @@
 		<DataType>
 			<value>FA</value>
 			<name>MSB</name>
-			<decimal>3</decimal>
-			<unit>s</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>s</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>FB</value>
 			<name>LSB</name>
-			<decimal>3</decimal>
-			<unit>s</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>s</unit>
+			</float>
 		</DataType>
 		<DataType>
 			<value>FC</value>
 			<name>时间间隔</name>
-			<decimal>3</decimal>
-			<unit>s</unit>
+			<float>
+				<decimal>3</decimal>
+				<unit>s</unit>
+			</float>
 		</DataType>
 	</DataTypes>
 	<SensorTypes>

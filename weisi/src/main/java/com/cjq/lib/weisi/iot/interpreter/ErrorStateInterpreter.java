@@ -1,7 +1,9 @@
-package com.cjq.lib.weisi.iot;
+package com.cjq.lib.weisi.iot.interpreter;
 
 import android.support.annotation.IntRange;
 import android.text.TextUtils;
+
+import com.cjq.lib.weisi.iot.SensorManager;
 
 public class ErrorStateInterpreter implements ValueInterpreter {
 

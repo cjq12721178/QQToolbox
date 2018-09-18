@@ -1,4 +1,4 @@
-package com.cjq.lib.weisi.iot;
+package com.cjq.lib.weisi.iot.corrector;
 
 import android.support.annotation.NonNull;
 import android.text.TextUtils;

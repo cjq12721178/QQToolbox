@@ -109,6 +109,14 @@ public final class ID implements Comparable<ID> {
         return (int) ((id & DATA_TYPE_MASK) >> DATA_TYPE_START_BIT);
     }
 
+    public String getFormattedDataTypeValue() {
+        return getFormattedDataTypeValue(mId);
+    }
+
+    public static String getFormattedDataTypeValue(long id) {
+        return String.format("%02X", getDataTypeValue(id));
+    }
+
     public int getDataTypeValueIndex() {
         return getDataTypeValueIndex(mId);
     }

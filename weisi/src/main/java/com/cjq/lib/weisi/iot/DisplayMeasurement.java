@@ -6,26 +6,26 @@ import android.support.annotation.NonNull;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public abstract class DisplayMeasurement extends Measurement<DisplayMeasurement.Value, DisplayMeasurement.Configuration> {
+public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configuration> extends Measurement<DisplayMeasurement.Value, C> {
 
-    private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
+    //private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
+    private final boolean mHidden;
 
-    protected DisplayMeasurement(int address, byte dataTypeValue, int dataTypeValueIndex, String name) {
-        super(address, dataTypeValue, dataTypeValueIndex, name);
-    }
+//    protected DisplayMeasurement(int address, byte dataTypeValue, int dataTypeValueIndex, String name, boolean hidden) {
+//        this(new ID(address, dataTypeValue, dataTypeValueIndex), name);
+//    }
+//
+//    protected DisplayMeasurement(long id, String name, boolean hidden) {
+//        this(new ID(id), name, hidden);
+//    }
 
-    protected DisplayMeasurement(long id, String name) {
+    protected DisplayMeasurement(@NonNull ID id, String name, boolean hidden) {
         super(id, name);
+        mHidden = hidden | (id.getDataTypeAbsValue() == 0xF1);
     }
 
-    protected DisplayMeasurement(@NonNull ID id, String name) {
-        super(id, name);
-    }
-
-    @NonNull
-    @Override
-    protected Configuration getEmptyConfiguration() {
-        return EMPTY_CONFIGURATION;
+    public boolean isHidden() {
+        return mHidden;
     }
 
     public int testValue(@NonNull Warner<Value> warner, @NonNull Value value) {
@@ -45,9 +45,9 @@ public abstract class DisplayMeasurement extends Measurement<DisplayMeasurement.
         return formatValue(getRealTimeValue());
     }
 
-    public String getFormattedRealTimeValueWithUnit() {
-        return formatValueWithUnit(getRealTimeValue());
-    }
+//    public String getFormattedRealTimeValueWithUnit() {
+//        return formatValueWithUnit(getRealTimeValue());
+//    }
 
     public String formatValue(Value v) {
         return formatValue(v.getRawValue());
@@ -55,18 +55,23 @@ public abstract class DisplayMeasurement extends Measurement<DisplayMeasurement.
 
     public abstract String formatValue(double rawValue);
 
-    public String formatValueWithUnit(@NonNull Value v) {
-        return formatValueWithUnit(v.getRawValue());
-    }
+//    public String formatValueWithUnit(@NonNull Value v) {
+//        return formatValueWithUnit(v.getRawValue());
+//    }
 
-    public abstract String formatValueWithUnit(double rawValue);
+    //public abstract String formatValueWithUnit(double rawValue);
 
-    public static class Value extends com.cjq.lib.weisi.iot.Value {
+    public static class Value extends com.cjq.lib.weisi.iot.container.Value {
 
         double mRawValue;
 
         public Value(long timeStamp) {
             super(timeStamp);
+        }
+
+        @Override
+        protected void setTimestamp(long timeStamp) {
+            mTimestamp = timeStamp;
         }
 
         public double getRawValue() {
@@ -81,7 +86,7 @@ public abstract class DisplayMeasurement extends Measurement<DisplayMeasurement.
         void setWarner(Warner<Value> warner);
     }
 
-    private static class EmptyConfiguration
+    protected static class EmptyConfiguration
             extends Measurement.EmptyConfiguration<Value>
             implements Configuration {
 
