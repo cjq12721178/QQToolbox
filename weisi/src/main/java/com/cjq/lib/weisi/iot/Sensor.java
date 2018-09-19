@@ -176,16 +176,11 @@ public abstract class Sensor {
         }
 
         public interface Configuration extends com.cjq.lib.weisi.iot.Configuration<Value> {
-            List<ID> getVirtualMeasurementIdList();
         }
 
         private static class EmptyConfiguration
                 extends Measurement.EmptyConfiguration<Value>
                 implements Configuration{
-            @Override
-            public List<ID> getVirtualMeasurementIdList() {
-                return null;
-            }
         }
 
         private static class DynamicValueContainerImpl extends DynamicValueContainer<Value> {
