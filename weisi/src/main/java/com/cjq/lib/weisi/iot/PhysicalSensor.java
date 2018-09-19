@@ -269,24 +269,17 @@ public class PhysicalSensor extends Sensor {
     }
 
     @Override
+    public Sensor.Info getMainMeasurement() {
+        return mInfo;
+    }
+
+    @Override
     public void resetConfiguration() {
         super.resetConfiguration();
         for (int i = 0, size = getDisplayMeasurementSize();i < size;++i) {
             getDisplayMeasurementByPosition(i).resetConfiguration();
         }
     }
-
-    //    private void clearVirtualMeasurement() {
-//        int i = 0;
-//        for (int size = mMeasurements.size(); i < size; ++i) {
-//            if (!mMeasurements.get(i).getId().isVirtualMeasurement()) {
-//                break;
-//            }
-//        }
-//        if (i > 0) {
-//            mMeasurements.subList(0, i).clear();
-//        }
-//    }
 
     /**
      * Created by CJQ on 2017/6/16.

@@ -36,6 +36,8 @@ public abstract class Sensor {
         return mInfo.getId();
     }
 
+    public abstract Measurement getMainMeasurement();
+
     public long getNetInTimestamp() {
         return mNetInTimestamp;
     }

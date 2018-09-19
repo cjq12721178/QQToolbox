@@ -15,56 +15,19 @@ public class LogicalSensor extends Sensor {
         mPracticalMeasurement = practicalMeasurement;
     }
 
-    public PracticalMeasurement getPracticalMeasurement() {
+    @Override
+    public ID getId() {
+        return mPracticalMeasurement.getId();
+    }
+
+    @Override
+    public PracticalMeasurement getMainMeasurement() {
         return mPracticalMeasurement;
     }
 
-    //    private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
-//
-//
-//    private final DataType mDataType;
-//    private final String mName;
-//    private LogicalSensor mNextMeasurement;
-//
-//    LogicalSensor(long id, @NonNull DataType dataType) {
-//        this(id, dataType, null);
-//    }
-//
-//    LogicalSensor(long id, @NonNull DataType dataType, String name) {
-//        this(new ID(id), dataType, name);
-//    }
-//
-//    LogicalSensor(@NonNull ID id, @NonNull DataType dataType) {
-//        this(id, dataType, null);
-//    }
-//
-//    LogicalSensor(@NonNull ID id, @NonNull DataType dataType, String name) {
-//        super(id);
-//        mDataType = dataType;
-//        mName = name != null ? name : dataType.getDefaultName();
-//    }
-//
-//    @NonNull
-//    @Override
-//    protected ValueContainer<Value> onCreateDynamicValueContainer() {
-//        return new DynamicValueContainerImpl();
-//    }
-//
-//    @NonNull
-//    @Override
-//    protected ValueContainer<Value> onCreateHistoryValueContainer() {
-//        return new HistoryValueContainerImpl();
-//    }
-//
-//    @Override
-//    protected Configuration getEmptyConfiguration() {
-//        return EMPTY_CONFIGURATION;
-//    }
-//
-//    @Override
-//    public String getDefaultName() {
-//        return mName;
-//    }
+    public PracticalMeasurement getPracticalMeasurement() {
+        return mPracticalMeasurement;
+    }
 
     public int addDynamicValue(long timestamp, float batteryVoltage, double rawValue) {
         //修正时间戳
