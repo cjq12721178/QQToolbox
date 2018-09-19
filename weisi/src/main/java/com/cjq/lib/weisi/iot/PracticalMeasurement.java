@@ -90,7 +90,7 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
         }
     }
 
-    int addHistoryValue(long timestamp, double rawValue) {
+    public int addHistoryValue(long timestamp, double rawValue) {
         int result = getHistoryValueContainer().addValue(timestamp);
         setValueContent(getValueByContainerAddMethodReturnValue(getHistoryValueContainer(), result), rawValue);
         return result;

@@ -256,7 +256,6 @@ public class PhysicalSensor extends Sensor {
     }
 
     public int addHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, float batteryVoltage, double rawValue) {
-
         return addInfoHistoryValue(timestamp, batteryVoltage);
     }
 

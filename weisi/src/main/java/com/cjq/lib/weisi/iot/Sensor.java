@@ -148,7 +148,7 @@ public abstract class Sensor {
             }
         }
 
-        int addHistoryValue(long timestamp, float batteryVoltage) {
+        public int addHistoryValue(long timestamp, float batteryVoltage) {
             int result = getHistoryValueContainer().addValue(timestamp);
             setValueContent(getValueByContainerAddMethodReturnValue(getHistoryValueContainer(), result), batteryVoltage);
             return result;

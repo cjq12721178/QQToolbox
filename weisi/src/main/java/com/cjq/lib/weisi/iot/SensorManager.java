@@ -89,11 +89,11 @@ public class SensorManager {
         return getSensorInfo(ID.getId(address));
     }
 
-    private static Sensor.Info getSensorInfo(long id, boolean autoCreate) {
+    private static @Nullable Sensor.Info getSensorInfo(long id, boolean autoCreate) {
         return getSensorInfo(id, autoCreate, autoCreate ? findSensorType(ID.getAddress(id)) : null);
     }
 
-    private static Sensor.Info getSensorInfo(long id, boolean autoCreate, @Nullable PhysicalSensor.Type type) {
+    private static @Nullable Sensor.Info getSensorInfo(long id, boolean autoCreate, @Nullable PhysicalSensor.Type type) {
         long correctId = ID.ensureSensorInfo(id);
         synchronized (MEASUREMENT_MAP) {
             Measurement measurement = MEASUREMENT_MAP.get(correctId);
@@ -133,23 +133,23 @@ public class SensorManager {
         return findPracticalMeasurement(address, dataTypeValue, 0);
     }
 
-    public static @NonNull PracticalMeasurement getPracticalMeasurement(@NonNull ID id) {
+    public static @Nullable PracticalMeasurement getPracticalMeasurement(@NonNull ID id) {
         return getPracticalMeasurement(id.getId());
     }
 
-    public static @NonNull PracticalMeasurement getPracticalMeasurement(int address, byte dataTypeValue, int dataTypeValueIndex) {
+    public static @Nullable PracticalMeasurement getPracticalMeasurement(int address, byte dataTypeValue, int dataTypeValueIndex) {
         return getPracticalMeasurement(ID.getId(address, dataTypeValue, dataTypeValueIndex));
     }
 
-    public static @NonNull PracticalMeasurement getPracticalMeasurement(int address, byte dataTypeValue) {
+    public static @Nullable PracticalMeasurement getPracticalMeasurement(int address, byte dataTypeValue) {
         return getPracticalMeasurement(address, dataTypeValue, 0);
     }
 
-    public static @NonNull PracticalMeasurement getPracticalMeasurement(long id) {
+    public static @Nullable PracticalMeasurement getPracticalMeasurement(long id) {
         return getPracticalMeasurement(id, true);
     }
 
-    private static PracticalMeasurement getPracticalMeasurement(long id, boolean autoCreate) {
+    private static @Nullable PracticalMeasurement getPracticalMeasurement(long id, boolean autoCreate) {
         return getPracticalMeasurement(id, autoCreate, autoCreate ? findSensorType(ID.getAddress(id)) : null);
     }
 
@@ -172,15 +172,12 @@ public class SensorManager {
         return parameter;
     }
 
-    private static PracticalMeasurement getPracticalMeasurement(long id, boolean autoCreate, @Nullable PhysicalSensor.Type type) {
+    private static @Nullable PracticalMeasurement getPracticalMeasurement(long id, boolean autoCreate, @Nullable PhysicalSensor.Type type) {
         return getPracticalMeasurement(id, autoCreate, autoCreate ? findPracticalMeasurementParameter(id, type) : null);
     }
 
     private static @Nullable PracticalMeasurement getPracticalMeasurement(long id, boolean autoCreate, @Nullable PhysicalSensor.Type.PracticalMeasurementParameter parameter) {
         if (!ID.isPracticalMeasurement(id)) {
-            if (autoCreate) {
-                throw new IllegalArgumentException("id of target practical measurement is abnormal");
-            }
             return null;
         }
         synchronized (MEASUREMENT_MAP) {
@@ -253,23 +250,22 @@ public class SensorManager {
 
     private static VirtualMeasurement getVirtualMeasurement(long id, PhysicalSensor.Type.VirtualMeasurementParameter parameter) {
         if (!ID.isVirtualMeasurement(id)) {
-            if (parameter != null) {
-                throw new IllegalArgumentException("id of target virtual measurement is abnormal");
-            }
             return null;
         }
         synchronized (MEASUREMENT_MAP) {
             Measurement measurement = MEASUREMENT_MAP.get(id);
             if (measurement == null && parameter != null) {
                 VirtualMeasurement virtualMeasurement = createVirtualMeasurement(new ID(id), parameter);
-                MEASUREMENT_MAP.put(id, virtualMeasurement);
+                if (virtualMeasurement != null) {
+                    MEASUREMENT_MAP.put(id, virtualMeasurement);
+                }
                 return virtualMeasurement;
             }
             return (VirtualMeasurement) measurement;
         }
     }
 
-    private static @NonNull VirtualMeasurement createVirtualMeasurement(@NonNull ID id, @NonNull PhysicalSensor.Type.VirtualMeasurementParameter parameter) {
+    private static @Nullable VirtualMeasurement createVirtualMeasurement(@NonNull ID id, @NonNull PhysicalSensor.Type.VirtualMeasurementParameter parameter) {
         switch (parameter.mMeasurementType) {
             case "RWA":
                 return new RatchetWheelMeasurementA(id,
@@ -283,8 +279,9 @@ public class SensorManager {
                         parameter.mValueInterpreter,
                         parameter.mHideMeasurement,
                         getPracticalMeasurement(id.getAddress(), (byte) 0x70));
+            default:
+                return null;
         }
-        throw new IllegalArgumentException("illegal measurement type to create virtual measurement");
     }
 
     //
@@ -382,21 +379,29 @@ public class SensorManager {
             measurements = new ArrayList<>(type.getMeasurementParameterSize());
             //生成实测型测量量
             PhysicalSensor.Type.PracticalMeasurementParameter pmp;
+            PracticalMeasurement practicalMeasurement;
             for (int i = 0, dataTypeValueIndex; i < type.mPracticalMeasurementParameters.length; ++i) {
                 pmp = type.mPracticalMeasurementParameters[i];
                 byte dataTypeValue = pmp.mInvolvedDataType.mValue;
                 dataTypeValueIndex = 0;
                 do {
-                    measurements.add(getPracticalMeasurement(ID.getId(address, dataTypeValue, dataTypeValueIndex++), true, pmp));
+                    practicalMeasurement = getPracticalMeasurement(ID.getId(address, dataTypeValue, dataTypeValueIndex++), true, pmp);
+                    if (practicalMeasurement != null) {
+                        measurements.add(practicalMeasurement);
+                    }
                     pmp = pmp.mNext;
                 } while (pmp != null);
             }
             //生成虚拟型测量量
             PhysicalSensor.Type.VirtualMeasurementParameter vmp;
+            VirtualMeasurement virtualMeasurement;
             if (type.mVirtualMeasurementParameters != null) {
                 for (int i = 0;i < type.mVirtualMeasurementParameters.size();++i) {
                     vmp = type.mVirtualMeasurementParameters.get(i);
-                    measurements.add(getVirtualMeasurement(ID.getId(address, (byte) 0, i + 1), vmp));
+                    virtualMeasurement = getVirtualMeasurement(ID.getId(address, (byte) 0, i + 1), vmp);
+                    if (virtualMeasurement != null) {
+                        measurements.add(virtualMeasurement);
+                    }
                 }
             }
         } else {
@@ -425,19 +430,19 @@ public class SensorManager {
         return getLogicalSensor(id, false);
     }
 
-    public static @NonNull LogicalSensor getLogicalSensor(int address, byte dataTypeValue) {
+    public static @Nullable LogicalSensor getLogicalSensor(int address, byte dataTypeValue) {
         return getLogicalSensor(address, dataTypeValue, 0);
     }
 
-    public static @NonNull LogicalSensor getLogicalSensor(int address, byte dataTypeValue, int dataTypeValueIndex) {
+    public static @Nullable LogicalSensor getLogicalSensor(int address, byte dataTypeValue, int dataTypeValueIndex) {
         return getLogicalSensor(ID.getId(address, dataTypeValue, dataTypeValueIndex));
     }
 
-    public static @NonNull LogicalSensor getLogicalSensor(@NonNull ID id) {
+    public static @Nullable LogicalSensor getLogicalSensor(@NonNull ID id) {
         return getLogicalSensor(id.getId());
     }
 
-    public static @NonNull LogicalSensor getLogicalSensor(long id) {
+    public static @Nullable LogicalSensor getLogicalSensor(long id) {
         return getLogicalSensor(id, true);
     }
 

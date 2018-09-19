@@ -487,3 +487,7 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 20180919-6.1.1(123):
 1. LogicalSensor类新增方法getPracticalMeasurement
 2. 修改LogicalSensor和PhysicalSensor类相应的addDynamicValue和addHistoryValue参数，以符合实际意义
+
+20180919-6.1.2(124):
+1. 将Sensor.Info和PracticalMeasurement类中的方法addHistoryValue访问权限从package提高至public
+2. 修正SensorManager中部分getXXXX方法返回非空情况标注有误的问题

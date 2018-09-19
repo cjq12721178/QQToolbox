@@ -13,14 +13,6 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
     private ValueContainer<V> mDynamicValueContainer;
     private ValueContainer<V> mHistoryValueContainer;
 
-//    protected Measurement(int address, byte dataTypeValue, int dataTypeValueIndex, String name) {
-//        this(new ID(address, dataTypeValue, dataTypeValueIndex), name);
-//    }
-//
-//    protected Measurement(long id, String name) {
-//        this(new ID(id), name);
-//    }
-
     protected Measurement(@NonNull ID id, String name) {
         mId = id;
         mDefaultName = name != null ? name : "";
