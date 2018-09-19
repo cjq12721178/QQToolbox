@@ -176,7 +176,7 @@ public class Storage<E> implements Parcelable {
         notifyFilterChangeListener(onFilterChangeListener, previousSize);
     }
 
-    public int add(E e) {
+    public int add(@NonNull E e) {
         int position;
         if (mFilters.match(e)) {
             if (mSorter != null) {
@@ -194,7 +194,7 @@ public class Storage<E> implements Parcelable {
         return position != -1 ? getOrderPosition(position) : -1;
     }
 
-    public int find(E e) {
+    public int find(@NonNull E e) {
         int position;
         if (mFilters.match(e)) {
             if (mSorter != null) {
@@ -206,6 +206,16 @@ public class Storage<E> implements Parcelable {
             position = -1;
         }
         return position != -1 ? getOrderPosition(position) : -1;
+    }
+
+    public <T> int find(@NonNull T t, @NonNull Comparator<E, T> comparator) {
+        int i = 0, count = size();
+        for (;i < count;++i) {
+            if (comparator.equals(mElements.get(i), t)) {
+                break;
+            }
+        }
+        return i == count ? -1 : getOrderPosition(i);
     }
 
     public Sorter<E> getSorter() {
@@ -259,4 +269,8 @@ public class Storage<E> implements Parcelable {
             return new Storage[size];
         }
     };
+
+    public interface Comparator<E, T> {
+        boolean equals(@NonNull E e, @NonNull T t);
+    }
 }
