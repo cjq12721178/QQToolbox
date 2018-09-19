@@ -15,7 +15,11 @@ public class LogicalSensor extends Sensor {
         mPracticalMeasurement = practicalMeasurement;
     }
 
-//    private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
+    public PracticalMeasurement getPracticalMeasurement() {
+        return mPracticalMeasurement;
+    }
+
+    //    private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
 //
 //
 //    private final DataType mDataType;
@@ -62,29 +66,26 @@ public class LogicalSensor extends Sensor {
 //        return mName;
 //    }
 
-    @Override
-    public int addDynamicValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, float batteryVoltage, double rawValue) {
-        //获取所属物理传感器
-        //PhysicalSensor sensor = getPhysicalSensor();
+    public int addDynamicValue(long timestamp, float batteryVoltage, double rawValue) {
         //修正时间戳
-        //long correctedTimestamp = sensor.correctTimestamp(timestamp);
         long correctedTimestamp = correctTimestamp(timestamp);
         //修正原始数据
         double correctedValue = mPracticalMeasurement.correctRawValue(rawValue);
         //将逻辑传感器实时数据添加至实时数据缓存
-        //int result = addLogicalDynamicValue(correctedTimestamp, correctedValue);
         int result = mPracticalMeasurement.addDynamicValue(correctedTimestamp, correctedValue);
         //为物理传感器添加动态数据
-        //sensor.addPhysicalDynamicValue(timestamp, batteryVoltage);
         mInfo.addDynamicValue(correctedTimestamp, batteryVoltage);
-        notifyDynamicValueCaptured(dataTypeValue, dataTypeValueIndex, batteryVoltage, correctedTimestamp, correctedValue);
+        notifyDynamicValueCaptured(getId().getDataTypeValue(), getId().getDataTypeValueIndex(), batteryVoltage, correctedTimestamp, correctedValue);
         return result;
     }
 
-    @Override
-    public int addHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, float batteryVoltage, double rawValue) {
-        //getPhysicalSensor().addPhysicalHistoryValue(timestamp, batteryVoltage);
-        mInfo.addHistoryValue(timestamp, batteryVoltage);
+    public int addHistoryValue(long timestamp, float batteryVoltage, double rawValue) {
+        addInfoHistoryValue(timestamp, batteryVoltage);
+        //mInfo.addHistoryValue(timestamp, batteryVoltage);
+        return addMeasurementHistoryValue(timestamp, rawValue);
+    }
+
+    public int addMeasurementHistoryValue(long timestamp, double rawValue) {
         return mPracticalMeasurement.addHistoryValue(timestamp, rawValue);
     }
 

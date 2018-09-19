@@ -483,3 +483,7 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 4. 新增VirtualMeasurement类，用于对某些仅作界面显示用的测量量进行设置
 5. 新增RatchetWheelMeasurement、RatchetWheelMeasurementA、RatchetWheelMeasurementB类，提供对棘轮检测装置a值和b值的显示支持
 6. 调整包结构，在iot包下新建container、corrector和interpreter三个包，并分别将相应类移入
+
+20180919-6.1.1(123):
+1. LogicalSensor类新增方法getPracticalMeasurement
+2. 修改LogicalSensor和PhysicalSensor类相应的addDynamicValue和addHistoryValue参数，以符合实际意义

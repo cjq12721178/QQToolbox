@@ -233,7 +233,6 @@ public class PhysicalSensor extends Sensor {
         return measurement;
     }
 
-    @Override
     public int addDynamicValue(byte dataTypeValue,
                                int dataTypeValueIndex,
                                long timestamp,
@@ -256,13 +255,18 @@ public class PhysicalSensor extends Sensor {
         return result;
     }
 
-    @Override
     public int addHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, float batteryVoltage, double rawValue) {
+
+        return addInfoHistoryValue(timestamp, batteryVoltage);
+    }
+
+    public int addMeasurementHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, double rawValue) {
         PracticalMeasurement measurement = getPracticalMeasurementWithAutoCreate(dataTypeValue, dataTypeValueIndex);
         if (measurement != null) {
-            measurement.addHistoryValue(timestamp, rawValue);
+            return measurement.addHistoryValue(timestamp, rawValue);
+        } else {
+            return ValueContainer.ADD_FAILED_RETURN_VALUE;
         }
-        return mInfo.addHistoryValue(timestamp, batteryVoltage);
     }
 
     @Override

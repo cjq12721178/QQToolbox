@@ -60,6 +60,10 @@ public abstract class Sensor {
         mInfo.resetConfiguration();
     }
 
+    public int addInfoHistoryValue(long timestamp, float batteryVoltage) {
+        return mInfo.addHistoryValue(timestamp, batteryVoltage);
+    }
+
     protected void notifyDynamicValueCaptured(byte dataTypeValue, int dataTypeValueIndex, float batteryVoltage, long correctedTimestamp, double correctedValue) {
         //传感器及其测量量实时数据捕获
         if (onDynamicValueCaptureListener != null) {
@@ -93,18 +97,6 @@ public abstract class Sensor {
     public static void setOnDynamicValueCaptureListener(OnDynamicValueCaptureListener listener) {
         onDynamicValueCaptureListener = listener;
     }
-
-    public abstract int addDynamicValue(byte dataTypeValue,
-                                        int dataTypeValueIndex,
-                                        long timestamp,
-                                        float batteryVoltage,
-                                        double rawValue);
-
-    public abstract int addHistoryValue(byte dataTypeValue,
-                                        int dataTypeValueIndex,
-                                        long timestamp,
-                                        float batteryVoltage,
-                                        double rawValue);
 
     public interface OnDynamicValueCaptureListener {
         void onDynamicValueCapture(int address,
