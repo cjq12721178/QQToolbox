@@ -743,7 +743,7 @@ public class SensorManager {
                     if (mType != null) {
                         mVirtualMeasurementName = mBuilder.toString();
                     } else {
-                        mDataType.mName = mBuilder.toString();
+                        mDataType.setName(mBuilder.toString());
                     }
                     break;
                 case "decimal":
@@ -758,6 +758,7 @@ public class SensorManager {
                     mValueInterpreter = new FloatInterpreter(mDecimal, mUnit);
                     mDecimal = 3;
                     mUnit = null;
+                    break;
                 case "type":
                     mValueType = Integer.parseInt(mBuilder.toString());
                     break;
@@ -768,7 +769,7 @@ public class SensorManager {
                     mCoefficient = Double.parseDouble(mBuilder.toString());
                     break;
                 case DATA_TYPE:
-                    mDataType.mInterpreter = mValueInterpreter;
+                    mDataType.setInterpreter(mValueInterpreter);
                     mValueInterpreter = null;
                     //根据mValueType为DataType配备不同的ValueBuilder
                     if (mValueType != -1) {

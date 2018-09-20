@@ -24,7 +24,7 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
 //    }
 
     protected PracticalMeasurement(@NonNull ID id, @NonNull DataType dataType, String name, boolean hidden) {
-        super(id, name, hidden);
+        super(id, TextUtils.isEmpty(name) ? dataType.getName() : name, hidden);
         mDataType = dataType;
     }
 
@@ -105,10 +105,9 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     public static class DataType {
 
         final byte mValue;
-        String mName;
-        //String mUnit = "";
-        ValueInterpreter mInterpreter = DefaultInterpreter.getInstance();
+        private String mName;
         ValueCorrector mCorrector;
+        private ValueInterpreter mInterpreter = DefaultInterpreter.getInstance();
 
         public DataType(byte value) {
             mValue = value;
@@ -126,15 +125,23 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
             return String.format("%02X", mValue);
         }
 
+        void setName(String name) {
+            mName = TextUtils.isEmpty(name) ? "未知测量量" : name;
+        }
+
         public String getName() {
             return mName;
         }
 
-        public String getDefaultName() {
-            return TextUtils.isEmpty(mName) ? "未知测量量" : mName;
+//        public String getDefaultName() {
+//            return TextUtils.isEmpty(mName) ? "未知测量量" : mName;
+//        }
+
+        void setInterpreter(ValueInterpreter interpreter) {
+            mInterpreter = interpreter != null ? interpreter : DefaultInterpreter.getInstance();
         }
 
-//        public String getUnit() {
+        //        public String getUnit() {
 //            return mUnit;
 //        }
 

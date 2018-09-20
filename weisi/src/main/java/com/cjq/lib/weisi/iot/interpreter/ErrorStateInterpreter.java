@@ -23,7 +23,7 @@ public class ErrorStateInterpreter implements ValueInterpreter {
         byte dataType = (byte) (rawValue & 0xff00);
         StringBuilder builder = new StringBuilder(100);
         builder.append("测量量-")
-                .append(SensorManager.getDataType(0xABCD, dataType, true).getDefaultName())
+                .append(SensorManager.getDataType(0xABCD, dataType, true).getName())
                 .append("存在");
         boolean hasErrorDsp = false;
         for (int i = 0, j = 1;i < Byte.SIZE;++i, j <<= 1) {
