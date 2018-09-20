@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.cjq.lib.weisi.iot.container.DynamicValueContainer;
 import com.cjq.lib.weisi.iot.container.HistoryValueContainer;
+import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
 
 import java.lang.annotation.Retention;

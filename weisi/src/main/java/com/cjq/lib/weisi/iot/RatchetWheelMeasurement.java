@@ -15,9 +15,10 @@ public abstract class RatchetWheelMeasurement extends VirtualMeasurement<Ratchet
                                       String name,
                                       ValueInterpreter valueInterpreter,
                                       boolean hidden,
-                                      PracticalMeasurement distanceRecorder) {
-        super(id, name, valueInterpreter, hidden);
+                                      @NonNull PracticalMeasurement distanceRecorder) {
+        super(id, name, valueInterpreter != null ? valueInterpreter : distanceRecorder.getDataType().getInterpreter(), hidden, false);
         mDistanceRecorder = distanceRecorder;
+        init();
     }
 
     @NonNull

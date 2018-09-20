@@ -267,18 +267,26 @@ public class SensorManager {
 
     private static @Nullable VirtualMeasurement createVirtualMeasurement(@NonNull ID id, @NonNull PhysicalSensor.Type.VirtualMeasurementParameter parameter) {
         switch (parameter.mMeasurementType) {
-            case "RWA":
-                return new RatchetWheelMeasurementA(id,
+            case "RWA": {
+                PracticalMeasurement host = getPracticalMeasurement(id.getAddress(), (byte) 0x70);
+                return host != null
+                        ? new RatchetWheelMeasurementA(id,
                         parameter.mMeasurementName,
                         parameter.mValueInterpreter,
                         parameter.mHideMeasurement,
-                        getPracticalMeasurement(id.getAddress(), (byte) 0x70));
-            case "RWB":
-                return new RatchetWheelMeasurementB(id,
+                        host)
+                        : null;
+            }
+            case "RWB": {
+                PracticalMeasurement host = getPracticalMeasurement(id.getAddress(), (byte) 0x70);
+                return host != null
+                        ? new RatchetWheelMeasurementB(id,
                         parameter.mMeasurementName,
                         parameter.mValueInterpreter,
                         parameter.mHideMeasurement,
-                        getPracticalMeasurement(id.getAddress(), (byte) 0x70));
+                        host)
+                        : null;
+            }
             default:
                 return null;
         }
@@ -454,18 +462,23 @@ public class SensorManager {
             Sensor sensor = SENSOR_MAP.get(id);
             if (sensor == null && autoCreate) {
                 LogicalSensor logicalSensor = createLogicalSensor(new ID(id));
-                SENSOR_MAP.put(id, logicalSensor);
+                if (logicalSensor != null) {
+                    SENSOR_MAP.put(id, logicalSensor);
+                }
                 return logicalSensor;
             }
             return (LogicalSensor) sensor;
         }
     }
 
-    private static @NonNull LogicalSensor createLogicalSensor(@NonNull ID id) {
+    private static @Nullable LogicalSensor createLogicalSensor(@NonNull ID id) {
         int address = id.getAddress();
         PhysicalSensor.Type type = findSensorType(address);
-        Sensor.Info info = getSensorInfo(id.getId(), true, type);
         PracticalMeasurement measurement = getPracticalMeasurement(id.getId(), true, type);
+        if (measurement == null) {
+            return null;
+        }
+        Sensor.Info info = getSensorInfo(id.getId(), true, type);
         return new LogicalSensor(info, measurement);
     }
 

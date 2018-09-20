@@ -8,19 +8,14 @@ import java.lang.annotation.RetentionPolicy;
 
 public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configuration> extends Measurement<DisplayMeasurement.Value, C> {
 
-    //private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
     private final boolean mHidden;
 
-//    protected DisplayMeasurement(int address, byte dataTypeValue, int dataTypeValueIndex, String name, boolean hidden) {
-//        this(new ID(address, dataTypeValue, dataTypeValueIndex), name);
-//    }
-//
-//    protected DisplayMeasurement(long id, String name, boolean hidden) {
-//        this(new ID(id), name, hidden);
-//    }
-
     protected DisplayMeasurement(@NonNull ID id, String name, boolean hidden) {
-        super(id, name);
+        this(id, name, hidden, true);
+    }
+
+    protected DisplayMeasurement(@NonNull ID id, String name, boolean hidden, boolean autoInit) {
+        super(id, name, autoInit);
         mHidden = hidden | (id.getDataTypeAbsValue() == 0xF1);
     }
 

@@ -12,7 +12,11 @@ public abstract class VirtualMeasurement<C extends DisplayMeasurement.Configurat
     private final ValueInterpreter mValueInterpreter;
 
     protected VirtualMeasurement(@NonNull ID id, String name, ValueInterpreter valueInterpreter, boolean hidden) {
-        super(id, name, hidden);
+        this(id, name, valueInterpreter, hidden, true);
+    }
+
+    protected VirtualMeasurement(@NonNull ID id, String name, ValueInterpreter valueInterpreter, boolean hidden, boolean autoInit) {
+        super(id, name, hidden, autoInit);
         mValueInterpreter = valueInterpreter != null ? valueInterpreter : DefaultInterpreter.getInstance();
     }
 

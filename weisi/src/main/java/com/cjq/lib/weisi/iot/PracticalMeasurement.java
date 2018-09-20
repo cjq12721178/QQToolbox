@@ -141,6 +141,10 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
             mInterpreter = interpreter != null ? interpreter : DefaultInterpreter.getInstance();
         }
 
+        public ValueInterpreter getInterpreter() {
+            return mInterpreter;
+        }
+
         //        public String getUnit() {
 //            return mUnit;
 //        }

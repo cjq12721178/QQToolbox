@@ -14,8 +14,18 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
     private ValueContainer<V> mHistoryValueContainer;
 
     protected Measurement(@NonNull ID id, String name) {
+        this(id, name, true);
+    }
+
+    protected Measurement(@NonNull ID id, String name, boolean autoInit) {
         mId = id;
         mDefaultName = name != null ? name : "";
+        if (autoInit) {
+            init();
+        }
+    }
+
+    protected void init() {
         mDynamicValueContainer = onCreateDynamicValueContainer();
         mHistoryValueContainer = onCreateHistoryValueContainer();
         resetConfiguration();
@@ -25,8 +35,7 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
         return mId;
     }
 
-    protected abstract @NonNull
-    ValueContainer<V> onCreateDynamicValueContainer();
+    protected abstract @NonNull ValueContainer<V> onCreateDynamicValueContainer();
 
     protected abstract @NonNull ValueContainer<V> onCreateHistoryValueContainer();
 

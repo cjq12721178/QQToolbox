@@ -507,3 +507,8 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 2. 将PracticalMeasurement.DataType的属性mName、mInterpreter的访问改为private，并添加相应设置方法供包内调用，同时去除了多余的方法getDefaultName
 3. 修复PracticalMeasurement.name设置错误的问题
 4. 修复FloatInterpreter在解析时遇到单位中含有“%”符号抛出异常的问题
+
+20180920-6.1.7(129):
+1. 修复RatchetWheelMeasurementA(B)实例化失败的问题
+2. 修复LogicalSensor类的getMainMeasurement方法可能为空的问题
+3. 修复Sensor类的getMainMeasurement方法返回值类型不明确的问题
