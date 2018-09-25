@@ -512,3 +512,9 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. 修复RatchetWheelMeasurementA(B)实例化失败的问题
 2. 修复LogicalSensor类的getMainMeasurement方法可能为空的问题
 3. 修复Sensor类的getMainMeasurement方法返回值类型不明确的问题
+
+20180925-6.1.8(130):
+1. 修复BleSensorProtocol在处理阵列传感器时有误的问题
+2. 修复BleSensorProtocol的数据解析相关问题
+3. 修复ScriptValueCorrector类correct方法强制转化结果错误的问题
+4. 修复PhysicalSensor.addDynamicValue未将校正后数据代替原始数据

@@ -29,7 +29,7 @@ public class ScriptValueCorrector implements ValueCorrector {
     public double correct(double value) {
         mScript.getEngine().getContext().setAttribute("v", value, ScriptContext.ENGINE_SCOPE);
         try {
-            return (double) mScript.eval();
+            return ((Double) mScript.eval()).doubleValue();
         } catch (Exception e) {
             return value;
         }

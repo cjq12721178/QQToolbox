@@ -56,44 +56,34 @@ public class BleSensorProtocol extends BaseSensorProtocol<BleAnalyzer> {
             return;
         }
         //是否为阵列传感器
-        boolean isArraySensor = NumericConverter.int8ToUInt16(mTmpBroadcastAddress[4]) != 0;
-        if (isArraySensor) {
-            Arrays.fill(mDataTypeArray, (byte) 0);
-        }
+        //暂时没有应用
+//        boolean isArraySensor = NumericConverter.int8ToUInt16(mTmpBroadcastAddress[4]) != 0;
+//        if (isArraySensor) {
+//            Arrays.fill(mDataTypeArray, (byte) 0);
+//        }
+        Arrays.fill(mDataTypeArray, (byte) 0);
         int sensorAddress = broadcastAddressToRawAddress(mTmpBroadcastAddress);
         long timestamp = System.currentTimeMillis();
         float voltage = mAnalyzer.analyzeBatteryVoltage(broadcastData[broadcastData.length
                 - CRC16_LENGTH
                 - RSSI_LENGTH
                 - SENSOR_BATTERY_VOLTAGE_LENGTH]);
-//        mValueBuildDelegator
-//                .setData(broadcastData)
-//                .setBatteryVoltageIndex(broadcastData.length
-//                        - CRC16_LENGTH
-//                        - RSSI_LENGTH
-//                        - SENSOR_BATTERY_VOLTAGE_LENGTH)
-//                .setTimestampIndex(System.currentTimeMillis());
         for (int start = DATA_ZONE_LENGTH_LENGTH,
-             end = dataZoneLength / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
+             end = start + (dataZoneLength - CRC16_LENGTH - DATA_ZONE_LENGTH_LENGTH) / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
              start < end;
              start += SENSOR_DATA_LENGTH) {
             listener.onSensorInfoAnalyzed(sensorAddress,
                     broadcastData[start],
-                    isArraySensor
-                            ? mDataTypeArray[NumericConverter.int8ToUInt16(broadcastData[start])]++
-                            : 0,
+//                    isArraySensor
+//                            ? mDataTypeArray[NumericConverter.int8ToUInt16(broadcastData[start])]++
+//                            : 0,
+                    mDataTypeArray[NumericConverter.int8ToUInt16(broadcastData[start])]++,
                     timestamp,
                     voltage,
                     mAnalyzer.analyzeRawValue(broadcastData,
                             start + DATA_TYPE_VALUE_LENGTH));
         }
     }
-
-//    private float analyzeBatteryVoltage(byte voltage) {
-//        return voltage < 0
-//                ? voltage
-//                : voltage * BATTERY_VOLTAGE_COEFFICIENT;
-//    }
 
     public byte[] broadcastAddressStringToBytes(String src) {
         byte[] dst = new byte[BROADCAST_ADDRESS_LENGTH];

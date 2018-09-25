@@ -250,7 +250,7 @@ public class PhysicalSensor extends Sensor {
         //修正原始数据
         double correctedValue = measurement.correctRawValue(rawValue);
         //为测量量添加动态数据（包括实时数据及其缓存）
-        measurement.addDynamicValue(correctedTimestamp, rawValue);
+        measurement.addDynamicValue(correctedTimestamp, correctedValue);
         notifyDynamicValueCaptured(dataTypeValue, dataTypeValueIndex, batteryVoltage, correctedTimestamp, correctedValue);
         return result;
     }
