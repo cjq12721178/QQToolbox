@@ -111,7 +111,7 @@ public class PhysicalSensor extends Sensor {
     }
 
     public DisplayMeasurement getVirtualMeasurementByIndex(int index) {
-        int position = getDisplayMeasurementPosition((byte) 0, index);
+        int position = getMeasurementPosition((byte) 0, index);
         DisplayMeasurement measurement = getMeasurementByPositionSafely(position);
         return measurement != null && measurement.getId().isVirtualMeasurement()
                 ? measurement
@@ -126,7 +126,7 @@ public class PhysicalSensor extends Sensor {
         if (dataTypeValue == 0) {
             return null;
         }
-        DisplayMeasurement measurement = getMeasurementByPositionSafely(getDisplayMeasurementPosition(dataTypeValue, dataTypeValueIndex));
+        DisplayMeasurement measurement = getMeasurementByPositionSafely(getMeasurementPosition(dataTypeValue, dataTypeValueIndex));
         return measurement != null ? (PracticalMeasurement) measurement : null;
     }
 
@@ -187,7 +187,18 @@ public class PhysicalSensor extends Sensor {
         return getVirtualMeasurementSize(true) != 0;
     }
 
-    private int getDisplayMeasurementPosition(byte dataTypeValue, int dataTypeValueIndex) {
+    public DisplayMeasurement getDisplayMeasurementById(long id) {
+        return getDisplayMeasurementByDataType(ID.getDataTypeValue(id), ID.getDataTypeValueIndex(id));
+    }
+
+    public DisplayMeasurement getDisplayMeasurementByDataType(byte dataTypeValue, int dataTypeValueIndex) {
+        DisplayMeasurement measurement = getMeasurementByPositionSafely(getMeasurementPosition(dataTypeValue, dataTypeValueIndex));
+        return measurement != null && !measurement.isHidden()
+                ? measurement
+                : null;
+    }
+
+    private int getMeasurementPosition(byte dataTypeValue, int dataTypeValueIndex) {
         synchronized (mMeasurements) {
             int position, size = mMeasurements.size();
             if (size > MEASUREMENT_SEARCH_THRESHOLD) {
@@ -221,7 +232,7 @@ public class PhysicalSensor extends Sensor {
         if (dataTypeValue == 0) {
             return null;
         }
-        int position = getDisplayMeasurementPosition(dataTypeValue, dataTypeValueIndex);
+        int position = getMeasurementPosition(dataTypeValue, dataTypeValueIndex);
         PracticalMeasurement measurement;
         if (position >= 0 && position < mMeasurements.size()) {
             measurement = (PracticalMeasurement) mMeasurements.get(position);
