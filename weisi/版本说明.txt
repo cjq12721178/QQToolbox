@@ -522,3 +522,7 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 20180926-6.1.9(131):
 1. 修改PhysicalSensor类getXXXMeasuremntXXX方法的名称
 2. PhysicalSensor类新增方法getDisplayMeasurementByDataType和getDisplayMeasurementById
+
+20180926-6.1.10(132):
+1. 修复BleSensorProtocol协议漏处理最后一个传感器有效数据的问题
+2. 取消ExceptionLog类在记录日志时对API版本进行判断，将该功能交给用户端

@@ -69,7 +69,7 @@ public class BleSensorProtocol extends BaseSensorProtocol<BleAnalyzer> {
                 - RSSI_LENGTH
                 - SENSOR_BATTERY_VOLTAGE_LENGTH]);
         for (int start = DATA_ZONE_LENGTH_LENGTH,
-             end = start + (dataZoneLength - CRC16_LENGTH - DATA_ZONE_LENGTH_LENGTH) / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
+             end = start + (dataZoneLength - RSSI_LENGTH - SENSOR_BATTERY_VOLTAGE_LENGTH) / SENSOR_DATA_LENGTH * SENSOR_DATA_LENGTH;
              start < end;
              start += SENSOR_DATA_LENGTH) {
             listener.onSensorInfoAnalyzed(sensorAddress,

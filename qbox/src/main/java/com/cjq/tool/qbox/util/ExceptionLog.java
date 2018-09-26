@@ -111,24 +111,19 @@ public class ExceptionLog {
 
     private static void saveInLocalFile(String information) {
         try {
-            FileWriter writer;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && !debuggable) {
-                writer = new FileWriter(context.getFileStreamPath(DEFAULT_LOG_FILE_NAME));
-            } else {
-                File directory = getErrorInfoDirectory();
-                if (directory == null) {
+            File directory = getErrorInfoDirectory();
+            if (directory == null) {
+                return;
+            }
+            File file = new File(directory.getAbsolutePath() +
+                    File.separator + DEFAULT_LOG_FILE_NAME);
+            if (!file.exists()) {
+                if (!file.createNewFile()) {
+                    SimpleCustomizeToast.show("日志文件创建失败，无法记录异常信息");
                     return;
                 }
-                File file = new File(directory.getAbsolutePath() +
-                        File.separator + DEFAULT_LOG_FILE_NAME);
-                if (!file.exists()) {
-                    if (!file.createNewFile()) {
-                        SimpleCustomizeToast.show("日志文件创建失败，无法记录异常信息");
-                        return;
-                    }
-                }
-                writer = new FileWriter(file, true);
             }
+            FileWriter writer = new FileWriter(file, true);
             try {
                 writer.write(information);
             } catch (IOException ioe) {
