@@ -1,5 +1,6 @@
 package com.cjq.tool.qbox.ui.adapter;
 
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
@@ -11,7 +12,7 @@ import java.util.List;
 
 public abstract class AdapterDelegateManager<E> {
 
-    public abstract void addAdapterDelegate(AdapterDelegate<E> delegate);
+    public abstract void addAdapterDelegate(@NonNull AdapterDelegate<E> delegate);
 
     protected abstract AdapterDelegate<E> getAdapterDelegate(int viewType);
 
