@@ -1,6 +1,7 @@
 package com.cjq.lib.weisi.iot;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
@@ -19,7 +20,7 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
 
     protected Measurement(@NonNull ID id, String name, boolean autoInit) {
         mId = id;
-        mDefaultName = name != null ? name : "";
+        mDefaultName = TextUtils.isEmpty(name) ? "未知测量量" : name;
         if (autoInit) {
             init();
         }

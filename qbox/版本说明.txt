@@ -280,3 +280,7 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20180911-1.6.8(79)：
 1. 修复SQLiteResolverDelegate类insert、delete和replace方法部分返回值有误的问题
 2. 修复SimpleSQLiteAsyncEventHandler.WorkerHandler类handleMessage方法在处理EVENT_ARG_INSERT、EVENT_ARG_UPDATE、EVENT_ARG_DELETE和EVENT_ARG_REPLACE这个事件时，Args.result设置错误的问题
+
+20180927-1.6.9(80):
+1. 删除MapAdapterDelegateManager.addAdapterDelegate(int viewType, @NonNull AdapterDelegate<E> delegate)，将原有功能整合进addAdapterDelegate(@NonNull AdapterDelegate<E> delegate)方法
+2. 在接口AdapterDelegateManager的方法addAdapterDelegate的参数AdapterDelegate<E>前添加@NonNull

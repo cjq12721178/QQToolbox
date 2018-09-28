@@ -3,6 +3,7 @@ package com.cjq.lib.weisi.iot;
 
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 import com.cjq.lib.weisi.iot.container.DynamicValueContainer;
 import com.cjq.lib.weisi.iot.container.HistoryValueContainer;
@@ -115,7 +116,7 @@ public abstract class Sensor {
         private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
 
         protected Info(@NonNull ID id, String name) {
-            super(id, name);
+            super(id, TextUtils.isEmpty(name) ? "未知传感器" : name);
             if (!id.isSensorInfo()) {
                 throw new IllegalArgumentException("main measurement data type and index may both be 0");
             }
