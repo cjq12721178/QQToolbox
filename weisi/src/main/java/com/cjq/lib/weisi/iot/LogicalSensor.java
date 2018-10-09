@@ -150,11 +150,11 @@ public class LogicalSensor extends Sensor {
 //                : value;
 //    }
 
-    @Override
-    public void resetConfiguration() {
-        super.resetConfiguration();
-        mPracticalMeasurement.resetConfiguration();
-    }
+//    @Override
+//    public void resetConfiguration() {
+//        super.resetConfiguration();
+//        mPracticalMeasurement.resetConfiguration();
+//    }
 
     /**
      * Created by CJQ on 2017/6/16.

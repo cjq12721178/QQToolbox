@@ -129,7 +129,7 @@ public abstract class RecyclerViewBaseAdapter<E>
         unregisterAdapterDataObserver(mDataObserver);
     }
 
-//    private boolean onItemSelected(View v) {
+//    private boolean onItemsSelected(View v) {
 //        int currentPosition = getPositionByItemView(v);
 //        if (currentPosition == -1) {
 //            return false;
@@ -200,14 +200,14 @@ public abstract class RecyclerViewBaseAdapter<E>
 
 //    @Override
 //    public void onClick(View v) {
-//        if (onItemSelected(v)) {
+//        if (onItemsSelected(v)) {
 //            mOnItemClickListener.onItemClick(v, mSelectedIndex);
 //        }
 //    }
 //
 //    @Override
 //    public boolean onLongClick(View v) {
-//        if (onItemSelected(v)) {
+//        if (onItemsSelected(v)) {
 //            mOnItemLongClickListener.onItemLongClick(v, mSelectedIndex);
 //        }
 //        return true;

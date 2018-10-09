@@ -1,7 +1,9 @@
 package com.cjq.tool.qbox.ui.dialog;
 
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
@@ -17,6 +19,9 @@ import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
 import com.cjq.tool.qbox.ui.decoration.SpaceItemDecoration;
 import com.cjq.tool.qbox.ui.gesture.SimpleRecyclerViewItemTouchListener;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by KAT on 2017/4/11.
  */
@@ -24,6 +29,7 @@ import com.cjq.tool.qbox.ui.gesture.SimpleRecyclerViewItemTouchListener;
 public class ListDialog extends BaseDialog<ListDialog.Decorator> {
 
     private static final String ARGUMENT_KEY_ITEMS = "items";
+    private static final String ARGUMENT_KEY_MULTIPLE_SELECT = "mul_select";
     private ItemAdapter mItemAdapter;
 
     public static class Decorator extends BaseDialog.Decorator {
@@ -68,6 +74,18 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         final public void setItemTextSizeDimenRes(@DimenRes int dimenRes) {
             mParameters.putInt("dp_item_text_size", dimenRes);
         }
+
+        final public @DrawableRes int getSelectedBackgroundDrawableRes() {
+            return mParameters.getInt("dp_item_select_bg", getDefaultSelectedBackgroundDrawableRes());
+        }
+
+        public @DrawableRes int getDefaultSelectedBackgroundDrawableRes() {
+            return R.color.qbox_background_button_pressed;
+        }
+
+        final public void setSelectedBackgroundDrawableRes(@DrawableRes int drawableRes) {
+            mParameters.putInt("dp_item_select_bg", drawableRes);
+        }
     }
 
     @Override
@@ -84,17 +102,41 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         rvItems.addOnItemTouchListener(new SimpleRecyclerViewItemTouchListener(rvItems) {
             @Override
             public void onItemClick(View v, int position) {
-                OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
-                if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
-                    listener.onItemSelected(ListDialog.this, position);
+                if (isMultipleSelect()) {
+                    mItemAdapter.mSelections[position] = !mItemAdapter.mSelections[position];
+                    mItemAdapter.notifyItemChanged(position);
+                } else {
+                    OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
+                    if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
+                        listener.onItemSelected(ListDialog.this, position);
+                    }
+                    dismiss();
                 }
-                dismiss();
             }
         });
         mItemAdapter = new ItemAdapter(getArguments().getStringArray(ARGUMENT_KEY_ITEMS),
-                getResources().getDimensionPixelSize(decorator.getItemTextSizeDimenRes()));
+                getResources().getDimensionPixelSize(decorator.getItemTextSizeDimenRes()),
+                isMultipleSelect()
+                        ? getResources().getDrawable(decorator.getSelectedBackgroundDrawableRes())
+                        : null);
         //mItemAdapter.setOnItemClickListener(this);
         rvItems.setAdapter(mItemAdapter);
+    }
+
+    @Override
+    protected boolean onConfirm() {
+        if (!isMultipleSelect()) {
+            return true;
+        }
+        OnMultipleItemSelectedListener listener = getListener(OnMultipleItemSelectedListener.class);
+        int[] positions = new int[mItemAdapter.getSelectedItemCount()];
+        for (int i = 0, j = 0, size = mItemAdapter.mSelections.length;i < size;++i) {
+            if (mItemAdapter.mSelections[i]) {
+                positions[j++] = i;
+            }
+        }
+        listener.onItemsSelected(this, positions);
+        return true;
     }
 
     @Override
@@ -110,15 +152,34 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         getArguments().putStringArray(ARGUMENT_KEY_ITEMS, items);
     }
 
+    public void setMultipleSelect(boolean enabled) {
+        getArguments().putBoolean(ARGUMENT_KEY_MULTIPLE_SELECT, enabled);
+        if (enabled) {
+            super.setExitType(EXIT_TYPE_OK_CANCEL);
+        } else {
+            super.setExitType(EXIT_TYPE_NULL);
+        }
+    }
+
+    public boolean isMultipleSelect() {
+        return getArguments().getBoolean(ARGUMENT_KEY_MULTIPLE_SELECT, false);
+    }
+
     private static class ItemAdapter extends RecyclerViewBaseAdapter<String> {
 
         private String[] mItems;
         private final float mItemTextSize;
+        private final Drawable mSelectedBackground;
+        private final boolean[] mSelections;
 
-        public ItemAdapter(String[] items, float itemTextSize) {
+        public ItemAdapter(String[] items, float itemTextSize, Drawable selectedBackground) {
             //super();
             mItems = items;
             mItemTextSize = itemTextSize;
+            mSelectedBackground = selectedBackground;
+            mSelections = selectedBackground != null
+                    ? new boolean[items.length]
+                    : null;
         }
 
         @Override
@@ -140,6 +201,19 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
             return 0;
         }
 
+        public int getSelectedItemCount() {
+            if (mSelections == null) {
+                return 0;
+            }
+            int count = 0;
+            for (int i = 0, size = mSelections.length;i < size;++i) {
+                if (mSelections[i]) {
+                    ++count;
+                }
+            }
+            return count;
+        }
+
         @Override
         public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent) {
             return new ViewHolder(LayoutInflater
@@ -154,6 +228,9 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         public void onBindViewHolder(RecyclerView.ViewHolder holder, String item, int position) {
             ViewHolder viewHolder = (ViewHolder) holder;
             viewHolder.mTvItem.setText(item);
+            if (mSelections != null) {
+                viewHolder.mTvItem.setBackground(mSelections[position] ? mSelectedBackground : null);
+            }
         }
     }
 
@@ -170,5 +247,9 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
 
     public interface OnItemSelectedListener {
         void onItemSelected(ListDialog dialog, int position);
+    }
+
+    public interface OnMultipleItemSelectedListener {
+        void onItemsSelected(ListDialog dialog, int[] positions);
     }
 }

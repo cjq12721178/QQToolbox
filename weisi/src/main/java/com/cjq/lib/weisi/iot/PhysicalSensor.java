@@ -284,13 +284,13 @@ public class PhysicalSensor extends Sensor {
         return mInfo;
     }
 
-    @Override
-    public void resetConfiguration() {
-        super.resetConfiguration();
-        for (int i = 0, size = getDisplayMeasurementSize();i < size;++i) {
-            getDisplayMeasurementByPosition(i).resetConfiguration();
-        }
-    }
+//    @Override
+//    public void resetConfiguration() {
+//        super.resetConfiguration();
+//        for (int i = 0, size = getDisplayMeasurementSize();i < size;++i) {
+//            getDisplayMeasurementByPosition(i).resetConfiguration();
+//        }
+//    }
 
     /**
      * Created by CJQ on 2017/6/16.

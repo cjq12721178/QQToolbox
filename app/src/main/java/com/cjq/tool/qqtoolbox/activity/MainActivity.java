@@ -66,10 +66,12 @@ public class MainActivity
         implements View.OnClickListener,
         SortDialog.OnSortTypeChangedListener,
         FilterDialog.OnFilterChangeListener,
+        ListDialog.OnMultipleItemSelectedListener,
         CompoundButton.OnCheckedChangeListener,
         TextView.OnEditorActionListener,
         DataReceiver.Listener,
-        SearchDialog.OnSearchListener, Storage.ElementsProvider<PhysicalSensor> {
+        SearchDialog.OnSearchListener,
+        Storage.ElementsProvider<PhysicalSensor> {
 
     private static final int RC_WRITE_EXTERNAL_STORAGE = 1;
     private SwitchableFragmentManager mSwitchableFragmentManager;
@@ -201,13 +203,21 @@ public class MainActivity
                 editDialog2.show(getSupportFragmentManager(),
                         "test_edit_custom_decorator");
                 break;
-            case R.id.btn_list_dialog:
+            case R.id.btn_list_dialog: {
                 ListDialog listDialog = new ListDialog();
                 listDialog.setTitle("this is list dialog");
                 listDialog.setItems(new String[] { "item1", "item2" });
                 listDialog.show(getSupportFragmentManager(),
                         "test_list");
-                break;
+            } break;
+            case R.id.btn_multi_list_dialog: {
+                ListDialog listDialog = new ListDialog();
+                listDialog.setTitle("this is multiple select list dialog");
+                listDialog.setItems(new String[] { "item1", "item2", "item3" });
+                listDialog.setMultipleSelect(true);
+                listDialog.show(getSupportFragmentManager(),
+                        "test_mul_list");
+            } break;
             case R.id.btn_set_base_decoration:
                 BaseDialog.Decorator decorator4 = BaseDialog.getBaseOverallDecorator();
                 decorator4.setTitleTextSize(R.dimen.super_text_size);
@@ -626,6 +636,19 @@ public class MainActivity
     @Override
     public void onProvideElements(@NonNull List<PhysicalSensor> elements, FilterCollection<PhysicalSensor> filters) {
 
+    }
+
+    @Override
+    public void onItemsSelected(ListDialog dialog, int[] positions) {
+        StringBuilder builder = new StringBuilder();
+        builder.append("selected items: ");
+        if (positions.length > 0) {
+            builder.append(positions[0]);
+        }
+        for (int i = 1;i < positions.length;++i) {
+            builder.append(", ").append(positions[i]);
+        }
+        Log.d(GENERAL_LOG_TAG, builder.toString());
     }
 
     private static class Value extends com.cjq.lib.weisi.iot.container.Value {

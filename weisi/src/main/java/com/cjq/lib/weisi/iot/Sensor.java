@@ -60,9 +60,9 @@ public abstract class Sensor {
                 : currentDynamicValueTimestamp;
     }
 
-    public void resetConfiguration() {
-        mInfo.resetConfiguration();
-    }
+//    public void resetConfiguration() {
+//        mInfo.resetConfiguration();
+//    }
 
     public int addInfoHistoryValue(long timestamp, float batteryVoltage) {
         return mInfo.addHistoryValue(timestamp, batteryVoltage);

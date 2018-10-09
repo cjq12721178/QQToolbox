@@ -284,3 +284,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 20180927-1.6.9(80):
 1. 删除MapAdapterDelegateManager.addAdapterDelegate(int viewType, @NonNull AdapterDelegate<E> delegate)，将原有功能整合进addAdapterDelegate(@NonNull AdapterDelegate<E> delegate)方法
 2. 在接口AdapterDelegateManager的方法addAdapterDelegate的参数AdapterDelegate<E>前添加@NonNull
+
+20181009-1.7.0(81):
+1. ListDialog类新增方法setMultipleSelect，用于提供多选功能

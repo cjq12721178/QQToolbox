@@ -655,15 +655,23 @@ public class SensorManager {
         }
     }
 
-    public static synchronized void setValueContainerConfigurationProvider(MeasurementConfigurationProvider provider, boolean isResetConfigurations) {
+    public static void setValueContainerConfigurationProvider(MeasurementConfigurationProvider provider, boolean isResetConfigurations) {
         if (configurationProvider != provider) {
             configurationProvider = provider;
             if (isResetConfigurations) {
-                for (Sensor sensor
-                        : SENSOR_MAP.values()) {
-                    sensor.resetConfiguration();
+                synchronized (MEASUREMENT_MAP) {
+                    for (Measurement measurement
+                            : MEASUREMENT_MAP.values()) {
+                        measurement.resetConfiguration();
+                    }
                 }
             }
+//            if (isResetConfigurations) {
+//                for (Sensor sensor
+//                        : SENSOR_MAP.values()) {
+//                    sensor.resetConfiguration();
+//                }
+//            }
         }
     }
 

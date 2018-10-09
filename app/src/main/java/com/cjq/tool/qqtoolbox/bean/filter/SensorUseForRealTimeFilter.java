@@ -25,7 +25,7 @@ public class SensorUseForRealTimeFilter<S extends Sensor> implements Filter<S>, 
 
     @Override
     public boolean match(S sensor) {
-        return sensor.hasRealTimeValue();
+        return sensor.getInfo().hasRealTimeValue();
     }
 
     public SensorUseForRealTimeFilter() {
