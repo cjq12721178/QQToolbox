@@ -11,6 +11,7 @@ import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -56,7 +57,7 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
     }
 
     public SortDialog setDefaultSelectedId(@IdRes int selectedId) {
-        if (selectedId > 0) {
+        if (selectedId != 0) {
             setSelectedId(selectedId);
         }
         return this;
@@ -187,6 +188,11 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
 
         public @DimenRes int getDefaultSortTypeTextSizeRes() {
             return R.dimen.qbox_size_text_dialog_view;
+        }
+
+        @Override
+        public int getDefaultExitGroupWidth() {
+            return ConstraintSet.WRAP_CONTENT;
         }
     }
 

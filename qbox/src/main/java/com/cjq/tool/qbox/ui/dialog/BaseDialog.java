@@ -12,6 +12,8 @@ import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
@@ -50,7 +52,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     private static final String ARGUMENT_KEY_CUSTOM_DECORATOR_PARAMETERS = "in_custom_decorator_paras";
     protected static final String ARGUMENT_KEY_CONTENT_STRING = "in_content_str";
     protected static final String ARGUMENT_KEY_CONTENT_RESOURCE = "in_content_res";
-    private static final String FLAG_SEPARATION_LINE = "line";
+    //private static final String FLAG_SEPARATION_LINE = "line";
 
     private static final Map<String, Decorator> overallDecorator = new HashMap<>();
     private D mCustomDecorator;
@@ -160,7 +162,8 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         }
 
         public @LayoutRes int getDefaultTitleLayoutRes() {
-            return 0;
+            return R.layout.qbox_dialog_title;
+            //return 0;
         }
 
         final public void setTitleLayoutRes(@LayoutRes int layoutRes) {
@@ -424,6 +427,78 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         final public void setViewVerticalInterval(@DimenRes int intervalRes) {
             mParameters.putInt("dp_view_vertical_interval", intervalRes);
         }
+
+        final public int getTitleWidth() {
+            return mParameters.getInt("dp_title_width", getDefaultTitleWidth());
+        }
+
+        public int getDefaultTitleWidth() {
+            return ConstraintSet.WRAP_CONTENT;
+        }
+
+        final public void setTitleWidth(int width) {
+            mParameters.putInt("dp_title_width", width);
+        }
+
+        final public int getContentGroupWidth() {
+            return mParameters.getInt("dp_content_width", getDefaultContentGroupWidth());
+        }
+
+        public int getDefaultContentGroupWidth() {
+            return ConstraintSet.MATCH_CONSTRAINT;
+        }
+
+        final public void setContentGroupWidth(int width) {
+            mParameters.putInt("dp_content_width", width);
+        }
+
+        final public int getContentGroupHeight() {
+            return mParameters.getInt("dp_content_height", getDefaultContentGroupHeight());
+        }
+
+        public int getDefaultContentGroupHeight() {
+            return ConstraintSet.WRAP_CONTENT;
+        }
+
+        final public void setContentGroupHeight(int height) {
+            mParameters.putInt("dp_content_height", height);
+        }
+
+        final public int getContentGroupMaxHeight() {
+            return mParameters.getInt("dp_content_max_height", getDefaultContentGroupMaxHeight());
+        }
+
+        public int getDefaultContentGroupMaxHeight() {
+            return 0;
+        }
+
+        final public void setContentGroupMaxHeight(int maxHeight) {
+            mParameters.putInt("dp_content_max_height", maxHeight);
+        }
+
+        final public float getContentGroupMaxHeightRatioToScreenHeight() {
+            return mParameters.getFloat("dp_content_max_h_ratio", getDefaultContentGroupMaxHeightRatioToScreenHeight());
+        }
+
+        public float getDefaultContentGroupMaxHeightRatioToScreenHeight() {
+            return 1.0f;
+        }
+
+        final public void setContentGroupMaxHeightRatioToScreenHeight(float ratio) {
+            mParameters.putFloat("dp_content_max_h_ratio", ratio);
+        }
+
+        final public int getExitGroupWidth() {
+            return mParameters.getInt("dp_exit_width", getDefaultExitGroupWidth());
+        }
+
+        public int getDefaultExitGroupWidth() {
+            return ConstraintSet.MATCH_CONSTRAINT;
+        }
+
+        final public void setExitGroupWidth(int width) {
+            mParameters.putInt("dp_exit_width", width);
+        }
     }
 
     private static class BaseDecorator extends Decorator {
@@ -451,24 +526,27 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         D decorator = getDecorator(savedInstanceState);
-        LinearLayout liBase = inflateBaseView(inflater, decorator);
-        //设置内容
-        onCreateContentView(inflater, liBase, decorator, savedInstanceState);
+        ConstraintLayout clBase = inflateBaseView(inflater, decorator);
         //设置标题（可选）
-        onCreateTitle(liBase, decorator);
-        //设置确定/取消按钮及其事件
-        onCreateExitGroup(inflater, liBase, decorator);
-        return liBase;
+        View vTitle = onCreateTitle(clBase, decorator);
+        //设置确定/取消按钮及其事件（可选）
+        View vExit = onCreateExitGroup(inflater, clBase, decorator);
+        //设置内容
+        View vContent = onCreateContentView(inflater, clBase, decorator, savedInstanceState);
+        //安排位置并设置分隔线
+        arrangeViewPositionAndSetSeparationLine(clBase, vTitle, vExit, vContent, decorator);
+        //getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        return clBase;
     }
 
-    private LinearLayout inflateBaseView(LayoutInflater inflater,
-                                         D decorator) {
-        LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.qbox_dialog_base, null);
+    private ConstraintLayout inflateBaseView(LayoutInflater inflater,
+                                             D decorator) {
+        //LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.qbox_dialog_base, null);
+        //ConstraintLayout layout = (ConstraintLayout) inflater.inflate(R.layout.qbox_dialog_base, null);
+        //ConstraintLayout layout = (ConstraintLayout)inflater.inflate(R.layout.qbox_dialog_base, getDialog().getWindow().findViewById(android.R.id.content), false);
+        //getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        ConstraintLayout layout = new ConstraintLayout(getContext());
         setViewBackground(layout, decorator.getBaseBackgroundRes());
-//        int background = decorator.getBaseBackgroundRes();
-//        if (background != 0) {
-//            layout.setBackgroundResource(background);
-//        }
         Resources resources = getResources();
         int leftPaddingDimenRes = decorator.getBaseLeftPaddingDimenRes();
         int topPaddingDimenRes = decorator.getBaseTopPaddingDimenRes();
@@ -493,11 +571,6 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             layout.setPadding(leftPadding, topPadding, rightPadding, bottomPadding);
         } else {
             setViewPadding(layout, decorator.getBasePaddingDimenRes(), resources);
-//            int paddingDimenRes = decorator.getBasePaddingDimenRes();
-//            if (paddingDimenRes != 0) {
-//                int padding = resources.getDimensionPixelOffset(paddingDimenRes);
-//                layout.setPadding(padding, padding, padding, padding);
-//            }
         }
         return layout;
     }
@@ -519,24 +592,33 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         }
     }
 
-    private void onCreateContentView(LayoutInflater inflater,
-                                     LinearLayout baseView,
+    private View onCreateContentView(LayoutInflater inflater,
+                                     ConstraintLayout baseView,
                                      D decorator,
                                      @Nullable Bundle savedInstanceState) {
         int contentLayoutRes = getContentLayoutRes(decorator);
         if (contentLayoutRes != 0) {
-            inflater.inflate(contentLayoutRes, baseView);
-            onSetContentView(baseView, decorator, savedInstanceState);
-            int intervalRes = decorator.getViewVerticalIntervalDimenRes();
-            if (intervalRes != 0) {
-                int interval = getResources().getDimensionPixelSize(intervalRes);
-                for (int i = 2, n = baseView.getChildCount();i < n;++i) {
-                    View childView = baseView.getChildAt(i);
-                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) childView.getLayoutParams();
-                    params.setMargins(params.leftMargin, interval, params.rightMargin, params.bottomMargin);
-                    childView.setLayoutParams(params);
-                }
-            }
+            View contentView = inflater.inflate(contentLayoutRes, baseView, false);
+            onSetContentView(contentView, decorator, savedInstanceState);
+//            int intervalRes = decorator.getViewVerticalIntervalDimenRes();
+//            if (intervalRes != 0) {
+//                int interval = getResources().getDimensionPixelSize(intervalRes);
+//                for (int i = 2, n = baseView.getChildCount();i < n;++i) {
+//                    View childView = baseView.getChildAt(i);
+//                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) childView.getLayoutParams();
+//                    params.setMargins(params.leftMargin, interval, params.rightMargin, params.bottomMargin);
+//                    childView.setLayoutParams(params);
+//                }
+//            }
+            ensureViewIdExist(contentView);
+            return contentView;
+        }
+        return null;
+    }
+
+    private void ensureViewIdExist(View contentView) {
+        if (contentView.getId() == View.NO_ID) {
+            contentView.setId(View.generateViewId());
         }
     }
 
@@ -544,78 +626,296 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         return decorator.getContentLayoutRes();
     }
 
-    private void onCreateTitle(LinearLayout baseView,
+    private View onCreateTitle(ConstraintLayout baseView,
                                D decorator) {
         if (isDrawTitle()) {
             String title = getTitle();
             if (!TextUtils.isEmpty(title)) {
-                ViewStub vsTitle = baseView.findViewById(R.id.vs_title_dialog_base);
+                //ViewStub vsTitle = baseView.findViewById(R.id.vs_title_dialog_base);
                 TextView tvTitle;
-                View attachView;
+                View vTitleCarrier;
                 int titleLayoutRes = decorator.getTitleLayoutRes();
-                int titleId = decorator.getTitleId();
-                if (titleLayoutRes != 0 && titleId != 0) {
-                    vsTitle.setLayoutResource(titleLayoutRes);
-                    attachView = vsTitle.inflate();
-                    tvTitle = (TextView) attachView.findViewById(titleId);
+                if (titleLayoutRes != 0) {
+                    //vsTitle.setLayoutResource(titleLayoutRes);
+                    vTitleCarrier = LayoutInflater.from(getContext()).inflate(titleLayoutRes, baseView, false);
+                    if (vTitleCarrier instanceof TextView) {
+                        tvTitle = (TextView) vTitleCarrier;
+                    } else {
+                        int titleId = decorator.getTitleId();
+                        if (titleId != 0) {
+                            tvTitle = vTitleCarrier.findViewById(titleId);
+                        } else {
+                            throw new IllegalArgumentException("title id may not be 0");
+                        }
+                    }
                 } else {
-                    tvTitle = (TextView) vsTitle.inflate();
-                    attachView = tvTitle;
+                    throw new IllegalArgumentException("title layout resource id may not be 0");
                 }
                 int titleSizeRes = decorator.getTitleTextSizeDimenRes();
                 if (titleSizeRes != 0) {
                     setTextViewSize(tvTitle, titleSizeRes);
-//                tvTitle.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-//                        getResources().getDimensionPixelSize(titleSizeRes));
                 }
                 tvTitle.setText(title);
-                inflateSeparationLine(baseView, attachView, decorator, false);
+                ensureViewIdExist(vTitleCarrier);
+                return vTitleCarrier;
+                //inflateSeparationLine(baseView, attachView, decorator, false);
             }
         }
+        return null;
     }
 
-    private void inflateSeparationLine(LinearLayout baseView,
-                                       View attachView,
-                                       D decorator,
-                                       boolean isAbove) {
-        //获取tvLine在baseView中应该添加的位置
-        int position = baseView.indexOfChild(attachView) + (isAbove ? 0 : 1);
+//    private View onCreateTitle(ConstraintLayout baseView,
+//                               D decorator) {
+//        if (isDrawTitle()) {
+//            String title = getTitle();
+//            if (!TextUtils.isEmpty(title)) {
+//                ViewStub vsTitle = baseView.findViewById(R.id.vs_title_dialog_base);
+//                TextView tvTitle;
+//                View vTitleCarrier;
+//                int titleLayoutRes = decorator.getTitleLayoutRes();
+//                int titleId = decorator.getTitleId();
+//                if (titleLayoutRes != 0 && titleId != 0) {
+//                    vsTitle.setLayoutResource(titleLayoutRes);
+//                    vTitleCarrier = vsTitle.inflate();
+//                    tvTitle = vTitleCarrier.findViewById(titleId);
+//                } else {
+//                    tvTitle = (TextView) vsTitle.inflate();
+//                    vTitleCarrier = tvTitle;
+//                }
+//                int titleSizeRes = decorator.getTitleTextSizeDimenRes();
+//                if (titleSizeRes != 0) {
+//                    setTextViewSize(tvTitle, titleSizeRes);
+//                }
+//                tvTitle.setText(title);
+//                ensureViewIdExist(vTitleCarrier);
+//                return vTitleCarrier;
+//                //inflateSeparationLine(baseView, attachView, decorator, false);
+//            }
+//        }
+//        return null;
+//    }
 
-        //判断是否需要渲染分隔线
-        boolean isSeparationLine = false;
-        if (decorator.isDrawSeparationLine() && position >= 0) {
-            View aboveView = baseView.getChildAt(position - 1);
-            //若上一个view即为分隔线，则无需再次添加
-            if (aboveView == null || !FLAG_SEPARATION_LINE.equals(aboveView.getTag())) {
-                isSeparationLine = true;
-            } else {
-                return;
-            }
+    private void arrangeViewPositionAndSetSeparationLine(ConstraintLayout clBase, View vTitle, View vExit, View vContent, D decorator) {
+        ConstraintSet constraintSet = new ConstraintSet();
+        constraintSet.clone(clBase);
+
+        //安排标题位置
+        if (vTitle != null) {
+            clBase.addView(vTitle);
+            int titleId = vTitle.getId();
+            constraintSet.clear(titleId);
+            constraintSet.constrainWidth(titleId, decorator.getTitleWidth());
+            constraintSet.constrainHeight(titleId, ConstraintSet.WRAP_CONTENT);
+            constraintSet.connect(titleId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+            constraintSet.connect(titleId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+            constraintSet.connect(titleId, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
         }
 
+        //安排确认/取消按钮位置
+        if (vExit != null) {
+            clBase.addView(vExit);
+            int exitId = vExit.getId();
+            constraintSet.constrainWidth(exitId, decorator.getExitGroupWidth());
+            constraintSet.constrainHeight(exitId, ConstraintSet.WRAP_CONTENT);
+            constraintSet.connect(exitId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+            constraintSet.connect(exitId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+            constraintSet.connect(exitId, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+        }
+
+        boolean drawSeparationLine = decorator.isDrawSeparationLine();
+        if (vContent != null) {
+            //安排内容位置
+            clBase.addView(vContent);
+            int contentId = vContent.getId();
+            constraintSet.constrainWidth(contentId, decorator.getContentGroupWidth());
+            constraintSet.constrainHeight(contentId, getProperContentGroupHeight(vContent, decorator));
+            constraintSet.connect(contentId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+            constraintSet.connect(contentId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+
+            //设置标题下方分隔线
+            if (vTitle != null) {
+                if (drawSeparationLine) {
+                    onCreateSeparationLine(clBase, constraintSet, vTitle, vContent, decorator);
+                } else {
+                    constraintSet.connect(contentId, ConstraintSet.TOP, vTitle.getId(), ConstraintSet.BOTTOM);
+                }
+            } else {
+                constraintSet.connect(contentId, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+            }
+            //设置确认/取消按钮上方分隔线
+            if (vExit != null) {
+                if (drawSeparationLine) {
+                    onCreateSeparationLine(clBase, constraintSet, vContent, vExit, decorator);
+                } else {
+                    constraintSet.connect(vExit.getId(), ConstraintSet.TOP, contentId, ConstraintSet.BOTTOM);
+                }
+            }
+
+//            //设置标题下方分隔线
+//            View vTop;
+//            if (vTitle != null) {
+//                if (drawSeparationLine) {
+//                    vTop = onCreateSeparationLine(clBase, constraintSet, vTitle, vContent, decorator);
+//                    //constraintSet.connect(vTitle.getId(), ConstraintSet.BOTTOM, vTop.getId(), ConstraintSet.TOP);
+//                } else {
+//                    vTop = vTitle;
+//                }
+//            } else {
+//                vTop = null;
+//            }
+//            //设置确认/取消按钮上方分隔线
+//            View vBottom;
+//            if (vExit != null) {
+//                if (drawSeparationLine) {
+//                    vBottom = onCreateSeparationLine(clBase, constraintSet, vContent, vExit, decorator);
+//                    //constraintSet.connect(vExit.getId(), ConstraintSet.TOP, vBottom.getId(), ConstraintSet.BOTTOM);
+//                } else {
+//                    vBottom = vExit;
+//                }
+//            } else {
+//                vBottom = null;
+//            }
+//            //安排内容位置
+//            clBase.addView(vContent);
+//            int contentId = vContent.getId();
+//            constraintSet.constrainWidth(contentId, ConstraintSet.MATCH_CONSTRAINT);
+//            constraintSet.constrainHeight(contentId, ConstraintSet.WRAP_CONTENT);
+//            constraintSet.connect(contentId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+//            constraintSet.connect(contentId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+//            if (vTop != null) {
+//                //constraintSet.connect(contentId, ConstraintSet.TOP, vTop.getId(), ConstraintSet.BOTTOM);
+//                //constraintSet.connect(vTop.getId(), ConstraintSet.BOTTOM, contentId, ConstraintSet.TOP);
+//            } else {
+//                constraintSet.connect(contentId, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
+//            }
+//            if (vBottom != null) {
+//                //constraintSet.connect(contentId, ConstraintSet.BOTTOM, vBottom.getId(), ConstraintSet.TOP);
+//                //constraintSet.connect(vBottom.getId(), ConstraintSet.TOP, contentId, ConstraintSet.BOTTOM);
+//            } else {
+//                constraintSet.connect(contentId, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+//            }
+        } else {
+            if (vTitle != null && vExit != null) {
+                if (drawSeparationLine) {
+                    onCreateSeparationLine(clBase, constraintSet, vTitle, vExit, decorator);
+                    //constraintSet.clear(vExit.getId(), ConstraintSet.TOP);
+                    //constraintSet.connect(vLine.getId(), ConstraintSet.TOP, vTitle.getId(), ConstraintSet.BOTTOM);
+                    //constraintSet.connect(vTitle.getId(), ConstraintSet.BOTTOM, vLine.getId(), ConstraintSet.TOP);
+                    //constraintSet.connect(vLine.getId(), ConstraintSet.BOTTOM, vExit.getId(), ConstraintSet.TOP);
+                    //constraintSet.connect(vExit.getId(), ConstraintSet.TOP, vLine.getId(), ConstraintSet.BOTTOM);
+                } else {
+                    //constraintSet.addToVerticalChain(vTitle.getId(), ConstraintSet.PARENT_ID, vExit.getId());
+                    //constraintSet.addToVerticalChain(vExit.getId(), vTitle.getId(), ConstraintSet.PARENT_ID);
+                    constraintSet.connect(vTitle.getId(), ConstraintSet.BOTTOM, vExit.getId(), ConstraintSet.TOP);
+                    constraintSet.connect(vExit.getId(), ConstraintSet.TOP, vTitle.getId(), ConstraintSet.BOTTOM);
+                }
+            }
+        }
+        constraintSet.applyTo(clBase);
+    }
+
+    private int getProperContentGroupHeight(View vContent, D decorator) {
+        int height = decorator.getContentGroupHeight();
+        if (height != ConstraintSet.WRAP_CONTENT) {
+            return height;
+        }
+        float ratio = decorator.getContentGroupMaxHeightRatioToScreenHeight();
+        int maxHeight;
+        if (ratio < 0f || ratio >= 1.0f) {
+            maxHeight = decorator.getContentGroupMaxHeight();
+            if (maxHeight <= 0) {
+                return height;
+            }
+        } else {
+            maxHeight = (int) (getResources().getDisplayMetrics().heightPixels * ratio + 0.5f);
+        }
+        vContent.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        int measuredHeight = vContent.getMeasuredHeight();
+        if (measuredHeight >= maxHeight) {
+            return maxHeight;
+        }
+        return height;
+    }
+
+    private View onCreateSeparationLine(ConstraintLayout clBase, ConstraintSet constraintSet, View vTop, View vBottom, D decorator) {
         //创建分隔线，同时设置baseView中各子view间隔
-        TextView tvLine = new TextView(getActivity());
-        tvLine.setTag(FLAG_SEPARATION_LINE);
+        View vLine = new View(getContext());
+        vLine.setId(View.generateViewId());
+        int lineId = vLine.getId();
+        clBase.addView(vLine);
+        //tvLine.setTag(FLAG_SEPARATION_LINE);
         Resources resources = getResources();
         int interval = resources.getDimensionPixelSize(decorator.getViewVerticalIntervalDimenRes());
         int separationWidth = resources.getDimensionPixelSize(decorator.getSeparationLineWidthDimenRes());
-        LinearLayout.LayoutParams params;
-        if (isSeparationLine && separationWidth > 0) {
-            tvLine.setBackgroundResource(decorator.getSeparationLineBackgroundRes());
-            params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    separationWidth);
-            params.setMargins(0, interval / 2, 0, interval / 2);
+        //LinearLayout.LayoutParams params;
+        constraintSet.constrainWidth(lineId, ConstraintSet.MATCH_CONSTRAINT);
+        constraintSet.connect(lineId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+        constraintSet.connect(lineId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+        constraintSet.connect(lineId, ConstraintSet.TOP, vTop.getId(), ConstraintSet.BOTTOM);
+        //constraintSet.connect(lineId, ConstraintSet.BOTTOM, vBottom.getId(), ConstraintSet.TOP);
+        constraintSet.connect(vBottom.getId(), ConstraintSet.TOP, lineId, ConstraintSet.BOTTOM);
+        //constraintSet.connect(vTop.getId(), ConstraintSet.BOTTOM, lineId, ConstraintSet.TOP);
+        if (separationWidth > 0) {
+            vLine.setBackgroundResource(decorator.getSeparationLineBackgroundRes());
+//            params = new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.MATCH_PARENT,
+//                    separationWidth);
+//            params.setMargins(0, interval / 2, 0, interval / 2);
+            constraintSet.constrainHeight(lineId, separationWidth);
+            constraintSet.setMargin(lineId, ConstraintSet.TOP, interval / 2);
+            //constraintSet.setMargin(lineId, ConstraintSet.BOTTOM, interval / 2);
+            constraintSet.setMargin(vBottom.getId(), ConstraintSet.TOP, interval / 2);
         } else {
-            params = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.MATCH_PARENT,
-                    interval);
+//            params = new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.MATCH_PARENT,
+//                    interval);
+            constraintSet.constrainHeight(lineId, interval);
         }
-        baseView.addView(tvLine, position, params);
+        return vLine;
     }
 
-    private void onCreateExitGroup(LayoutInflater inflater,
-                                   LinearLayout baseView,
+//    private void inflateSeparationLine(ConstraintLayout baseView,
+//                                       View attachView,
+//                                       D decorator,
+//                                       boolean isAbove) {
+//        //获取tvLine在baseView中应该添加的位置
+//        int position = baseView.indexOfChild(attachView) + (isAbove ? 0 : 1);
+//
+//        //判断是否需要渲染分隔线
+//        boolean isSeparationLine = false;
+//        if (decorator.isDrawSeparationLine() && position >= 0) {
+//            View aboveView = baseView.getChildAt(position - 1);
+//            //若上一个view即为分隔线，则无需再次添加
+//            if (aboveView == null || !FLAG_SEPARATION_LINE.equals(aboveView.getTag())) {
+//                isSeparationLine = true;
+//            } else {
+//                return;
+//            }
+//        }
+//
+//        //创建分隔线，同时设置baseView中各子view间隔
+//        TextView tvLine = new TextView(getActivity());
+//        tvLine.setTag(FLAG_SEPARATION_LINE);
+//        Resources resources = getResources();
+//        int interval = resources.getDimensionPixelSize(decorator.getViewVerticalIntervalDimenRes());
+//        int separationWidth = resources.getDimensionPixelSize(decorator.getSeparationLineWidthDimenRes());
+//        LinearLayout.LayoutParams params;
+//        if (isSeparationLine && separationWidth > 0) {
+//            tvLine.setBackgroundResource(decorator.getSeparationLineBackgroundRes());
+//            params = new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.MATCH_PARENT,
+//                    separationWidth);
+//            params.setMargins(0, interval / 2, 0, interval / 2);
+//        } else {
+//            params = new LinearLayout.LayoutParams(
+//                    LinearLayout.LayoutParams.MATCH_PARENT,
+//                    interval);
+//        }
+//        baseView.addView(tvLine, position, params);
+//    }
+
+    private View onCreateExitGroup(LayoutInflater inflater,
+                                   ConstraintLayout baseView,
                                    D decorator) {
         int exitType = getExitType();
         View grpExit;
@@ -627,13 +927,24 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             grpExit = null;
         }
         if (grpExit != null) {
-            baseView.addView(grpExit);
+            ensureViewIdExist(grpExit);
+//            ConstraintSet constraintSet = new ConstraintSet();
+//            constraintSet.clone(baseView);
+//            baseView.addView(grpExit);
+//            int targetId = grpExit.getId();
+//            constraintSet.constrainWidth(targetId, ConstraintSet.MATCH_CONSTRAINT);
+//            constraintSet.constrainHeight(targetId, ConstraintSet.WRAP_CONTENT);
+//            constraintSet.connect(targetId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
+//            constraintSet.connect(targetId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
+//            constraintSet.connect(targetId, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
+//            constraintSet.applyTo(baseView);
             setExitButton(grpExit, decorator, true);
             if (exitType == EXIT_TYPE_OK_CANCEL) {
                 setExitButton(grpExit, decorator, false);
             }
-            inflateSeparationLine(baseView, grpExit, decorator, true);
+            //inflateSeparationLine(baseView, grpExit, decorator, true);
         }
+        return grpExit;
     }
 
     private void setExitButton(View group,

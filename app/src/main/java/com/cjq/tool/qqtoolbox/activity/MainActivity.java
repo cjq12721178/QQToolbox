@@ -143,6 +143,7 @@ public class MainActivity
                 //dialog.setContent("this is content");
                 //ConfirmDialog.Decorator decorator = dialog.getCustomDecorator();
                 //decorator.setDrawSeparationLine(false);
+                dialog.getCustomDecorator().setDrawSeparationLine(true);
                 dialog.show(getSupportFragmentManager(),
                         "test_confirm");
             } break;
@@ -177,8 +178,9 @@ public class MainActivity
                 break;
             case R.id.btn_edit_use_default_overall_decorator:
                 EditDialog editDialog = new EditDialog();
-                editDialog.setTitle("use default overall decorator");
+                editDialog.setTitle("use default overall decorator \n1\n2\n3\n4\n5");
                 editDialog.setContent("yaya");
+                //editDialog.getCustomDecorator().setDrawSeparationLine(false);
                 editDialog.show(getSupportFragmentManager(),
                         "test_edit_default_overall_decorator");
                 break;
@@ -213,7 +215,11 @@ public class MainActivity
             case R.id.btn_multi_list_dialog: {
                 ListDialog listDialog = new ListDialog();
                 listDialog.setTitle("this is multiple select list dialog");
-                listDialog.setItems(new String[] { "item1", "item2", "item3" });
+                String[] items = new String[40];
+                for (int i = 0;i < items.length;++i) {
+                    items[i] = "item" + (i + 1);
+                }
+                listDialog.setItems(items);
                 listDialog.setMultipleSelect(true);
                 listDialog.show(getSupportFragmentManager(),
                         "test_mul_list");

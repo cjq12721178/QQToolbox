@@ -16,6 +16,8 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.PagerTabStrip;
@@ -378,6 +380,11 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         public @DimenRes int getDefaultFilterPaneHeightDimenRes() {
             return 0;
         }
+
+        @Override
+        public int getDefaultContentGroupWidth() {
+            return ConstraintSet.WRAP_CONTENT;
+        }
     }
 
     private static class FilterType implements Parcelable {
@@ -682,10 +689,14 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                 }
                 view.addView(layout);
                 //设置FilterPane高度
-                container.setLayoutParams(new LinearLayout.LayoutParams(
-                        ViewGroup.LayoutParams.MATCH_PARENT,
-                        getPageMaxHeight(tagBuilder)
-                                + container.findViewById(R.id.pts_filter).getMeasuredHeight()));
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) container.getLayoutParams();
+                params.height = getPageMaxHeight(tagBuilder)
+                        + container.findViewById(R.id.pts_filter).getMeasuredHeight();
+//                container.setLayoutParams(new ConstraintLayout.LayoutParams(
+//                        ViewGroup.LayoutParams.WRAP_CONTENT,
+//                        getPageMaxHeight(tagBuilder)
+//                                + container.findViewById(R.id.pts_filter).getMeasuredHeight()));
+                container.setLayoutParams(params);
                 mView = view;
             }
             return mView;
@@ -745,7 +756,7 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
                         ? resources.getDimensionPixelOffset(decorator.getFilterPaneHeightDimenRes())
                         : 0;
                 if (paneHeightLimit == 0) {
-                    paneHeightLimit = resources.getDisplayMetrics().heightPixels * 2 / 3;
+                    paneHeightLimit = resources.getDisplayMetrics().heightPixels / 2;
                 }
             }
 

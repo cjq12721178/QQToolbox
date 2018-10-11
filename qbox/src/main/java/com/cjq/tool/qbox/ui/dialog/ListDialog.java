@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -85,6 +86,11 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
 
         final public void setSelectedBackgroundDrawableRes(@DrawableRes int drawableRes) {
             mParameters.putInt("dp_item_select_bg", drawableRes);
+        }
+
+        @Override
+        public float getDefaultContentGroupMaxHeightRatioToScreenHeight() {
+            return 1 / 2f;
         }
     }
 
@@ -246,10 +252,10 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
     }
 
     public interface OnItemSelectedListener {
-        void onItemSelected(ListDialog dialog, int position);
+        void onItemSelected(@NonNull ListDialog dialog, int position);
     }
 
     public interface OnMultipleItemSelectedListener {
-        void onItemsSelected(ListDialog dialog, int[] positions);
+        void onItemsSelected(@NonNull ListDialog dialog, @NonNull int[] positions);
     }
 }

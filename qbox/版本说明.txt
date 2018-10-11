@@ -287,3 +287,11 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20181009-1.7.0(81):
 1. ListDialog类新增方法setMultipleSelect，用于提供多选功能
+
+20181009-1.7.1(82):
+1. 为ListDialog.OnItemSelectedListener和ListDialog.OnMultipleItemSelectedListener的方法添加注解
+
+20181011-1.7.2(83):
+1. 修改Dialog类簇底层baseView，以ConstraintLayout代替LinearLayout
+2. 修改相应布局以适应上面的修改
+3. BaseDialog.Decorator添加方法getContentGroupHeight等用以提供对contentView高度的设置
