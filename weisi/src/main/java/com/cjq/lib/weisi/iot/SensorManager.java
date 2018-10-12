@@ -242,7 +242,7 @@ public class SensorManager {
         int index = ID.getDataTypeValueIndex(id);
         int size = type.getVirtualMeasurementParameterSize();
         if (type != null && index > 0 && index <= size) {
-            return type.mVirtualMeasurementParameters.get(index);
+            return type.mVirtualMeasurementParameters.get(index - 1);
         } else {
             return null;
         }

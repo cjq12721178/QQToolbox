@@ -9,7 +9,7 @@ import android.text.TextUtils;
 
 public final class ID implements Comparable<ID> {
 
-    private static final long INVALID_ID = -1L;
+    public static final long INVALID_ID = -1L;
     private static final long ADDRESS_MASK = 0xffffff00000000L;
     private static final long DATA_TYPE_MASK = 0xff000000L;
     private static final long DATA_TYPE_INDEX_MASK = 0xffffffL;
