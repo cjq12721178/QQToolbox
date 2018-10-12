@@ -1,6 +1,7 @@
 package com.cjq.lib.weisi.iot;
 
 import android.support.annotation.NonNull;
+import android.text.TextUtils;
 
 /**
  * Created by CJQ on 2017/11/29.
@@ -8,6 +9,7 @@ import android.support.annotation.NonNull;
 
 public final class ID implements Comparable<ID> {
 
+    private static final long INVALID_ID = -1L;
     private static final long ADDRESS_MASK = 0xffffff00000000L;
     private static final long DATA_TYPE_MASK = 0xff000000L;
     private static final long DATA_TYPE_INDEX_MASK = 0xffffffL;
@@ -91,6 +93,19 @@ public final class ID implements Comparable<ID> {
         return isBleProtocolFamily(address)
                 ? String.format("%06X", address)
                 : String.format("%04X", address);
+    }
+
+    public static String getFormatId(long id) {
+        long safeId = ensureSensor(id);
+        return getFormatId(getAddress(safeId),
+                getDataTypeValue(safeId),
+                getDataTypeValueIndex(safeId));
+    }
+
+    private static String getFormatId(int address, byte dataValue, int dataValueIndex) {
+        return isBleProtocolFamily(address)
+                ? String.format("%06X-%02X-%d", address, dataValue, dataValueIndex)
+                : String.format("%04X-%02X-%d", address, dataValue, dataValueIndex);
     }
 
     public byte getDataTypeValue() {
@@ -183,6 +198,49 @@ public final class ID implements Comparable<ID> {
                 && (id & DATA_TYPE_INDEX_MASK) != 0;
     }
 
+    public static long parse(String formatId) {
+        if (TextUtils.isEmpty(formatId)) {
+            return INVALID_ID;
+        }
+        //输入格式为XXXX或XXXXXX
+        int addressEnd = formatId.indexOf('-');
+        int address;
+        String addressStr;
+        if (addressEnd == -1) {
+            addressStr = formatId;
+        } else {
+            addressStr = formatId.substring(0, addressEnd);
+        }
+        try {
+            address = Integer.parseInt(addressStr, 16);
+        } catch (Exception e) {
+            return INVALID_ID;
+        }
+        if (addressEnd == -1) {
+            return getId(address);
+        }
+        //输入格式为XXXX-XX或XXXXXX-XX
+        int dataValueEnd = formatId.indexOf('-', addressEnd + 1);
+        byte dataValue;
+        String dataValueStr = formatId.substring(addressEnd + 1,
+                dataValueEnd == -1 ? formatId.length() : dataValueEnd);
+        try {
+            dataValue = Byte.parseByte(dataValueStr, 16);
+        } catch (Exception e) {
+            return INVALID_ID;
+        }
+        if (dataValueEnd == -1) {
+            return getId(address, dataValue, 0);
+        }
+        //输入格式为XXXX-XX-D或XXXXXX-XX-D
+        try {
+            int dataValueIndex = Integer.parseInt(formatId.substring(dataValueEnd + 1));
+            return getId(address, dataValue, dataValueIndex);
+        } catch (Exception e) {
+            return INVALID_ID;
+        }
+    }
+
     @Override
     public int hashCode() {
         return (int)(mId ^ (mId >>> 32));
@@ -204,7 +262,8 @@ public final class ID implements Comparable<ID> {
 
     @Override
     public String toString() {
-        return String.format("%6X-%02X-%d", getAddress(), getDataTypeValue(), getDataTypeValueIndex());
+        //return String.format("%6X-%02X-%d", getAddress(), getDataTypeValue(), getDataTypeValueIndex());
+        return getFormatId(mId);
     }
 
     @Override

@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
+import android.support.constraint.ConstraintSet;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -179,7 +180,10 @@ public class MainActivity
             case R.id.btn_edit_use_default_overall_decorator:
                 EditDialog editDialog = new EditDialog();
                 editDialog.setTitle("use default overall decorator \n1\n2\n3\n4\n5");
+                //editDialog.setTitle("修改节点名称");
                 editDialog.setContent("yaya");
+                //editDialog.setSummary("节点名称为空时，采用测量量名称fdsfsdfsdfsdfsdf");
+                editDialog.getCustomDecorator().setContentGroupWidth(ConstraintSet.WRAP_CONTENT);
                 //editDialog.getCustomDecorator().setDrawSeparationLine(false);
                 editDialog.show(getSupportFragmentManager(),
                         "test_edit_default_overall_decorator");
