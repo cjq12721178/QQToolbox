@@ -853,36 +853,32 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         if (contentWidth >= titleWidth) {
             return contentWidth;
         }
-        return titleWidth;
-        //getDialog().getWindow().getDecorView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        //int windowWidth = getDialog().getWindow().getDecorView().getMeasuredWidth();
-//        tvTitle.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-//            @Override
-//            public void onGlobalLayout() {
-//                int w = tvTitle.getMeasuredWidth();
-//                tvTitle.getViewTreeObserver().removeOnGlobalLayoutListener(this);
-//            }
-//        });
-        //return 500;
-//        return textWidth <= titleWidth
-//                ? width
-//                : titleWidth;
-//        clBase.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//        int baseWidth = clBase.getMeasuredWidth();
-//        if (baseWidth < getDialogDefaultWidth()) {
-//            return width;
-//        }
-//        vTitle.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//        return vTitle.getMeasuredWidth();
+        return titleWidth - getDialogPaddingStartAndEnd(decorator);
     }
 
-    private int getDialogDefaultWidth() {
-        int screenWidth = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
-                ? getResources().getDisplayMetrics().widthPixels
-                : getResources().getDisplayMetrics().heightPixels;
-        return screenWidth - getDialog().getWindow().getDecorView().getPaddingStart()
-                - getDialog().getWindow().getDecorView().getPaddingEnd();
+    private int getDialogPaddingStartAndEnd(D decorator) {
+        int paddingRes = decorator.getBasePaddingDimenRes();
+        int innerPadding;
+        if (paddingRes != 0) {
+            innerPadding = getResources().getDimensionPixelSize(paddingRes) * 2;
+        } else {
+            int paddingLeftRes = decorator.getBaseLeftPaddingDimenRes();
+            int paddingRightRes = decorator.getBaseRightPaddingDimenRes();
+            innerPadding = (paddingLeftRes != 0 ? getResources().getDimensionPixelSize(paddingLeftRes) : 0)
+                    + (paddingRightRes != 0 ? getResources().getDimensionPixelSize(paddingRightRes) : 0);
+        }
+        int outerPadding = getDialog().getWindow().getDecorView().getPaddingStart()
+                + getDialog().getWindow().getDecorView().getPaddingEnd();
+        return innerPadding + outerPadding;
     }
+
+//    private int getDialogDefaultWidth() {
+//        int screenWidth = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
+//                ? getResources().getDisplayMetrics().widthPixels
+//                : getResources().getDisplayMetrics().heightPixels;
+//        return screenWidth - getDialog().getWindow().getDecorView().getPaddingStart()
+//                - getDialog().getWindow().getDecorView().getPaddingEnd();
+//    }
 
     private int getProperContentGroupHeight(View vContent, D decorator) {
         int height = decorator.getContentGroupHeight();

@@ -298,3 +298,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20181012-1.7.3(84):
 1. 修复ListDialog当标题为多行时，列表内容显示异常的问题
+
+20181012-1.7.4(85):
+1. 修复ListDilog标题长于一行时显示不完整的问题
