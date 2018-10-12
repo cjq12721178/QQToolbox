@@ -295,3 +295,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 1. 修改Dialog类簇底层baseView，以ConstraintLayout代替LinearLayout
 2. 修改相应布局以适应上面的修改
 3. BaseDialog.Decorator添加方法getContentGroupHeight等用以提供对contentView高度的设置
+
+20181012-1.7.3(84):
+1. 修复ListDialog当标题为多行时，列表内容显示异常的问题

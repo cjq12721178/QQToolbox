@@ -4,5 +4,5 @@
     android:layout_height="wrap_content"
     android:textSize="@dimen/qbox_size_text_dialog_title"
     android:gravity="center"
-    android:lines="2">
+    android:maxLines="2">
 </TextView>

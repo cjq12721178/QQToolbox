@@ -2,6 +2,7 @@ package com.cjq.tool.qbox.ui.dialog;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
@@ -17,12 +18,15 @@ import android.support.constraint.ConstraintSet;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.RecyclerView;
+import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.ViewTreeObserver;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -535,9 +539,20 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         View vContent = onCreateContentView(inflater, clBase, decorator, savedInstanceState);
         //安排位置并设置分隔线
         arrangeViewPositionAndSetSeparationLine(clBase, vTitle, vExit, vContent, decorator);
-        //getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        //return clBase;
+//        onSetContentView(vContent, decorator, savedInstanceState);
+//        ConstraintSet constraintSet = new ConstraintSet();
+//        constraintSet.clone(clBase);
+//        constraintSet.constrainHeight(vContent.getId(), getProperContentGroupHeight(vContent, decorator));
+//        constraintSet.applyTo(clBase);
         return clBase;
+        //getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        //return onPostCreateView(clBase, decorator, savedInstanceState);
     }
+
+//    protected View onPostCreateView(View baseView, D decorator, @Nullable Bundle savedInstanceState) {
+//        return baseView;
+//    }
 
     private ConstraintLayout inflateBaseView(LayoutInflater inflater,
                                              D decorator) {
@@ -727,8 +742,11 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             //安排内容位置
             clBase.addView(vContent);
             int contentId = vContent.getId();
-            constraintSet.constrainWidth(contentId, decorator.getContentGroupWidth());
+            constraintSet.constrainWidth(contentId, getProperContentGroupWidth(vTitle, vContent, clBase, decorator));
+            //constraintSet.constrainWidth(contentId, decorator.getContentGroupWidth());
             constraintSet.constrainHeight(contentId, getProperContentGroupHeight(vContent, decorator));
+            //constraintSet.constrainHeight(contentId, decorator.getContentGroupHeight());
+            //constraintSet.constrainHeight(contentId, 300);
             constraintSet.connect(contentId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
             constraintSet.connect(contentId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
 
@@ -812,6 +830,58 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             }
         }
         constraintSet.applyTo(clBase);
+    }
+
+    private int getProperContentGroupWidth(View vTitle, View vContent, ConstraintLayout clBase, D decorator) {
+        int width = decorator.getContentGroupWidth();
+        if (vTitle == null
+                || width != ConstraintSet.MATCH_CONSTRAINT
+                || !(vContent instanceof RecyclerView)) {
+            return width;
+        }
+//        TextView tvTitle = vTitle instanceof TextView
+//                ? (TextView) vTitle
+//                : vTitle.findViewById(decorator.getTitleId());
+//        TextPaint paint = tvTitle.getPaint();
+//        int textWidth = (int) paint.measureText(tvTitle.getText(), 0, tvTitle.getText().length());
+//        vTitle.measure(View.MeasureSpec.makeMeasureSpec(540, View.MeasureSpec.AT_MOST), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        int maxWidth = vTitle.getMeasuredWidth();
+        vTitle.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        int titleWidth = vTitle.getMeasuredWidth();
+        vContent.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        int contentWidth = vContent.getMeasuredWidth();
+        if (contentWidth >= titleWidth) {
+            return contentWidth;
+        }
+        return titleWidth;
+        //getDialog().getWindow().getDecorView().measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        //int windowWidth = getDialog().getWindow().getDecorView().getMeasuredWidth();
+//        tvTitle.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+//            @Override
+//            public void onGlobalLayout() {
+//                int w = tvTitle.getMeasuredWidth();
+//                tvTitle.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+//            }
+//        });
+        //return 500;
+//        return textWidth <= titleWidth
+//                ? width
+//                : titleWidth;
+//        clBase.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        int baseWidth = clBase.getMeasuredWidth();
+//        if (baseWidth < getDialogDefaultWidth()) {
+//            return width;
+//        }
+//        vTitle.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        return vTitle.getMeasuredWidth();
+    }
+
+    private int getDialogDefaultWidth() {
+        int screenWidth = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
+                ? getResources().getDisplayMetrics().widthPixels
+                : getResources().getDisplayMetrics().heightPixels;
+        return screenWidth - getDialog().getWindow().getDecorView().getPaddingStart()
+                - getDialog().getWindow().getDecorView().getPaddingEnd();
     }
 
     private int getProperContentGroupHeight(View vContent, D decorator) {

@@ -1,5 +1,6 @@
 package com.cjq.tool.qbox.ui.dialog;
 
+import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
@@ -128,6 +129,14 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         //mItemAdapter.setOnItemClickListener(this);
         rvItems.setAdapter(mItemAdapter);
     }
+
+//    @Override
+//    protected View onPostCreateView(View baseView, Decorator decorator, @Nullable Bundle savedInstanceState) {
+//        RecyclerView rvItems = baseView.findViewById(decorator.getListId());
+//        //rvItems.setAdapter(null);
+//        rvItems.setAdapter(mItemAdapter);
+//        return baseView;
+//    }
 
     @Override
     protected boolean onConfirm() {

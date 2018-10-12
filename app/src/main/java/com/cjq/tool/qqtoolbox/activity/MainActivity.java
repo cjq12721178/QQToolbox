@@ -214,7 +214,8 @@ public class MainActivity
             } break;
             case R.id.btn_multi_list_dialog: {
                 ListDialog listDialog = new ListDialog();
-                listDialog.setTitle("this is multiple select list dialog");
+                listDialog.setTitle("this is multiple select list dialog ddddddd");
+                //listDialog.setTitle("this is multiple select list dialog");
                 String[] items = new String[40];
                 for (int i = 0;i < items.length;++i) {
                     items[i] = "item" + (i + 1);
