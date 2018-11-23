@@ -2,7 +2,6 @@ package com.cjq.tool.qbox.ui.dialog;
 
 import android.app.Activity;
 import android.content.DialogInterface;
-import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.ColorRes;
@@ -18,17 +17,12 @@ import android.support.constraint.ConstraintSet;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.widget.RecyclerView;
-import android.text.TextPaint;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewStub;
-import android.view.ViewTreeObserver;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.cjq.tool.qbox.R;
@@ -832,28 +826,26 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         constraintSet.applyTo(clBase);
     }
 
-    private int getProperContentGroupWidth(View vTitle, View vContent, ConstraintLayout clBase, D decorator) {
+//    protected int getProperContentGroupWidth(View vTitle, View vContent, ConstraintLayout clBase, D decorator) {
+//        return decorator.getContentGroupWidth();
+//    }
+
+    protected int getProperContentGroupWidth(View vTitle, View vContent, ConstraintLayout clBase, D decorator) {
         int width = decorator.getContentGroupWidth();
         if (vTitle == null
-                || width != ConstraintSet.MATCH_CONSTRAINT
-                || !(vContent instanceof RecyclerView)) {
+                || width != ConstraintSet.MATCH_CONSTRAINT) {
             return width;
         }
-//        TextView tvTitle = vTitle instanceof TextView
-//                ? (TextView) vTitle
-//                : vTitle.findViewById(decorator.getTitleId());
-//        TextPaint paint = tvTitle.getPaint();
-//        int textWidth = (int) paint.measureText(tvTitle.getText(), 0, tvTitle.getText().length());
-//        vTitle.measure(View.MeasureSpec.makeMeasureSpec(540, View.MeasureSpec.AT_MOST), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//        int maxWidth = vTitle.getMeasuredWidth();
         vTitle.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         int titleWidth = vTitle.getMeasuredWidth();
         vContent.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         int contentWidth = vContent.getMeasuredWidth();
         if (contentWidth >= titleWidth) {
-            return contentWidth;
+            return ConstraintSet.WRAP_CONTENT;
+            //return contentWidth;
         }
-        return titleWidth - getDialogPaddingStartAndEnd(decorator);
+        return titleWidth;
+        //return titleWidth - getDialogPaddingStartAndEnd(decorator);
     }
 
     private int getDialogPaddingStartAndEnd(D decorator) {
@@ -871,6 +863,24 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                 + getDialog().getWindow().getDecorView().getPaddingEnd();
         return innerPadding + outerPadding;
     }
+
+//    protected int getProperContentGroupWidth(View vTitle, View vContent, ConstraintLayout clBase, D decorator) {
+//        int width = decorator.getContentGroupWidth();
+//        if (vTitle == null
+//                || width != ConstraintSet.MATCH_CONSTRAINT
+//                || !(vContent instanceof RecyclerView)) {
+//            return width;
+//        }
+//        vTitle.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        int titleWidth = vTitle.getMeasuredWidth();
+//        vContent.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+//        int contentWidth = vContent.getMeasuredWidth();
+//        if (contentWidth >= titleWidth) {
+//            return ConstraintSet.WRAP_CONTENT;
+//            //return contentWidth;
+//        }
+//        return titleWidth - getDialogPaddingStartAndEnd(decorator);
+//    }
 
 //    private int getDialogDefaultWidth() {
 //        int screenWidth = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT

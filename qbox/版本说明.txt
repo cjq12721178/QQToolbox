@@ -301,3 +301,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20181012-1.7.4(85):
 1. 修复ListDilog标题长于一行时显示不完整的问题
+
+20181123-1.7.5(86):
+1. 修复Dialog类簇宽度显示异常的问题

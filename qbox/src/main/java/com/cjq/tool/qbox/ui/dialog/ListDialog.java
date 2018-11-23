@@ -8,6 +8,8 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.constraint.ConstraintLayout;
+import android.support.constraint.ConstraintSet;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.TypedValue;
@@ -137,6 +139,8 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
 //        rvItems.setAdapter(mItemAdapter);
 //        return baseView;
 //    }
+
+
 
     @Override
     protected boolean onConfirm() {

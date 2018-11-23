@@ -140,8 +140,10 @@ public class MainActivity
             case R.id.btn_confirm_default_overall_decorator: {
                 ConfirmDialog dialog = new ConfirmDialog();
                 dialog.setTitle("use default overall decorator");
+                //dialog.setTitle("检测到新版本1.8.3");
                 dialog.setDrawCancelButton(false);
-                //dialog.setContent("this is content");
+                dialog.setContent("haha");
+                //dialog.setContent("1. 修复数据浏览界面按传感器名称排序后，部分传感器实时数据无法及时更新的问题");
                 //ConfirmDialog.Decorator decorator = dialog.getCustomDecorator();
                 //decorator.setDrawSeparationLine(false);
                 dialog.getCustomDecorator().setDrawSeparationLine(true);
@@ -181,9 +183,9 @@ public class MainActivity
                 EditDialog editDialog = new EditDialog();
                 editDialog.setTitle("use default overall decorator \n1\n2\n3\n4\n5");
                 //editDialog.setTitle("修改节点名称");
-                editDialog.setContent("yaya");
-                //editDialog.setSummary("节点名称为空时，采用测量量名称fdsfsdfsdfsdfsdf");
-                editDialog.getCustomDecorator().setContentGroupWidth(ConstraintSet.WRAP_CONTENT);
+                //editDialog.setContent("yaya");
+                editDialog.setSummary("节点名称为空时，采用测量量名称fdsfsdfsdfsdfsdf");
+                //editDialog.getCustomDecorator().setContentGroupWidth(ConstraintSet.WRAP_CONTENT);
                 //editDialog.getCustomDecorator().setDrawSeparationLine(false);
                 editDialog.show(getSupportFragmentManager(),
                         "test_edit_default_overall_decorator");
