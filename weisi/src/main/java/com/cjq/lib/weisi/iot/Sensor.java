@@ -160,6 +160,11 @@ public abstract class Sensor {
 
         public static class Value extends com.cjq.lib.weisi.iot.container.Value {
 
+//            public Value(long timestamp, float batteryVoltage) {
+//                super(timestamp);
+//                mBatteryVoltage = batteryVoltage;
+//            }
+
             float mBatteryVoltage;
 
             public Value(long timeStamp) {
@@ -172,7 +177,7 @@ public abstract class Sensor {
 
             public String getFormattedBatteryVoltage() {
                 return mBatteryVoltage < 0
-                        ? String.format("%d\\%", (int) mBatteryVoltage)
+                        ? String.format("%d%%", ((int) mBatteryVoltage) & 0x7F)
                         : String.format("%.2fV", mBatteryVoltage);
             }
         }

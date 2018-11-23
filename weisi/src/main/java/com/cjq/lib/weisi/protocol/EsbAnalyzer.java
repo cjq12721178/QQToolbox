@@ -33,11 +33,12 @@ public class EsbAnalyzer implements Analyzable {
     public long analyzeTimestamp(byte[] src, int position) {
         int calendarPos = position;
         //若基站或者其他网关设备没有打上时间戳，取本地系统时间
-        if (src[calendarPos] == 0
-                && src[calendarPos + 1] == 0
-                && src[calendarPos + 2] == 0
-                && src[calendarPos + 3] == 0
-                && src[calendarPos + 4] == 0) {
+//        src[calendarPos] == 0
+//                && src[calendarPos + 1] == 0
+//                && src[calendarPos + 2] == 0
+//                && src[calendarPos + 3] == 0
+//                && src[calendarPos + 4] == 0
+        if (src[calendarPos] == 0 || src[calendarPos + 1] == 0) {
             return System.currentTimeMillis();
         } else {
             long lastTime, currTime;
@@ -70,7 +71,7 @@ public class EsbAnalyzer implements Analyzable {
     public float analyzeBatteryVoltage(byte voltage, int sensorAddress) {
         return sensorAddress >= VOLTAGE_DIVIDE_VALUE
                 ? voltage * BATTERY_VOLTAGE_COEFFICIENT
-                : (voltage != 0
+                : (voltage > 0
                 ? VOLTAGE_UP_CONVERSION_VALUE / voltage
                 : 0f);
     }
