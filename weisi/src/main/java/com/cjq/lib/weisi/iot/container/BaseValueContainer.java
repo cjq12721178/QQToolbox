@@ -2,7 +2,7 @@ package com.cjq.lib.weisi.iot.container;
 
 import android.support.annotation.NonNull;
 
-import com.cjq.lib.weisi.util.SimpleReflection;
+import com.wsn.lib.wsb.util.SimpleReflection;
 
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public abstract class BaseValueContainer<V extends Value>
 
     protected V onCreateValue(long timestamp) {
         try {
-            Constructor constructor = ((Class<V>) SimpleReflection.getClassParameterizedType(this, BaseValueContainer.class, 0)).getConstructor(long.class);
+            Constructor constructor = ((Class<V>) SimpleReflection.INSTANCE.getClassParameterizedType(this, 0)).getConstructor(long.class);
             if (!constructor.isAccessible()) {
                 constructor.setAccessible(true);
             }

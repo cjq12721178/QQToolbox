@@ -1,6 +1,6 @@
 package com.cjq.lib.weisi.iot.container;
 
-import com.cjq.lib.weisi.util.ExpandCollections;
+import com.wsn.lib.wsb.util.ExpandCollections;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,7 +71,7 @@ public abstract class HistoryValueContainer<V extends Value> extends BaseValueCo
     @Override
     public int findValuePosition(long timestamp) {
         synchronized (mValues) {
-            return ExpandCollections.binarySearch(mValues,
+            return ExpandCollections.INSTANCE.binarySearch(mValues,
                     timestamp,
                     SEARCH_HELPER);
         }

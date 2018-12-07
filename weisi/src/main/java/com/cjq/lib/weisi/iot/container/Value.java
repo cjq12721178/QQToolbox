@@ -1,6 +1,6 @@
 package com.cjq.lib.weisi.iot.container;
 
-import com.cjq.lib.weisi.util.ExpandComparator;
+import com.wsn.lib.wsb.util.ExpandComparator;
 
 import java.lang.reflect.Constructor;
 

@@ -7,8 +7,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.cjq.lib.weisi.communicator.Communicator;
-import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
+import com.wsn.lib.wsb.communicator.Communicator;
+import com.wsn.lib.wsb.communicator.receiver.DataReceiver;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qqtoolbox.R;
 
@@ -192,9 +192,13 @@ public class TcpDebugActivity extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    public void stopRead() throws IOException {
+    public void stopRead() {
         if (mWriter != null) {
-            mWriter.write(new byte[0]);
+            try {
+                mWriter.write(new byte[0]);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

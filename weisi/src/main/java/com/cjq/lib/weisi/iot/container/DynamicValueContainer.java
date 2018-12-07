@@ -1,6 +1,6 @@
 package com.cjq.lib.weisi.iot.container;
 
-import com.cjq.lib.weisi.util.ExpandCollections;
+import com.wsn.lib.wsb.util.ExpandCollections;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -147,12 +147,12 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
         synchronized (this) {
             int position;
             if (mValueHead == 0) {
-                return ExpandCollections.binarySearch(mValues,
+                return ExpandCollections.INSTANCE.binarySearch(mValues,
                         timestamp,
                         SEARCH_HELPER);
             }
             if (timestamp >= mValues.get(0).mTimestamp) {
-                position = ExpandCollections.binarySearch(
+                position = ExpandCollections.INSTANCE.binarySearch(
                         mValues,
                         0,
                         mValueHead - 1,
@@ -162,7 +162,7 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                         ? MAX_VALUE_SIZE - mValueHead + position
                         : encodePosition(MAX_VALUE_SIZE - mValueHead + decodePosition(position));
             } else {
-                position = ExpandCollections.binarySearch(
+                position = ExpandCollections.INSTANCE.binarySearch(
                         mValues,
                         mValueHead,
                         mValues.size() - 1,

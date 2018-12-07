@@ -4,9 +4,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 
-import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
-import com.cjq.lib.weisi.communicator.UdpKit;
-import com.cjq.lib.weisi.communicator.receiver.SyncDataReceiver;
+import com.wsn.lib.wsb.communicator.UdpKit;
+import com.wsn.lib.wsb.communicator.receiver.DataReceiver;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qqtoolbox.R;
 
@@ -16,7 +15,7 @@ public class UdpDebugActivity
         DataReceiver.Listener {
 
     private UdpKit mUdpKit;
-    private SyncDataReceiver mDataReceiver;
+    private DataReceiver mDataReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +44,7 @@ public class UdpDebugActivity
         if (mUdpKit != null) {
             mUdpKit.close();
         }
-        SyncDataReceiver.shutdown();
+        //SyncDataReceiver.shutdown();
     }
 
     @Override
@@ -64,7 +63,7 @@ public class UdpDebugActivity
             case R.id.btn_start_listen:
                 if (mUdpKit != null) {
                     if (mDataReceiver == null) {
-                        mDataReceiver = new SyncDataReceiver(mUdpKit);
+                        mDataReceiver = new DataReceiver(mUdpKit);
                     }
                     if (mDataReceiver.startListen(this)) {
                         SimpleCustomizeToast.show("start udp listen");

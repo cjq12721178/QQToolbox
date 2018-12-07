@@ -543,3 +543,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. 修复UDP协议时间戳有时为0的问题
 2. 修复UDP协议电压解析有误的问题
 3. 修复Sensor.Info.Value.getFormattedBatteryVoltage当电压小于0时，抛出异常的问题
+
+20181207-7.0.0(138):
+1. 将本模块中部分基础功能（主要是protocol包全部、communicator包部分和util包部分）移至wsb.jar模块

@@ -1,0 +1,5 @@
+﻿20181207-0.1.0(1):
+1. 将weisi.aar模块中的部分基础功能（主要是protocol包全部、communicator包部分和util包部分）移至本模块
+
+20181207-0.1.1(2):
+1. 精简communicator.receiver功能，修改DataReceiver.stopListen和UdpKit.stopRead，同时删除SyncDataReceiver

@@ -74,7 +74,7 @@ static speed_t getBaudrate(jint baudrate)
  * Signature: (Ljava/lang/String;II)Ljava/io/FileDescriptor;
  */
 JNIEXPORT jobject JNICALL Java_com_cjq_lib_weisi_communicator_SerialPortKit_open
-  (JNIEnv *env, jclass thiz, jstring path, jint baudrate, jint flags)
+  (JNIEnv *env, jclass thiz, jstring path, jint baudRate, jint flags)
 {
 	int fd;
 	speed_t speed;
@@ -82,7 +82,7 @@ JNIEXPORT jobject JNICALL Java_com_cjq_lib_weisi_communicator_SerialPortKit_open
 
 	/* Check arguments */
 	{
-		speed = getBaudrate(baudrate);
+		speed = getBaudrate(baudRate);
 		if (speed == -1) {
 			LOGE("Invalid baudrate");
 			return NULL;

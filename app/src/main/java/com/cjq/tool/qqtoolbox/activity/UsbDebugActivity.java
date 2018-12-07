@@ -17,14 +17,14 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 
-import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
+import com.wsn.lib.wsb.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialDriver;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialPort;
 import com.cjq.lib.weisi.communicator.usb.UsbSerialProber;
-import com.cjq.lib.weisi.protocol.UdpSensorProtocol;
+import com.wsn.lib.wsb.protocol.UdpSensorProtocol;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qbox.util.ExceptionLog;
-import com.cjq.lib.weisi.util.NumericConverter;
+import com.wsn.lib.wsb.util.NumericConverter;
 import com.cjq.tool.qqtoolbox.R;
 
 import java.io.IOException;

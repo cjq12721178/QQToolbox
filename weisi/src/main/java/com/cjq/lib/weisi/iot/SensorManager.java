@@ -13,9 +13,9 @@ import com.cjq.lib.weisi.iot.interpreter.GroundLeadInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ParaphraseInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.StatusInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
-import com.cjq.lib.weisi.protocol.EsbAnalyzer;
-import com.cjq.lib.weisi.util.ExpandCollections;
-import com.cjq.lib.weisi.util.ExpandComparator;
+import com.wsn.lib.wsb.protocol.EsbAnalyzer;
+import com.wsn.lib.wsb.util.ExpandCollections;
+import com.wsn.lib.wsb.util.ExpandComparator;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -603,7 +603,7 @@ public class SensorManager {
         List<PhysicalSensor.Type> types = getSensorTypes(address);
         if (types == null)
             return null;
-        int position = ExpandCollections.binarySearch(types,
+        int position = ExpandCollections.INSTANCE.binarySearch(types,
                 address,
                 SENSOR_TYPE_SEARCH_COMPARATOR);
         return position >= 0 ? types.get(position) : null;
@@ -794,7 +794,7 @@ public class SensorManager {
                     mValueInterpreter = null;
                     //根据mValueType为DataType配备不同的ValueBuilder
                     if (mValueType != -1) {
-                        EsbAnalyzer.setValueBuilder(mDataType.mValue, mValueType, mSigned, mCoefficient);
+                        EsbAnalyzer.Companion.setValueBuilder(mDataType.mValue, mValueType, mSigned, mCoefficient);
                         mValueType = -1;
                         mCoefficient = 1;
                     }

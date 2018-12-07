@@ -2,6 +2,8 @@ package com.cjq.lib.weisi.communicator;
 
 import android.util.Log;
 
+import com.wsn.lib.wsb.communicator.Communicator;
+
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileInputStream;

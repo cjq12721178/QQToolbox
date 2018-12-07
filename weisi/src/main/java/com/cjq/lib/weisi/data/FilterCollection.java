@@ -7,9 +7,6 @@ import android.util.SparseArray;
 
 import com.cjq.lib.weisi.util.SimpleCustomClassParcel;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Created by CJQ on 2018/5/25.

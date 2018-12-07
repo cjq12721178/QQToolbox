@@ -25,8 +25,6 @@ import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
 
-import com.cjq.lib.weisi.communicator.Communicator;
-
 import java.io.IOException;
 
 /**

@@ -7,13 +7,17 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.cjq.lib.weisi.communicator.receiver.DataReceiver;
-import com.cjq.lib.weisi.communicator.receiver.ReceiveException;
-import com.cjq.lib.weisi.communicator.tcp.TcpClient;
-import com.cjq.lib.weisi.communicator.tcp.TcpServer;
-import com.cjq.lib.weisi.communicator.tcp.TcpSocket;
+import com.wsn.lib.wsb.communicator.receiver.DataReceiver;
+import com.wsn.lib.wsb.communicator.receiver.ReceiveException;
+import com.wsn.lib.wsb.communicator.tcp.Tcp;
+import com.wsn.lib.wsb.communicator.tcp.TcpClient;
+import com.wsn.lib.wsb.communicator.tcp.TcpServer;
+import com.wsn.lib.wsb.communicator.tcp.TcpSocket;
 import com.cjq.tool.qbox.ui.toast.SimpleCustomizeToast;
 import com.cjq.tool.qqtoolbox.R;
+
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
 
@@ -167,7 +171,19 @@ public class TcpDebugActivity2
     }
 
     @Override
-    public boolean onClientAccept(int state, TcpSocket socket) {
+    public void onServerConnect(@NotNull Tcp.ConnectState state, @Nullable TcpSocket socket) {
+        if (socket != null) {
+            mSocket = socket;
+            mReceiver = new DataReceiver(socket);
+            mReceiver.startListen(this);
+            SimpleCustomizeToast.show("远程服务器连接成功");
+        } else {
+            SimpleCustomizeToast.show("连接远程服务器失败");
+        }
+    }
+
+    @Override
+    public boolean onClientAccept(@NotNull Tcp.ConnectState state, @Nullable TcpSocket socket) {
         if (socket != null) {
             mSocket = socket;
             mReceiver = new DataReceiver(socket);
@@ -177,18 +193,6 @@ public class TcpDebugActivity2
         } else {
             SimpleCustomizeToast.show("客户端连接失败");
             return true;
-        }
-    }
-
-    @Override
-    public void onServerConnect(int state, TcpSocket socket) {
-        if (socket != null) {
-            mSocket = socket;
-            mReceiver = new DataReceiver(socket);
-            mReceiver.startListen(this);
-            SimpleCustomizeToast.show("远程服务器连接成功");
-        } else {
-            SimpleCustomizeToast.show("连接远程服务器失败");
         }
     }
 }

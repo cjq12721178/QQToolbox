@@ -6,7 +6,7 @@ import com.cjq.lib.weisi.data.Filter;
 import com.cjq.lib.weisi.iot.LogicalSensor;
 import com.cjq.lib.weisi.iot.PhysicalSensor;
 import com.cjq.lib.weisi.iot.Sensor;
-import com.cjq.lib.weisi.util.SimpleReflection;
+import com.wsn.lib.wsb.util.SimpleReflection;
 
 import org.junit.Test;
 
@@ -63,7 +63,7 @@ public class ReflectionTest {
     }
 
     public <S extends Sensor> Class<S> getFilterParameterizedType(Filter<S> filter) {
-        return (Class<S>) SimpleReflection.getInterfaceParameterizedType(filter, Filter.class, 0);
+        return (Class<S>) SimpleReflection.INSTANCE.getInterfaceParameterizedType(filter, Filter.class, 0);
     }
 
     @Test

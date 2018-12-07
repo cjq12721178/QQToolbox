@@ -1,11 +1,9 @@
 package com.cjq.lib.weisi.iot;
 
-import com.cjq.lib.weisi.protocol.UdpSensorProtocol;
-import com.cjq.lib.weisi.util.HexDump;
+import com.wsn.lib.wsb.protocol.UdpSensorProtocol;
+import com.wsn.lib.wsb.util.HexDump;
 
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class ProtocolTest {
 

@@ -5,8 +5,8 @@ import android.support.annotation.NonNull;
 
 import com.cjq.lib.weisi.iot.container.ValueContainer;
 import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
-import com.cjq.lib.weisi.util.ExpandCollections;
-import com.cjq.lib.weisi.util.ExpandComparator;
+import com.wsn.lib.wsb.util.ExpandCollections;
+import com.wsn.lib.wsb.util.ExpandComparator;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -202,7 +202,7 @@ public class PhysicalSensor extends Sensor {
         synchronized (mMeasurements) {
             int position, size = mMeasurements.size();
             if (size > MEASUREMENT_SEARCH_THRESHOLD) {
-                return ExpandCollections.binarySearch(mMeasurements,
+                return ExpandCollections.INSTANCE.binarySearch(mMeasurements,
                         ID.getId(mInfo.getId().getAddress(), dataTypeValue, dataTypeValueIndex),
                         MEASUREMENT_SEARCH_HELPER);
             } else {

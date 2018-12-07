@@ -24,7 +24,7 @@ package com.cjq.lib.weisi.communicator.usb;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 
-import com.cjq.lib.weisi.communicator.Communicator;
+import com.wsn.lib.wsb.communicator.Communicator;
 
 import java.io.IOException;
 

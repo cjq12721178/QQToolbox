@@ -28,7 +28,7 @@ import android.hardware.usb.UsbEndpoint;
 import android.hardware.usb.UsbRequest;
 import android.util.Log;
 
-import com.cjq.lib.weisi.util.HexDump;
+import com.wsn.lib.wsb.util.HexDump;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
