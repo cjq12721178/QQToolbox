@@ -3,3 +3,6 @@
 
 20181207-0.1.1(2):
 1. 精简communicator.receiver功能，修改DataReceiver.stopListen和UdpKit.stopRead，同时删除SyncDataReceiver
+
+20181212-0.1.2(3):
+1. 新增config包，提供对相关配置导入的支持

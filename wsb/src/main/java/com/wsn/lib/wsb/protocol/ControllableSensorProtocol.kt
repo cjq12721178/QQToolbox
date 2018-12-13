@@ -20,7 +20,7 @@ abstract class ControllableSensorProtocol<A : Analyzable> protected constructor(
         analyze(data, 0, data.size, listener)
     }
 
-    fun analyze(data: ByteArray, offset: Int, length: Int, listener: OnFrameAnalyzedListener) {
+    open fun analyze(data: ByteArray, offset: Int, length: Int, listener: OnFrameAnalyzedListener) {
         //判断数据是否为空，以及数据长度是否大于最小数据长度
         if (offset < 0
                 || offset + length > data.size
@@ -78,7 +78,7 @@ abstract class ControllableSensorProtocol<A : Analyzable> protected constructor(
         }
     }
 
-    fun analyzeMultiplePackages(data: ByteArray, offset: Int, length: Int, listener: OnFrameAnalyzedListener): Int {
+    open fun analyzeMultiplePackages(data: ByteArray, offset: Int, length: Int, listener: OnFrameAnalyzedListener): Int {
         if (offset < 0 || offset + length > data.size) {
             return 0
         }

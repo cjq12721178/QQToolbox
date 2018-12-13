@@ -15,8 +15,8 @@ targetCompatibility = "1.8"
 
 buildscript {
     ext.kotlin_version = '1.2.71'
-    ext.versionName = '0.1.1'
-    ext.versionCode = 2
+    ext.versionName = '0.1.2'
+    ext.versionCode = 3
     repositories {
         mavenCentral()
     }
@@ -41,14 +41,35 @@ compileTestKotlin {
     }
 }
 
-task copyJar(type: Copy) {
-    from "${buildDir}/libs/"
-    into "${projectDir}"
-    exclude "debug*"
-    include "wsb.jar"
-    rename "wsb.jar", "com.wsn.lib.wsb-${versionName}.jar"
+task copyJar << {
+    ["${projectDir}", "${rootDir}/wsc/libs", "${rootDir}/weisi/libs"].each { dest ->
+        if (!dest.contains("wsb")) {
+            new File(dest).listFiles().each { file ->
+                if (file.name.startsWith("com.wsn.lib.wsb") && file.name.endsWith(".jar")) {
+                    file.delete()
+                }
+            }
+        }
+        copy {
+            from "${buildDir}/libs/"
+            into dest
+            exclude "debug*"
+            include "wsb.jar"
+            rename "wsb.jar", "com.wsn.lib.wsb-${versionName}.jar"
+        }
+    }
     println "wsb.jar build successfully"
 }
+
+//task copyJar(type: Copy) {
+//    from "${buildDir}/libs/"
+//    into "${projectDir}"
+//    into
+//    exclude "debug*"
+//    include "wsb.jar"
+//    rename "wsb.jar", "com.wsn.lib.wsb-${versionName}.jar"
+//    println "wsb.jar build successfully"
+//}
 
 afterEvaluate {
     tasks.matching {

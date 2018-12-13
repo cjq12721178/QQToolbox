@@ -1,1 +1,1 @@
-include ':app', ':qbox', ':weisi', ':wsb', ':JavaApplication'
+include ':app', ':qbox', ':weisi', ':wsb', ':JavaApplication', ':wsc'

@@ -120,9 +120,7 @@ class UdpKit : Communicator {
             } catch (ioe: IOException) {
                 ioe.printStackTrace()
             } catch (e: java.lang.Exception) {
-                Thread() {
-                    sendStopReadFrame()
-                }.start()
+                close()
             }
         }
     }

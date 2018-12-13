@@ -8,6 +8,7 @@
       <module fileurl="file://$PROJECT_DIR$/qbox/qbox.iml" filepath="$PROJECT_DIR$/qbox/qbox.iml" />
       <module fileurl="file://$PROJECT_DIR$/weisi/weisi.iml" filepath="$PROJECT_DIR$/weisi/weisi.iml" />
       <module fileurl="file://$PROJECT_DIR$/wsb/wsb.iml" filepath="$PROJECT_DIR$/wsb/wsb.iml" />
+      <module fileurl="file://$PROJECT_DIR$/wsc/wsc.iml" filepath="$PROJECT_DIR$/wsc/wsc.iml" />
     </modules>
   </component>
 </project>

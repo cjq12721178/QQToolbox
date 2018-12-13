@@ -13,6 +13,7 @@ import com.cjq.lib.weisi.iot.interpreter.GroundLeadInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ParaphraseInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.StatusInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
+import com.wsn.lib.wsb.config.ConfigurationImporter;
 import com.wsn.lib.wsb.protocol.EsbAnalyzer;
 import com.wsn.lib.wsb.util.ExpandCollections;
 import com.wsn.lib.wsb.util.ExpandComparator;
@@ -21,6 +22,7 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -644,15 +646,15 @@ public class SensorManager {
     }
 
     private static ConfigurationImporter getConfigurationImporter(Context context, String fileName) {
+        ConfigurationImporter importer = new ConfigurationImporter();
         try {
-            SAXParserFactory factory = SAXParserFactory.newInstance();
-            SAXParser parser = factory.newSAXParser();
-            ConfigurationImporter importer = new ConfigurationImporter();
-            parser.parse(context.getAssets().open(fileName), importer);
-            return importer;
+            return importer.leadIn(context.getAssets().open(fileName))
+                    ? importer
+                    : null;
         } catch (Exception e) {
-            return null;
+            e.printStackTrace();
         }
+        return null;
     }
 
     public static void setValueContainerConfigurationProvider(MeasurementConfigurationProvider provider, boolean isResetConfigurations) {
@@ -683,16 +685,16 @@ public class SensorManager {
         <C extends Configuration> C getConfiguration(ID id);
     }
 
-    private static class ConfigurationImporter extends DefaultHandler {
+    private static class ConfigurationImporter extends com.wsn.lib.wsb.config.ConfigurationImporter {
 
-        private static final String DATA_TYPE = "DataType";
+        //private static final String DATA_TYPE = "DataType";
         private static final String PARAPHRASES = "paraphrases";
         private static final String SENSOR_TYPE = "SensorType";
         private static final String DATA_TYPE_CUSTOM_NAME = "DataTypeCustomName";
 
         private Map<Byte, PracticalMeasurement.DataType> mDataTypeMap;
         private PracticalMeasurement.DataType mDataType;
-        private StringBuilder mBuilder;
+        //private StringBuilder getBuilder();
         private Map<Double, String> mParaphrases;
         private Double mNumber;
         private String mText;
@@ -703,12 +705,12 @@ public class SensorManager {
         private List<PhysicalSensor.Type.PracticalMeasurementParameter> mPracticalMeasurementParameters;
         private PhysicalSensor.Type.PracticalMeasurementParameter mPracticalMeasurementParameter;
         private int mIndex;
-        private byte mDataTypeValue;
+        //private byte mDataTypeValue;
         private String mDataTypeCustomName;
         private int mCustomDataTypeNameType;
-        private int mValueType = -1;
-        private boolean mSigned;
-        private double mCoefficient;
+        //private int mValueType = -1;
+        //private boolean mSigned;
+        //private double mCoefficient;
         private ScriptValueCorrector.Builder mScriptValueCorrectorBuilder;
         private String mLabel;
         private ErrorStateInterpreter mErrorStateInterpreter;
@@ -729,8 +731,8 @@ public class SensorManager {
         }
 
         @Override
-        public void startDocument() throws SAXException {
-            mBuilder = new StringBuilder();
+        public void startDocument() {
+            //getBuilder() = new StringBuilder();
             mDataTypeMap = new HashMap<>();
             mTypes = new ArrayList<>();
             mPracticalMeasurementParameters = new ArrayList<>();
@@ -739,98 +741,98 @@ public class SensorManager {
 
         @Override
         public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
-            if (localName.equals(SENSOR_TYPE)) {
+            super.startElement(uri, localName, qName, attributes);
+            if (qName.equals(SENSOR_TYPE)) {
                 mType = new PhysicalSensor.Type();
-            } else if (localName.equals(PARAPHRASES)) {
+            } else if (qName.equals(PARAPHRASES)) {
                 mParaphrases = new HashMap<>();
-            } else if (localName.equals(DATA_TYPE_CUSTOM_NAME)) {
+            } else if (qName.equals(DATA_TYPE_CUSTOM_NAME)) {
                 mCustomDataTypeNameType = Integer.parseInt(attributes.getValue("type"));
             }
-            mBuilder.setLength(0);
+            //getBuilder().setLength(0);
         }
 
-        @Override
-        public void characters(char[] ch, int start, int length) throws SAXException {
-            mBuilder.append(ch, start, length);
-        }
+//        @Override
+//        public void characters(char[] ch, int start, int length) throws SAXException {
+//            getBuilder().append(ch, start, length);
+//        }
 
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
-            switch (localName) {
+            super.endElement(uri, localName, qName);
+            switch (qName) {
                 case "value":
-                    mDataType = new PracticalMeasurement.DataType((byte)Integer.parseInt(mBuilder.toString(), 16));
+                    mDataType = new PracticalMeasurement.DataType(getDataTypeValue());
                     break;
                 case "name":
                     if (mType != null) {
-                        mVirtualMeasurementName = mBuilder.toString();
+                        mVirtualMeasurementName = getBuilder().toString();
                     } else {
-                        mDataType.setName(mBuilder.toString());
+                        mDataType.setName(getBuilder().toString());
                     }
                     break;
                 case "decimal":
-                    //mDataType.mInterpreter = new FloatInterpreter(Integer.parseInt(mBuilder.toString()));
-                    mDecimal = Integer.parseInt(mBuilder.toString());
+                    mDecimal = Integer.parseInt(getBuilder().toString());
                     break;
                 case "unit":
-                    //mDataType.mUnit = mBuilder.toString();
-                    mUnit = mBuilder.toString();
+                    mUnit = getBuilder().toString();
                     break;
                 case "float":
                     mValueInterpreter = new FloatInterpreter(mDecimal, mUnit);
                     mDecimal = 3;
                     mUnit = null;
                     break;
-                case "type":
-                    mValueType = Integer.parseInt(mBuilder.toString());
-                    break;
-                case "signed":
-                    mSigned = Boolean.parseBoolean(mBuilder.toString());
-                    break;
-                case "coefficient":
-                    mCoefficient = Double.parseDouble(mBuilder.toString());
-                    break;
+//                case "type":
+//                    mValueType = Integer.parseInt(getBuilder().toString());
+//                    break;
+//                case "signed":
+//                    mSigned = Boolean.parseBoolean(getBuilder().toString());
+//                    break;
+//                case "coefficient":
+//                    mCoefficient = Double.parseDouble(getBuilder().toString());
+//                    break;
                 case DATA_TYPE:
                     mDataType.setInterpreter(mValueInterpreter);
                     mValueInterpreter = null;
-                    //根据mValueType为DataType配备不同的ValueBuilder
-                    if (mValueType != -1) {
-                        EsbAnalyzer.Companion.setValueBuilder(mDataType.mValue, mValueType, mSigned, mCoefficient);
-                        mValueType = -1;
-                        mCoefficient = 1;
-                    }
+//                    //根据mValueType为DataType配备不同的ValueBuilder
+//                    if (mValueType != -1) {
+//                        EsbAnalyzer.setValueBuilder(mDataType.mValue, mValueType, mSigned, mCoefficient);
+//                        mValueType = -1;
+//                        mCoefficient = 1;
+//                    }
                     mDataTypeMap.put(mDataType.mValue, mDataType);
                     break;
                 case "SensorName":
-                    mType.mSensorGeneralName = mBuilder.toString();
+                    mType.mSensorGeneralName = getBuilder().toString();
                     break;
                 case "start":
-                    mType.mStartAddress = Integer.parseInt(mBuilder.toString(), 16);
+                    mType.mStartAddress = Integer.parseInt(getBuilder().toString(), 16);
                     break;
                 case "end":
-                    mType.mEndAddress = Integer.parseInt(mBuilder.toString(), 16);
+                    mType.mEndAddress = Integer.parseInt(getBuilder().toString(), 16);
                     break;
                 case "DataTypeValue":
-                    mDataTypeValue = (byte)Integer.parseInt(mBuilder.toString(), 16);
+                    setDataTypeValue((byte)Integer.parseInt(getBuilder().toString(), 16));
                     break;
                 case DATA_TYPE_CUSTOM_NAME:
-                    mDataTypeCustomName = mBuilder.toString();
+                    mDataTypeCustomName = getBuilder().toString();
                     break;
                 case "hidden":
-                    mHiddenMeasurement = Boolean.parseBoolean(mBuilder.toString());
+                    mHiddenMeasurement = Boolean.parseBoolean(getBuilder().toString());
                     break;
                 case "pattern":
-                    mVirtualMeasurementPattern = mBuilder.toString();
+                    mVirtualMeasurementPattern = getBuilder().toString();
                     break;
                 case "measurement":
-                    if (mDataTypeValue != 0) {
+                    if (getDataTypeValue() != 0) {
                         //生成PracticalMeasurementParameter
                         //获取数据类型
-                        PracticalMeasurement.DataType dataType = mDataTypeMap.get(mDataTypeValue);
+                        PracticalMeasurement.DataType dataType = mDataTypeMap.get(getDataTypeValue());
                         if (dataType == null) {
-                            dataType = new PracticalMeasurement.DataType(mDataTypeValue);
-                            mDataTypeMap.put(mDataTypeValue, dataType);
+                            dataType = new PracticalMeasurement.DataType(getDataTypeValue());
+                            mDataTypeMap.put(getDataTypeValue(), dataType);
                         }
-                        mDataTypeValue = 0;
+                        setDataTypeValue((byte) 0);
                         //生成测量参数
                         mPracticalMeasurementParameter = new PhysicalSensor.Type.PracticalMeasurementParameter(dataType,
                                 mDataTypeCustomName != null
@@ -867,19 +869,19 @@ public class SensorManager {
                     mType = null;
                     break;
                 case "on":
-                    mOn = mBuilder.toString();
+                    mOn = getBuilder().toString();
                     break;
                 case "off":
-                    mOff = mBuilder.toString();
+                    mOff = getBuilder().toString();
                     break;
                 case "status":
                     mValueInterpreter = new StatusInterpreter(mOn, mOff);
                     break;
                 case "number":
-                    mNumber = Double.parseDouble(mBuilder.toString());
+                    mNumber = Double.parseDouble(getBuilder().toString());
                     break;
                 case "text":
-                    mText = mBuilder.toString();
+                    mText = getBuilder().toString();
                     break;
                 case "paraphrase":
                     mParaphrases.put(mNumber, mText);
@@ -888,10 +890,10 @@ public class SensorManager {
                     mValueInterpreter = new ParaphraseInterpreter(mParaphrases);
                     break;
                 case "calendar":
-                    mValueInterpreter = CalendarInterpreter.from(mBuilder.toString());
+                    mValueInterpreter = CalendarInterpreter.from(getBuilder().toString());
                     break;
                 case "interpreter":
-                    switch (mBuilder.toString()) {
+                    switch (getBuilder().toString()) {
                         case "ground":mValueInterpreter = GroundLeadInterpreter.getInstance();
                             break;
                     }
@@ -905,22 +907,22 @@ public class SensorManager {
                     });
                     break;
                 case "label":
-                    mLabel = mBuilder.toString();
+                    mLabel = getBuilder().toString();
                     break;
                 case "function":
-                    mScriptValueCorrectorBuilder.putScript(mLabel, mBuilder.toString());
+                    mScriptValueCorrectorBuilder.putScript(mLabel, getBuilder().toString());
                     break;
                 case "ScriptValueCorrectorLabel":
-                    mDataType.mCorrector = mScriptValueCorrectorBuilder.getCorrector(mBuilder.toString());
+                    mDataType.mCorrector = mScriptValueCorrectorBuilder.getCorrector(getBuilder().toString());
                     break;
                 case "pos":
-                    mErrorPos = Integer.parseInt(mBuilder.toString());
+                    mErrorPos = Integer.parseInt(getBuilder().toString());
                     break;
                 case "state":
                     if (mErrorStateInterpreter == null) {
                         mErrorStateInterpreter = new ErrorStateInterpreter();
                     }
-                    mErrorStateInterpreter.setState(mErrorPos, mBuilder.toString());
+                    mErrorStateInterpreter.setState(mErrorPos, getBuilder().toString());
                     break;
                 case "ErrorState":
                     mValueInterpreter = mErrorStateInterpreter;
@@ -937,24 +939,6 @@ public class SensorManager {
             return Collections.binarySearch(practicalMeasurementParameters,
                     parameterGetter,
                     MEASURE_PARAMETER_COMPARATOR);
-//            int index, size = practicalMeasurementParameters.size();
-//            final int threshold = 3;
-//            if (size > threshold) {
-//                index = Collections.binarySearch(practicalMeasurementParameters,
-//                        parameterGetter,
-//                        MEASURE_PARAMETER_COMPARATOR);
-//            } else {
-//                byte dataTypeValue = parameterGetter.mInvolvedDataType.mValue;
-//                for (index = 0;index < size;++index) {
-//                    if (practicalMeasurementParameters.get(index).mInvolvedDataType.mValue == dataTypeValue) {
-//                        break;
-//                    }
-//                }
-//                if (index == size) {
-//                    index = -(index + 1);
-//                }
-//            }
-//            return index;
         }
 
         private static final Comparator<PhysicalSensor.Type.PracticalMeasurementParameter> MEASURE_PARAMETER_COMPARATOR = new Comparator<PhysicalSensor.Type.PracticalMeasurementParameter>() {

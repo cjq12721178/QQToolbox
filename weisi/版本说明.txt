@@ -546,3 +546,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20181207-7.0.0(138):
 1. 将本模块中部分基础功能（主要是protocol包全部、communicator包部分和util包部分）移至wsb.jar模块
+
+20181213-7.0.1(139):
+1. 修改ConfigurationImporter类，抽取其基础功能（主要是UDP协议数值解析部分）移至wsb模块

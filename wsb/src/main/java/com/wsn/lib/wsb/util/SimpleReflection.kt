@@ -11,6 +11,7 @@ import java.lang.reflect.Type
 
 object SimpleReflection {
 
+    @JvmStatic
     fun getInterfaceParameterizedType(interfaceInstance: Any, interfaceClass: Class<*>, interfaceTypeParameterPosition: Int): Type {
         var c: Class<*> = interfaceInstance.javaClass
         do {
@@ -34,6 +35,7 @@ object SimpleReflection {
         throw IllegalArgumentException("no proper parameter")
     }
 
+    @JvmStatic
     fun getClassParameterizedType(classInstance: Any, classTypeParameterPosition: Int): Type {
         var c: Class<*> = classInstance.javaClass
         do {

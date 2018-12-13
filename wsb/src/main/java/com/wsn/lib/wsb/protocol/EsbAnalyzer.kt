@@ -98,6 +98,7 @@ open class EsbAnalyzer : Analyzable {
             }
         }
 
+        @JvmStatic
         fun setValueBuilder(dataTypeValue: Byte, valueType: Int, signed: Boolean, coefficient: Double) {
             VALUE_BUILDERS[NumericConverter.int8ToUInt16(dataTypeValue)] = ValueBuilder(valueType, signed, coefficient)
         }
