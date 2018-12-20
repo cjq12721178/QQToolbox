@@ -267,6 +267,14 @@
 			</float>
 		</DataType>
 		<DataType>
+			<value>48</value>
+			<name>差压</name>
+			<float>
+				<decimal>3</decimal>
+				<unit>Pa</unit>
+			</float>
+		</DataType>
+		<DataType>
 			<value>4A</value>
 			<name>光照度</name>
 			<float>
@@ -878,9 +886,19 @@
 			</measurements>
 		</SensorType>
 		<SensorType>
+			<SensorName>智能呼吸器</SensorName>
+			<start>B40000</start>
+			<end>B4FFFF</end>
+			<measurements>
+				<measurement>
+					<DataTypeValue>49</DataTypeValue>
+				</measurement>
+			</measurements>
+		</SensorType>
+		<SensorType>
 			<SensorName>智能用电测控终端</SensorName>
 			<start>C00000</start>
-			<end>C3FFFF</end>
+			<end>C0FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>20</DataTypeValue>
@@ -1132,21 +1150,47 @@
 			</measurements>
 		</SensorType>
 		<SensorType>
-			<SensorName>智能避雷器</SensorName>
-			<start>CA0000</start>
-			<end>CDFFFF</end>
+			<SensorName>智能垫片</SensorName>
+			<start>D00000</start>
+			<end>D1FFFF</end>
 			<measurements>
 				<measurement>
 					<DataTypeValue>05</DataTypeValue>
 				</measurement>
 				<measurement>
-					<DataTypeValue>11</DataTypeValue>
+					<DataTypeValue>60</DataTypeValue>
+				</measurement>
+			</measurements>
+		</SensorType>
+		<SensorType>
+			<SensorName>智能螺栓</SensorName>
+			<start>D20000</start>
+			<end>D3FFFF</end>
+			<measurements>
+				<measurement>
+					<DataTypeValue>05</DataTypeValue>
 				</measurement>
 				<measurement>
-					<DataTypeValue>1A</DataTypeValue>
+					<DataTypeValue>60</DataTypeValue>
 				</measurement>
 				<measurement>
-					<DataTypeValue>FC</DataTypeValue>
+					<DataTypeValue>65</DataTypeValue>
+				</measurement>
+			</measurements>
+		</SensorType>
+		<SensorType>
+			<SensorName>螺母位置传感器</SensorName>
+			<start>D40000</start>
+			<end>D4FFFF</end>
+			<measurements>
+				<measurement>
+					<DataTypeValue>05</DataTypeValue>
+				</measurement>
+				<measurement>
+					<DataTypeValue>65</DataTypeValue>
+				</measurement>
+				<measurement>
+					<DataTypeValue>6D</DataTypeValue>
 				</measurement>
 			</measurements>
 		</SensorType>

@@ -1,4 +1,5 @@
 apply plugin: 'java-library'
+//apply plugin: 'application'
 apply plugin: 'kotlin'
 apply plugin: 'com.github.johnrengelman.shadow'
 apply plugin: 'java'
@@ -12,8 +13,8 @@ sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 buildscript {
     ext.kotlin_version = '1.2.71'
-    ext.versionName = '0.1.0'
-    ext.versionCode = 1
+    ext.versionName = '0.1.1'
+    ext.versionCode = 2
     repositories {
         mavenCentral()
         jcenter()
@@ -42,56 +43,23 @@ shadowJar {
     baseName = "com.wsn.lib.wsc"
     classifier = null
     version = "${versionName}"
-    dependencies {
-        include(dependency {
-            it.moduleGroup == "com.weisi.lib.wsb"
-        })
+
+//    只导入wsb包
+//    dependencies {
+//        include(dependency {
+//            it.moduleGroup == "com.weisi.lib.wsb"
+//        })
+//    }
+    manifest {
+        attributes "Main-Class": "${baseName}.Executor"
     }
-    def copyDest = "${rootDir}/JavaApplication/libs"
-    doLast {
-        delete fileTree(dir: copyDest, include: ["${baseName}*"])
-        copy {
-            from "${projectDir}"
-            into copyDest
-            include "${archiveName}"
-        }
-    }
-}
-
-//task buildJar(type: Jar, dependsOn: ['compileReleaseJavaWithJavac']) {
-//    //导出的jar文件的名称
-//    archiveName = "test-debug.jar"
-//    //需打包的资源所在的路径集
-//    //from('build/intermediates/classes/release')
-//    from fileTree(dir: 'src/main')
-//    from (project.zipTree('libs')) //第三方jar包
-//    destinationDir = file("${projectDir}")  // //导出的jar文件的存放目录（未指定则默认存放在build/libs下）  destinationDir = file('D:/libs')
-//    exclude('**/R.class')
-//    exclude('**/R\$*.class') //过虑资源文件
-//    exclude "com/r/c/v/BuildConfig.class"
-//    exclude "com/r/c/v/BuildConfig\$*.class" //过滤BuildConfig
-//    //include "**/*.*"    //需要打包的类 如 // include('com/reginer/mytest/*.class')
-//    //include('com/r/c/v/*.class')
-//    //include "assets/**"   //引入assets目录下的资源
-//    //include "com/android/aop/**"  //第三方jar包的包路径
-//}
-
-//task copyJar(type: Copy) {
-//    from "${buildDir}/libs/"
-//    into "${projectDir}"
-//    exclude "debug*"
-//    include "wsc.jar"
-//    rename "wsc.jar", "com.wsn.lib.wsc-${versionName}.jar"
-//    println "wsc.jar build successfully"
-//}
-
-//afterEvaluate {
-//    tasks.matching {
-//        it.project.name == "wsc" && it.name == "assemble"
-//    }.each { task ->
-//        //task.dependsOn(copyJar)
-//        task.doLast {
-//            tasks.copyJar.execute()
+//    def copyDest = "${rootDir}/JavaApplication/libs"
+//    doLast {
+//        delete fileTree(dir: copyDest, include: ["${baseName}*"])
+//        copy {
+//            from "${projectDir}"
+//            into copyDest
+//            include "${archiveName}"
 //        }
 //    }
-//}
+}
