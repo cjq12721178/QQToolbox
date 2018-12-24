@@ -891,6 +891,15 @@
 			<end>B4FFFF</end>
 			<measurements>
 				<measurement>
+					<DataTypeValue>05</DataTypeValue>
+				</measurement>
+				<measurement>
+					<DataTypeValue>40</DataTypeValue>
+				</measurement>
+				<measurement>
+					<DataTypeValue>48</DataTypeValue>
+				</measurement>
+				<measurement>
 					<DataTypeValue>49</DataTypeValue>
 				</measurement>
 			</measurements>
