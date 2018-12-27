@@ -8,9 +8,11 @@
 <!-- 日历时间型，使用calendar标签设置时间显示模式 -->
 <!-- 默认类型，直接显示value -->
 <!-- 自定义数据类型名称的type，0时为在默认名称之后附加，1为替换 -->
+<!-- 使用curve标签标示进行曲线绘制时的类型，1-10为传感器基础信息（如电量为1，rssi为2）,具体见《数据曲线类型》 -->
 <Sensor>
 	<DataTypes>
 		<DataType>
+			<curve>11</curve>
 			<value>05</value>
 			<name>温度</name>
 			<float>
@@ -19,6 +21,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>11</curve>
 			<value>06</value>
 			<name>最高温度</name>
 			<float>
@@ -27,6 +30,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>11</curve>
 			<value>07</value>
 			<name>最低温度</name>
 			<float>
@@ -35,6 +39,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>11</curve>
 			<value>08</value>
 			<name>平均温度</name>
 			<float>
@@ -43,6 +48,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>13</curve>
 			<value>11</value>
 			<name>动作次数</name>
 			<float>
@@ -51,6 +57,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>12</curve>
 			<value>18</value>
 			<name>阻性电流</name>
 			<float>
@@ -59,6 +66,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>12</curve>
 			<value>1A</value>
 			<name>泄露电流</name>
 			<float>
@@ -67,6 +75,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>15</curve>
 			<value>1B</value>
 			<name>电流</name>
 			<float>
@@ -75,6 +84,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>18</curve>
 			<value>1D</value>
 			<name>电压</name>
 			<float>
@@ -83,6 +93,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>33</curve>
 			<value>20</value>
 			<name>有功功率</name>
 			<float>
@@ -91,6 +102,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>32</curve>
 			<value>21</value>
 			<name>无功功率</name>
 			<float>
@@ -99,6 +111,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>34</curve>
 			<value>22</value>
 			<name>视在功率</name>
 			<float>
@@ -107,6 +120,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>14</curve>
 			<value>23</value>
 			<name>功率因素</name>
 			<float>
@@ -115,6 +129,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>15</curve>
 			<value>24</value>
 			<name>相电流</name>
 			<float>
@@ -123,6 +138,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>18</curve>
 			<value>25</value>
 			<name>相电压</name>
 			<float>
@@ -131,6 +147,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>35</curve>
 			<value>26</value>
 			<name>相能耗</name>
 			<float>
@@ -139,6 +156,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>36</curve>
 			<value>27</value>
 			<name>相频率</name>
 			<float>
@@ -147,6 +165,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>15</curve>
 			<value>28</value>
 			<name>电流三次谐波</name>
 			<float>
@@ -155,6 +174,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>15</curve>
 			<value>29</value>
 			<name>电流五次谐波</name>
 			<float>
@@ -163,6 +183,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>15</curve>
 			<value>2A</value>
 			<name>电流七次谐波</name>
 			<float>
@@ -171,6 +192,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>15</curve>
 			<value>2B</value>
 			<name>电流九次谐波</name>
 			<float>
@@ -179,6 +201,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>18</curve>
 			<value>2C</value>
 			<name>电压三次谐波</name>
 			<float>
@@ -187,6 +210,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>18</curve>
 			<value>2D</value>
 			<name>电压五次谐波</name>
 			<float>
@@ -195,6 +219,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>18</curve>
 			<value>2E</value>
 			<name>电压七次谐波</name>
 			<float>
@@ -203,6 +228,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>18</curve>
 			<value>2F</value>
 			<name>电压九次谐波</name>
 			<float>
@@ -211,6 +237,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>22</curve>
 			<value>40</value>
 			<name>相对湿度</name>
 			<float>
@@ -219,6 +246,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>11</curve>
 			<value>41</value>
 			<name>露点温度</name>
 			<float>
@@ -227,6 +255,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>23</curve>
 			<value>42</value>
 			<name>液位高度</name>
 			<float>
@@ -235,6 +264,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>23</curve>
 			<value>45</value>
 			<name>雨量</name>
 			<float>
@@ -243,6 +273,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>38</curve>
 			<value>46</value>
 			<name>风速</name>
 			<float>
@@ -251,6 +282,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>14</curve>
 			<value>47</value>
 			<name>风向</name>
 			<float>
@@ -259,6 +291,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>37</curve>
 			<value>48</value>
 			<name>气压</name>
 			<float>
@@ -267,7 +300,8 @@
 			</float>
 		</DataType>
 		<DataType>
-			<value>48</value>
+			<curve>37</curve>
+			<value>49</value>
 			<name>差压</name>
 			<float>
 				<decimal>3</decimal>
@@ -275,6 +309,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>27</curve>
 			<value>4A</value>
 			<name>光照度</name>
 			<float>
@@ -283,6 +318,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>19</curve>
 			<value>4C</value>
 			<name>声强</name>
 			<float>
@@ -291,6 +327,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>22</curve>
 			<value>4E</value>
 			<name>容积含水率</name>
 			<float>
@@ -299,6 +336,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>48</curve>
 			<value>50</value>
 			<name>水浸状态</name>
 			<status>
@@ -307,6 +345,7 @@
 			</status>
 		</DataType>
 		<DataType>
+			<curve>49</curve>
 			<value>52</value>
 			<name>振动状态</name>
 			<status>
@@ -315,6 +354,7 @@
 			</status>
 		</DataType>
 		<DataType>
+			<curve>24</curve>
 			<value>54</value>
 			<name>开关状态</name>
 			<status>
@@ -323,6 +363,7 @@
 			</status>
 		</DataType>
 		<DataType>
+			<curve>26</curve>
 			<value>55</value>
 			<name>报警状态</name>
 			<status>
@@ -331,6 +372,7 @@
 			</status>
 		</DataType>
 		<DataType>
+			<curve>25</curve>
 			<value>56</value>
 			<name>热释电红外</name>
 			<status>
@@ -339,6 +381,7 @@
 			</status>
 		</DataType>
 		<DataType>
+			<curve>45</curve>
 			<value>5A</value>
 			<name>继电器状态</name>
 			<status>
@@ -347,6 +390,7 @@
 			</status>
 		</DataType>
 		<DataType>
+			<curve>13</curve>
 			<value>5F</value>
 			<name>开关次数</name>
 			<float>
@@ -355,6 +399,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>39</curve>
 			<value>60</value>
 			<name>拉力</name>
 			<float>
@@ -363,6 +408,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>29</curve>
 			<value>62</value>
 			<name>形变</name>
 			<float>
@@ -371,6 +417,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>41</curve>
 			<value>65</value>
 			<name>重力加速度</name>
 			<float>
@@ -379,6 +426,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>50</curve>
 			<value>66</value>
 			<name>振动加速度</name>
 			<float>
@@ -387,6 +435,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>38</curve>
 			<value>67</value>
 			<name>振动速率</name>
 			<float>
@@ -395,6 +444,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>23</curve>
 			<value>68</value>
 			<name>振动位移</name>
 			<float>
@@ -403,6 +453,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>36</curve>
 			<value>69</value>
 			<name>振动频率</name>
 			<float>
@@ -411,6 +462,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>42</curve>
 			<value>6A</value>
 			<name>位移</name>
 			<float>
@@ -419,6 +471,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>23</curve>
 			<value>6B</value>
 			<name>距离</name>
 			<float>
@@ -427,6 +480,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>14</curve>
 			<value>6D</value>
 			<name>角度</name>
 			<float>
@@ -435,6 +489,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>51</curve>
 			<value>6E</value>
 			<name>朝向</name>
 			<unit/>
@@ -514,6 +569,7 @@
 			</paraphrases>
 		</DataType>
 		<DataType>
+			<curve>43</curve>
 			<value>80</value>
 			<name>氧气浓度</name>
 			<float>
@@ -522,6 +578,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>44</curve>
 			<value>81</value>
 			<name>一氧化碳浓度</name>
 			<float>
@@ -530,6 +587,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>44</curve>
 			<value>82</value>
 			<name>二氧化碳浓度</name>
 			<float>
@@ -538,6 +596,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>52</curve>
 			<value>A1</value>
 			<name>温度系数</name>
 			<float>
@@ -546,6 +605,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>42</curve>
 			<value>A8</value>
 			<name>指示范围</name>
 			<float>
@@ -554,12 +614,14 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>53</curve>
 			<value>F8</value>
 			<name>日历时间</name>
 			<unit/>
 			<calendar>yyyy-MM-dd HH:mm:ss</calendar>
 		</DataType>
 		<DataType>
+			<curve>54</curve>
 			<value>FA</value>
 			<name>MSB</name>
 			<float>
@@ -568,6 +630,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>54</curve>
 			<value>FB</value>
 			<name>LSB</name>
 			<float>
@@ -576,6 +639,7 @@
 			</float>
 		</DataType>
 		<DataType>
+			<curve>54</curve>
 			<value>FC</value>
 			<name>时间间隔</name>
 			<float>

@@ -7,8 +7,8 @@ import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
 
 public class RatchetWheelMeasurementA extends RatchetWheelMeasurement {
 
-    protected RatchetWheelMeasurementA(@NonNull ID id, String name, ValueInterpreter valueInterpreter, boolean hidden, PracticalMeasurement distanceRecorder) {
-        super(id, name, valueInterpreter, hidden, distanceRecorder);
+    protected RatchetWheelMeasurementA(@NonNull ID id, String name, int curveType, ValueInterpreter valueInterpreter, boolean hidden, PracticalMeasurement distanceRecorder) {
+        super(id, name, curveType, valueInterpreter, hidden, distanceRecorder);
     }
 
     @NonNull

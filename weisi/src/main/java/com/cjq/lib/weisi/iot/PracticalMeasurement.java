@@ -15,46 +15,20 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     private static final Configuration EMPTY_CONFIGURATION = new DisplayMeasurement.EmptyConfiguration();
     private final DataType mDataType;
 
-//    protected PracticalMeasurement(int address, int dataTypeValueIndex, @NonNull DataType dataType, String name) {
-//        this(new ID(address, dataType.mValue, dataTypeValueIndex), dataType, name);
-//    }
-//
-//    protected PracticalMeasurement(long id, @NonNull DataType dataType, String name) {
-//        this(new ID(id), dataType, name);
-//    }
-
     protected PracticalMeasurement(@NonNull ID id, @NonNull DataType dataType, String name, boolean hidden) {
         super(id, TextUtils.isEmpty(name) ? dataType.getName() : name, hidden);
         mDataType = dataType;
     }
-
-//    PracticalMeasurement(long id, @NonNull DataType dataType) {
-//        this(id, dataType, null);
-//    }
-//
-//    PracticalMeasurement(long id, @NonNull DataType dataType, String name) {
-//        this(new ID(id), dataType, name);
-//    }
-
-//    PracticalMeasurement(@NonNull ID id, @NonNull DataType dataType) {
-//        this(id, dataType, null);
-//    }
-//
-//    PracticalMeasurement(@NonNull ID id, @NonNull DataType dataType, String name) {
-//        super(id);
-//        mDataType = dataType;
-//        mDefaultName = name != null ? name : dataType.getDefaultName();
-//    }
 
     @Override
     public String formatValue(double rawValue) {
         return mDataType.formatValue(rawValue);
     }
 
-//    @Override
-//    public String formatValueWithUnit(double rawValue) {
-//        return mDataType.formatValueWithUnit(rawValue);
-//    }
+    @Override
+    public int getCurveType() {
+        return 0;
+    }
 
     @NonNull
     @Override
@@ -105,12 +79,22 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     public static class DataType {
 
         final byte mValue;
+        private final int mCurveType;
         private String mName;
         ValueCorrector mCorrector;
         private ValueInterpreter mInterpreter = DefaultInterpreter.getInstance();
 
         public DataType(byte value) {
+            this(value, 0);
+        }
+
+        public DataType(byte value, int curveType) {
             mValue = value;
+            if (curveType <= CURVE_TYPE_INVALID) {
+                mCurveType = getUnknownCurveType();
+            } else {
+                mCurveType = curveType;
+            }
         }
 
         public byte getValue() {

@@ -555,3 +555,10 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20181224-7.0.3(141):
 1. 新增智能呼吸器配置
+
+20181225-7.0.5(142):
+1. 提升PhysicalSensor.getMeasurementPosition方法为public
+
+20181227-7.1.0(143):
+1. 修改传感器配置文件，为measurement、DataType新增curve标签用于表示数据曲线类型
+2. 修改相应源码以支持curveType属性

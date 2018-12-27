@@ -13,25 +13,18 @@ import com.cjq.lib.weisi.iot.interpreter.GroundLeadInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ParaphraseInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.StatusInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
-import com.wsn.lib.wsb.config.ConfigurationImporter;
-import com.wsn.lib.wsb.protocol.EsbAnalyzer;
 import com.wsn.lib.wsb.util.ExpandCollections;
 import com.wsn.lib.wsb.util.ExpandComparator;
 
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
-import org.xml.sax.helpers.DefaultHandler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.xml.parsers.SAXParser;
-import javax.xml.parsers.SAXParserFactory;
 
 /**
  * Created by CJQ on 2017/8/31.
@@ -274,6 +267,7 @@ public class SensorManager {
                 return host != null
                         ? new RatchetWheelMeasurementA(id,
                         parameter.mMeasurementName,
+                        parameter.mCurveType,
                         parameter.mValueInterpreter,
                         parameter.mHideMeasurement,
                         host)
@@ -284,6 +278,7 @@ public class SensorManager {
                 return host != null
                         ? new RatchetWheelMeasurementB(id,
                         parameter.mMeasurementName,
+                        parameter.mCurveType,
                         parameter.mValueInterpreter,
                         parameter.mHideMeasurement,
                         host)
@@ -687,14 +682,12 @@ public class SensorManager {
 
     private static class ConfigurationImporter extends com.wsn.lib.wsb.config.ConfigurationImporter {
 
-        //private static final String DATA_TYPE = "DataType";
         private static final String PARAPHRASES = "paraphrases";
         private static final String SENSOR_TYPE = "SensorType";
         private static final String DATA_TYPE_CUSTOM_NAME = "DataTypeCustomName";
 
         private Map<Byte, PracticalMeasurement.DataType> mDataTypeMap;
         private PracticalMeasurement.DataType mDataType;
-        //private StringBuilder getBuilder();
         private Map<Double, String> mParaphrases;
         private Double mNumber;
         private String mText;
@@ -705,12 +698,8 @@ public class SensorManager {
         private List<PhysicalSensor.Type.PracticalMeasurementParameter> mPracticalMeasurementParameters;
         private PhysicalSensor.Type.PracticalMeasurementParameter mPracticalMeasurementParameter;
         private int mIndex;
-        //private byte mDataTypeValue;
         private String mDataTypeCustomName;
         private int mCustomDataTypeNameType;
-        //private int mValueType = -1;
-        //private boolean mSigned;
-        //private double mCoefficient;
         private ScriptValueCorrector.Builder mScriptValueCorrectorBuilder;
         private String mLabel;
         private ErrorStateInterpreter mErrorStateInterpreter;
@@ -721,6 +710,7 @@ public class SensorManager {
         private boolean mHiddenMeasurement;
         private String mVirtualMeasurementName;
         private String mVirtualMeasurementPattern;
+        private int mCurveType;
 
         public Map<Byte, PracticalMeasurement.DataType> getDataTypeMap() {
             return mDataTypeMap;
@@ -732,7 +722,6 @@ public class SensorManager {
 
         @Override
         public void startDocument() {
-            //getBuilder() = new StringBuilder();
             mDataTypeMap = new HashMap<>();
             mTypes = new ArrayList<>();
             mPracticalMeasurementParameters = new ArrayList<>();
@@ -749,20 +738,17 @@ public class SensorManager {
             } else if (qName.equals(DATA_TYPE_CUSTOM_NAME)) {
                 mCustomDataTypeNameType = Integer.parseInt(attributes.getValue("type"));
             }
-            //getBuilder().setLength(0);
         }
-
-//        @Override
-//        public void characters(char[] ch, int start, int length) throws SAXException {
-//            getBuilder().append(ch, start, length);
-//        }
 
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             super.endElement(uri, localName, qName);
             switch (qName) {
+                case "curve":
+                    mCurveType = Integer.parseInt(getBuilder().toString());
+                    break;
                 case "value":
-                    mDataType = new PracticalMeasurement.DataType(getDataTypeValue());
+                    mDataType = new PracticalMeasurement.DataType(getDataTypeValue(), mCurveType);
                     break;
                 case "name":
                     if (mType != null) {
@@ -852,7 +838,7 @@ public class SensorManager {
                         }
                     } else {
                         //生成VirtualMeasurementParameter
-                        PhysicalSensor.Type.VirtualMeasurementParameter parameter = new PhysicalSensor.Type.VirtualMeasurementParameter(mVirtualMeasurementName, mVirtualMeasurementPattern, mValueInterpreter, mHiddenMeasurement);
+                        PhysicalSensor.Type.VirtualMeasurementParameter parameter = new PhysicalSensor.Type.VirtualMeasurementParameter(mVirtualMeasurementName, mVirtualMeasurementPattern, mValueInterpreter, mCurveType, mHiddenMeasurement);
                         if (mType.mVirtualMeasurementParameters == null) {
                             mType.mVirtualMeasurementParameters = new ArrayList<>();
                         }

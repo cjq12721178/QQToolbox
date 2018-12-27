@@ -13,10 +13,11 @@ public abstract class RatchetWheelMeasurement extends VirtualMeasurement<Ratchet
 
     protected RatchetWheelMeasurement(@NonNull ID id,
                                       String name,
+                                      int curveType,
                                       ValueInterpreter valueInterpreter,
                                       boolean hidden,
                                       @NonNull PracticalMeasurement distanceRecorder) {
-        super(id, name, valueInterpreter != null ? valueInterpreter : distanceRecorder.getDataType().getInterpreter(), hidden, false);
+        super(id, name, curveType, valueInterpreter != null ? valueInterpreter : distanceRecorder.getDataType().getInterpreter(), hidden, false);
         mDistanceRecorder = distanceRecorder;
         init();
     }

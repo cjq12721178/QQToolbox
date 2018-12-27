@@ -7,12 +7,10 @@ import android.text.TextUtils;
 
 import com.cjq.lib.weisi.iot.container.DynamicValueContainer;
 import com.cjq.lib.weisi.iot.container.HistoryValueContainer;
-import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
-import java.util.List;
 
 /**
  * Created by CJQ on 2017/11/3.
@@ -120,6 +118,11 @@ public abstract class Sensor {
             if (!id.isSensorInfo()) {
                 throw new IllegalArgumentException("main measurement data type and index may both be 0");
             }
+        }
+
+        @Override
+        public int getCurveType() {
+            return CURVE_TYPE_SENSOR_INFO;
         }
 
         @NonNull

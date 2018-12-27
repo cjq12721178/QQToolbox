@@ -8,11 +8,20 @@ import com.cjq.lib.weisi.iot.container.ValueContainer;
 
 public abstract class Measurement<V extends Value, C extends Configuration<V>> implements Comparable<Measurement<V, C>> {
 
+    protected static final int CURVE_TYPE_INVALID = 0;
+    protected static final int CURVE_TYPE_SENSOR_INFO = 1;
+
+    private static int unknownCurveType = -1;
+
     private final ID mId;
     private final String mDefaultName;
     private C mConfiguration;
     private ValueContainer<V> mDynamicValueContainer;
     private ValueContainer<V> mHistoryValueContainer;
+
+    protected static int getUnknownCurveType() {
+        return unknownCurveType--;
+    }
 
     protected Measurement(@NonNull ID id, String name) {
         this(id, name, true);
@@ -35,6 +44,8 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
     public ID getId() {
         return mId;
     }
+
+    public abstract int getCurveType();
 
     protected abstract @NonNull ValueContainer<V> onCreateDynamicValueContainer();
 

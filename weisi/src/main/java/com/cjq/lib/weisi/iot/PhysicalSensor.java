@@ -198,7 +198,7 @@ public class PhysicalSensor extends Sensor {
                 : null;
     }
 
-    private int getMeasurementPosition(byte dataTypeValue, int dataTypeValueIndex) {
+    public int getMeasurementPosition(byte dataTypeValue, int dataTypeValueIndex) {
         synchronized (mMeasurements) {
             int position, size = mMeasurements.size();
             if (size > MEASUREMENT_SEARCH_THRESHOLD) {
@@ -343,15 +343,18 @@ public class PhysicalSensor extends Sensor {
             final String mMeasurementName;
             final String mMeasurementType;
             final ValueInterpreter mValueInterpreter;
+            final int mCurveType;
 
             public VirtualMeasurementParameter(String measurementName,
                                                String measurementType,
                                                ValueInterpreter valueInterpreter,
+                                               int curveType,
                                                boolean hideMeasurement) {
                 super(hideMeasurement);
                 mMeasurementName = measurementName;
                 mMeasurementType = measurementType;
                 mValueInterpreter = valueInterpreter;
+                mCurveType = curveType;
             }
         }
 
