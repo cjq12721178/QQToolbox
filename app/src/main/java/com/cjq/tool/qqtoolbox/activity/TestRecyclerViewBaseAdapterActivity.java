@@ -242,9 +242,9 @@ public class TestRecyclerViewBaseAdapterActivity
 //        }
 //
 //        @Override
-//        public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent) {
+//        public RecyclerView.TestViewHolder onCreateViewHolder(ViewGroup parent) {
 //            CodeRunTimeCatcher.start();
-//            ViewHolder holder = new ViewHolder(LayoutInflater
+//            TestViewHolder holder = new TestViewHolder(LayoutInflater
 //                    .from(parent.getContext())
 //                    .inflate(R.layout.list_item_test_recycler_view_base_adapter,
 //                            parent,
@@ -258,9 +258,9 @@ public class TestRecyclerViewBaseAdapterActivity
 //        }
 //
 //        @Override
-//        public void onBindViewHolder(RecyclerView.ViewHolder viewHolder, City item, int position) {
+//        public void onBindViewHolder(RecyclerView.TestViewHolder viewHolder, City item, int position) {
 //            CodeRunTimeCatcher.start();
-//            ViewHolder holder = (ViewHolder) viewHolder;
+//            TestViewHolder holder = (TestViewHolder) viewHolder;
 //            holder.mTvCity.setText(item.getName());
 //            ClosableLog.d(DebugTag.TEST_GENERAL_RECYCLER_VIEW,
 //                    "on bind view, position = "
@@ -272,7 +272,7 @@ public class TestRecyclerViewBaseAdapterActivity
 //        }
 //
 //        @Override
-//        public void onBindViewHolder(RecyclerView.ViewHolder holder, City item, int position, List payloads) {
+//        public void onBindViewHolder(RecyclerView.TestViewHolder holder, City item, int position, List payloads) {
 //            ClosableLog.d(DebugTag.TEST_GENERAL_RECYCLER_VIEW,
 //                    "on bind view payloads, position = "
 //                            + position
@@ -280,11 +280,11 @@ public class TestRecyclerViewBaseAdapterActivity
 //                            + createTimes);
 //        }
 //
-//        public static class ViewHolder extends RecyclerView.ViewHolder {
+//        public static class TestViewHolder extends RecyclerView.TestViewHolder {
 //
 //            private final TextView mTvCity;
 //
-//            public ViewHolder(View itemView) {
+//            public TestViewHolder(View itemView) {
 //                super(itemView);
 //                mTvCity = (TextView) itemView.findViewById(R.id.tv_city);
 //            }

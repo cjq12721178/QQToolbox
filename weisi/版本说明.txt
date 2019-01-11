@@ -562,3 +562,15 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 20181227-7.1.0(143):
 1. 修改传感器配置文件，为measurement、DataType新增curve标签用于表示数据曲线类型
 2. 修改相应源码以支持curveType属性
+
+20190102-7.1.2(145):
+1. 修改传感器数据添加方法
+2. 增加和修改传感器数据添加监听方法
+3. Measurement新增字段mUniteValueContainer，及setUniteValueContainer、getUniteValueContainer和clearUniteValueContainer等相应方法
+
+20190107-7.1.3(146):
+1. 修复DisplayMeasurement.testRealTimeValue当实时数据为空时抛出NPE的问题
+2. 修复PracticalMeasurement.getCurveType始终返回0的问题
+
+20190111-7.1.4(147):
+1. 为Measurement重写toString方法

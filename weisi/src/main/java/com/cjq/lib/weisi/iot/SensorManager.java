@@ -56,6 +56,79 @@ public class SensorManager {
     private SensorManager() {
     }
 
+    public static void addDynamicSensorValue(int address,
+                                             byte dataTypeValue,
+                                             int dataTypeValueIndex,
+                                             long timestamp,
+                                             float batteryVoltage,
+                                             double rawValue) {
+        addDynamicSensorValue(address, dataTypeValue, dataTypeValueIndex, timestamp, batteryVoltage, rawValue, null);
+    }
+
+    public static void addDynamicSensorValue(int address,
+                                             byte dataTypeValue,
+                                             int dataTypeValueIndex,
+                                             long timestamp,
+                                             float batteryVoltage,
+                                             double rawValue,
+                                             Sensor.OnValueAchievedListener listener) {
+        Sensor sensor = getSensor(address, dataTypeValue, dataTypeValueIndex);
+        if (sensor != null) {
+            sensor.addDynamicValue(dataTypeValue, dataTypeValueIndex, timestamp, batteryVoltage, rawValue, listener);
+        }
+    }
+
+    public static void addHistorySensorValue(int address,
+                                             byte dataTypeValue,
+                                             int dataTypeValueIndex,
+                                             long timestamp,
+                                             float batteryVoltage,
+                                             double rawValue) {
+        addHistorySensorValue(address, dataTypeValue, dataTypeValueIndex, timestamp, batteryVoltage, rawValue, null);
+    }
+
+    public static void addHistorySensorValue(int address,
+                                             byte dataTypeValue,
+                                             int dataTypeValueIndex,
+                                             long timestamp,
+                                             float batteryVoltage,
+                                             double rawValue,
+                                             Sensor.OnValueAchievedListener listener) {
+        Sensor sensor = getSensor(address, dataTypeValue, dataTypeValueIndex);
+        if (sensor != null) {
+            sensor.addHistoryValue(dataTypeValue, dataTypeValueIndex, timestamp, batteryVoltage, rawValue, listener);
+        }
+    }
+
+    public static void addHistorySensorInfoValue(int address,
+                                                 long timestamp,
+                                                 float batteryVoltage) {
+        addHistorySensorInfoValue(address, timestamp, batteryVoltage, null);
+    }
+
+    public static void addHistorySensorInfoValue(int address,
+                                                 long timestamp,
+                                                 float batteryVoltage,
+                                                 Sensor.OnValueAchievedListener listener) {
+        getPhysicalSensor(address).addHistoryInfoValue(timestamp, batteryVoltage, listener);
+    }
+
+    public static void addHistoryMeasurementValue(long measurementId,
+                                                  long timestamp,
+                                                  double rawValue) {
+        addHistoryMeasurementValue(measurementId, timestamp, rawValue, null);
+    }
+
+    public static void addHistoryMeasurementValue(long measurementId,
+                                                  long timestamp,
+                                                  double rawValue,
+                                                  Sensor.OnValueAchievedListener listener) {
+        LogicalSensor sensor = getLogicalSensor(measurementId);
+        if (sensor != null) {
+            sensor.addHistoryMeasurementValue(sensor.getPracticalMeasurement(), timestamp, rawValue, listener);
+        }
+    }
+
     //
     //  获取Sensor.Info的相关方法
     //

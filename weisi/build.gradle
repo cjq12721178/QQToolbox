@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 143
-        versionName "7.1.0"
+        versionCode 147
+        versionName "7.1.4"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -48,17 +48,37 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    implementation 'com.android.support:appcompat-v7:27.0.2'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'io.apisense:rhino-android:1.0'
     testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:support-annotations:27.0.2'
+    implementation 'com.android.support:support-annotations:28.0.0'
 }
 
-task copyAar(type: Copy) {
-    from "${buildDir}/outputs/aar/"
-    into "${projectDir}"
-    exclude 'debug*'
-    include "*${android.defaultConfig.versionName}.aar"
+//task copyAar(type: Copy) {
+//    from "${buildDir}/outputs/aar/"
+//    into "${projectDir}"
+//    exclude 'debug*'
+//    include "*${android.defaultConfig.versionName}.aar"
+//    println "weisi back-up completed"
+//}
+
+task copyAar << {
+    ["${projectDir}", "${rootDir}/app/libs"].each { dest ->
+        if (!dest.contains("weisi")) {
+            new File(dest).listFiles().each { file ->
+                if (file.name.startsWith("com.cjq.lib.weisi") && file.name.endsWith(".aar")) {
+                    file.delete()
+                }
+            }
+        }
+        copy {
+            from "${buildDir}/outputs/aar/"
+            into dest
+            exclude "debug*"
+            include "*${android.defaultConfig.versionName}.aar"
+            //rename "wsb.jar", "com.wsn.lib.wsb-${versionName}.jar"
+        }
+    }
     println "weisi back-up completed"
 }
 

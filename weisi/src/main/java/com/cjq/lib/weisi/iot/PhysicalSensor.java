@@ -3,7 +3,6 @@ package com.cjq.lib.weisi.iot;
 
 import android.support.annotation.NonNull;
 
-import com.cjq.lib.weisi.iot.container.ValueContainer;
 import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
 import com.wsn.lib.wsb.util.ExpandCollections;
 import com.wsn.lib.wsb.util.ExpandComparator;
@@ -244,40 +243,65 @@ public class PhysicalSensor extends Sensor {
         return measurement;
     }
 
-    public int addDynamicValue(byte dataTypeValue,
-                               int dataTypeValueIndex,
-                               long timestamp,
-                               float batteryVoltage,
-                               double rawValue) {
-        //获取相应测量量
-        PracticalMeasurement measurement = getPracticalMeasurementWithAutoCreate(dataTypeValue, dataTypeValueIndex);
-        if (measurement == null) {
-            return ValueContainer.ADD_FAILED_RETURN_VALUE;
-        }
+    @Override
+    void addDynamicValue(byte dataTypeValue,
+                         int dataTypeValueIndex,
+                         long timestamp,
+                         float batteryVoltage,
+                         double rawValue,
+                         OnValueAchievedListener listener) {
         //修正时间戳
         long correctedTimestamp = correctTimestamp(timestamp);
         //将传感器实时数据添加至实时数据缓存
-        int result = mInfo.addDynamicValue(correctedTimestamp, batteryVoltage);
+        //int result = mInfo.addDynamicValue(correctedTimestamp, batteryVoltage);
+//        int result = mInfo.getDynamicValueContainer().addValue(correctedTimestamp);
+//        if (mInfo.setValueContent(mInfo.getDynamicValueContainer(), result, batteryVoltage)) {
+//            notifyDynamicSensorInfoAchieved(result);
+//        }
+        addDynamicInfoValue(correctedTimestamp, batteryVoltage, listener);
+        //获取相应测量量
+        PracticalMeasurement measurement = getPracticalMeasurementWithAutoCreate(dataTypeValue, dataTypeValueIndex);
+        if (measurement == null) {
+            //return ValueContainer.ADD_FAILED_RETURN_VALUE;
+            return;
+        }
         //修正原始数据
         double correctedValue = measurement.correctRawValue(rawValue);
         //为测量量添加动态数据（包括实时数据及其缓存）
-        measurement.addDynamicValue(correctedTimestamp, correctedValue);
-        notifyDynamicValueCaptured(dataTypeValue, dataTypeValueIndex, batteryVoltage, correctedTimestamp, correctedValue);
-        return result;
+        //measurement.addDynamicValue(correctedTimestamp, correctedValue);
+//        int measurementResult = measurement.getDynamicValueContainer().addValue(correctedTimestamp);
+//        if (measurement.setValueContent(measurement.getDynamicValueContainer(), measurementResult, correctedValue)) {
+//            notifyDynamicMeasurementValueAchieved(measurement, measurementResult);
+//        }
+        addDynamicMeasurementValue(measurement, correctedTimestamp, correctedValue, listener);
+        notifyDynamicRawValueAchieved(dataTypeValue, dataTypeValueIndex, batteryVoltage, correctedTimestamp, correctedValue);
+        //return result;
     }
 
-    public int addHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, float batteryVoltage, double rawValue) {
-        return addInfoHistoryValue(timestamp, batteryVoltage);
-    }
-
-    public int addMeasurementHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, double rawValue) {
+    @Override
+    void addHistoryValue(byte dataTypeValue,
+                         int dataTypeValueIndex,
+                         long timestamp,
+                         float batteryVoltage,
+                         double rawValue,
+                         OnValueAchievedListener listener) {
+        addHistoryInfoValue(timestamp, batteryVoltage, listener);
         PracticalMeasurement measurement = getPracticalMeasurementWithAutoCreate(dataTypeValue, dataTypeValueIndex);
-        if (measurement != null) {
-            return measurement.addHistoryValue(timestamp, rawValue);
-        } else {
-            return ValueContainer.ADD_FAILED_RETURN_VALUE;
+        if (measurement == null) {
+            return;
         }
+        addHistoryMeasurementValue(measurement, timestamp, rawValue, listener);
     }
+
+//    public int addMeasurementHistoryValue(byte dataTypeValue, int dataTypeValueIndex, long timestamp, double rawValue) {
+//        PracticalMeasurement measurement = getPracticalMeasurementWithAutoCreate(dataTypeValue, dataTypeValueIndex);
+//        if (measurement != null) {
+//            int result =
+//            return measurement.addHistoryValue(timestamp, rawValue);
+//        } else {
+//            return ValueContainer.ADD_FAILED_RETURN_VALUE;
+//        }
+//    }
 
     @Override
     public Sensor.Info getMainMeasurement() {

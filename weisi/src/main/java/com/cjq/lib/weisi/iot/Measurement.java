@@ -3,6 +3,7 @@ package com.cjq.lib.weisi.iot;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
+import com.cjq.lib.weisi.iot.container.SubValueContainer;
 import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
 
@@ -18,6 +19,7 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
     private C mConfiguration;
     private ValueContainer<V> mDynamicValueContainer;
     private ValueContainer<V> mHistoryValueContainer;
+    private ValueContainer<V> mUniteValueContainer;
 
     protected static int getUnknownCurveType() {
         return unknownCurveType--;
@@ -154,6 +156,33 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
             C configuration = provider.getConfiguration(mId);
             return setConfiguration(configuration);
         }
+    }
+
+    public void setUniteValueContainer() {
+        setUniteValueContainer(0L, 0L);
+    }
+
+    public void setUniteValueContainer(long startTime, long endTime) {
+        clearUniteValueContainer();
+        if (startTime < 0 || startTime >= endTime) {
+            mUniteValueContainer = mDynamicValueContainer;
+        } else {
+            mUniteValueContainer = mHistoryValueContainer.applyForSubValueContainer(startTime, endTime);
+        }
+    }
+
+    public ValueContainer<V> getUniteValueContainer() {
+        return mUniteValueContainer;
+    }
+
+    public void clearUniteValueContainer() {
+        mHistoryValueContainer.detachSubValueContainer(mUniteValueContainer);
+        mUniteValueContainer = null;
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
     @Override

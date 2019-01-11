@@ -312,6 +312,24 @@
             app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
             app:layout_constraintTop_toBottomOf="@+id/btn_test_recycler_view_base_adapter"/>
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_test_scroll_linearlayout"
+            android:text="测试可滚动部分子view的LinearLayout"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@+id/btn_test_recycler_view_inconsistency"/>
+        
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_test_adaptive_table_layout"
+            android:text="测试AdaptiveTableLayout"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@+id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@+id/btn_test_scroll_linearlayout"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -319,7 +337,7 @@
             android:text="Common View"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_test_recycler_view_inconsistency"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_adaptive_table_layout"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginStart="16dp"/>
         <Button
@@ -704,6 +722,14 @@
             android:onClick="onClick"
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
             app:layout_constraintTop_toBottomOf="@id/tv_else"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_export_excel"
+            android:text="export excel"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_update_version"/>
 
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

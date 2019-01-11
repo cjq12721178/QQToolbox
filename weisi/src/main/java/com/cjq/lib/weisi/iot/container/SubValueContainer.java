@@ -169,7 +169,7 @@ public class SubValueContainer<V extends Value>
     }
 
     @Override
-    public void detachSubValueContainer(ValueContainer<V> subContainer) {
+    public void detachSubValueContainer(ValueContainer subContainer) {
         mParent.detachSubValueContainer(subContainer);
     }
 

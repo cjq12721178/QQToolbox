@@ -73,7 +73,7 @@ public abstract class ValueContainerWrapper<V extends Value> implements ValueCon
     }
 
     @Override
-    public void detachSubValueContainer(ValueContainer<V> subContainer) {
+    public void detachSubValueContainer(ValueContainer subContainer) {
         if (subContainer instanceof ValueContainerWrapper) {
             mHostContainer.detachSubValueContainer(((ValueContainerWrapper) subContainer).mHostContainer);
         }

@@ -12,7 +12,10 @@ import java.lang.annotation.RetentionPolicy;
 
 public interface ValueContainer<V extends Value> {
 
-    @IntDef({ADD_VALUE_FAILED, NEW_VALUE_ADDED, VALUE_UPDATED, LOOP_VALUE_ADDED})
+    @IntDef({ADD_VALUE_FAILED,
+            NEW_VALUE_ADDED,
+            VALUE_UPDATED,
+            LOOP_VALUE_ADDED})
     @Retention(RetentionPolicy.SOURCE)
     @interface AddResult {
     }
@@ -169,7 +172,7 @@ public interface ValueContainer<V extends Value> {
      * 则子容器的一些方法将引发未知错误
      * @param subContainer
      */
-    void detachSubValueContainer(ValueContainer<V> subContainer);
+    void detachSubValueContainer(ValueContainer subContainer);
 
     /**
      * 注册数据添加监听事件，不用的时候应调用{@link #unregisterOnValueAddListener}

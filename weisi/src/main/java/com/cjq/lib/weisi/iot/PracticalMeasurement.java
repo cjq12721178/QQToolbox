@@ -27,7 +27,7 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
 
     @Override
     public int getCurveType() {
-        return 0;
+        return mDataType.mCurveType;
     }
 
     @NonNull
@@ -52,22 +52,33 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
         return mDataType;
     }
 
-    int addDynamicValue(long timestamp, double rawValue) {
-        int result = getDynamicValueContainer().addValue(timestamp);
-        setValueContent(getValueByContainerAddMethodReturnValue(getDynamicValueContainer(), result), rawValue);
-        return result;
-    }
+//    int addDynamicValue(long timestamp, double rawValue) {
+//        int result = getDynamicValueContainer().addValue(timestamp);
+//        setValueContent(getValueByContainerAddMethodReturnValue(getDynamicValueContainer(), result), rawValue);
+//        return result;
+//    }
+//
+//    private void setValueContent(Value value, double rawValue) {
+//        if (value != null) {
+//            value.mRawValue = rawValue;
+//        }
+//    }
+//
+//    public int addHistoryValue(long timestamp, double rawValue) {
+//        int result = getHistoryValueContainer().addValue(timestamp);
+//        setValueContent(getValueByContainerAddMethodReturnValue(getHistoryValueContainer(), result), rawValue);
+//        return result;
+//    }
 
-    private void setValueContent(Value value, double rawValue) {
+    boolean setValueContent(@NonNull ValueContainer<Value> container, int addMethodReturnValue, double rawValue) {
+        Value value = getValueByContainerAddMethodReturnValue(container, addMethodReturnValue);
         if (value != null) {
-            value.mRawValue = rawValue;
+            if (addMethodReturnValue >= 0 || Math.abs(value.mRawValue - rawValue) > 0.00001) {
+                value.mRawValue = rawValue;
+                return true;
+            }
         }
-    }
-
-    public int addHistoryValue(long timestamp, double rawValue) {
-        int result = getHistoryValueContainer().addValue(timestamp);
-        setValueContent(getValueByContainerAddMethodReturnValue(getHistoryValueContainer(), result), rawValue);
-        return result;
+        return false;
     }
 
     double correctRawValue(double value) {

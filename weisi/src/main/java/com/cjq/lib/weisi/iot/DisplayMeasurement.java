@@ -33,7 +33,8 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
     }
 
     public int testRealTimeValue() {
-        return testValue(getRealTimeValue());
+        Value v = getRealTimeValue();
+        return v != null ? testValue(v) : Warner.RESULT_NORMAL;
     }
 
     public String getFormattedRealTimeValue() {

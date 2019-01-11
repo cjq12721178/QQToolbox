@@ -19,6 +19,8 @@ import java.lang.annotation.RetentionPolicy;
 public abstract class Sensor {
 
     private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
+    private static OnValueAchievedListener onValueAchievedListener;
+
     private static OnDynamicValueCaptureListener onDynamicValueCaptureListener;
 
     protected final Info mInfo;
@@ -37,6 +39,36 @@ public abstract class Sensor {
     }
 
     public abstract Measurement getMainMeasurement();
+
+    void addDynamicValue(byte dataTypeValue,
+                         int dataTypeValueIndex,
+                         long timestamp,
+                         float batteryVoltage,
+                         double rawValue) {
+        addDynamicValue(dataTypeValue, dataTypeValueIndex, timestamp, batteryVoltage, rawValue, null);
+    }
+
+    abstract void addDynamicValue(byte dataTypeValue,
+                                  int dataTypeValueIndex,
+                                  long timestamp,
+                                  float batteryVoltage,
+                                  double rawValue,
+                                  OnValueAchievedListener listener);
+
+    void addHistoryValue(byte dataTypeValue,
+                         int dataTypeValueIndex,
+                         long timestamp,
+                         float batteryVoltage,
+                         double rawValue) {
+        addHistoryValue(dataTypeValue, dataTypeValueIndex, timestamp, batteryVoltage, rawValue, null);
+    }
+
+    abstract void addHistoryValue(byte dataTypeValue,
+                                  int dataTypeValueIndex,
+                                  long timestamp,
+                                  float batteryVoltage,
+                                  double rawValue,
+                                  OnValueAchievedListener listener);
 
     public long getNetInTimestamp() {
         return mNetInTimestamp;
@@ -62,11 +94,47 @@ public abstract class Sensor {
 //        mInfo.resetConfiguration();
 //    }
 
-    public int addInfoHistoryValue(long timestamp, float batteryVoltage) {
-        return mInfo.addHistoryValue(timestamp, batteryVoltage);
+    int addDynamicInfoValue(long timestamp, float batteryVoltage, OnValueAchievedListener listener) {
+        int result = mInfo.getDynamicValueContainer().addValue(timestamp);
+        if (mInfo.setValueContent(mInfo.getDynamicValueContainer(), result, batteryVoltage)) {
+            notifyDynamicSensorInfoAchieved(result, listener);
+            return result;
+        }
+        return ValueContainer.ADD_FAILED_RETURN_VALUE;
     }
 
-    protected void notifyDynamicValueCaptured(byte dataTypeValue, int dataTypeValueIndex, float batteryVoltage, long correctedTimestamp, double correctedValue) {
+    int addHistoryInfoValue(long timestamp, float batteryVoltage, OnValueAchievedListener listener) {
+        int result = mInfo.getHistoryValueContainer().addValue(timestamp);
+        if (mInfo.setValueContent(mInfo.getHistoryValueContainer(), result, batteryVoltage)) {
+            notifyHistorySensorInfoAchieved(result, listener);
+            return result;
+        }
+        return ValueContainer.ADD_FAILED_RETURN_VALUE;
+    }
+
+    int addDynamicMeasurementValue(@NonNull PracticalMeasurement measurement, long timestamp, double rawValue, OnValueAchievedListener listener) {
+        int result = measurement.getDynamicValueContainer().addValue(timestamp);
+        if (measurement.setValueContent(measurement.getDynamicValueContainer(), result, rawValue)) {
+            notifyDynamicMeasurementValueAchieved(measurement, result, listener);
+            return result;
+        }
+        return ValueContainer.ADD_FAILED_RETURN_VALUE;
+    }
+
+    int addHistoryMeasurementValue(@NonNull PracticalMeasurement measurement, long timestamp, double rawValue, OnValueAchievedListener listener) {
+        int result = measurement.getHistoryValueContainer().addValue(timestamp);
+        if (measurement.setValueContent(measurement.getHistoryValueContainer(), result, rawValue)) {
+            notifyHistoryMeasurementValueAchieved(measurement, result, listener);
+            return result;
+        }
+        return ValueContainer.ADD_FAILED_RETURN_VALUE;
+    }
+
+    protected void notifyDynamicRawValueAchieved(byte dataTypeValue,
+                                                 int dataTypeValueIndex,
+                                                 float batteryVoltage,
+                                                 long correctedTimestamp,
+                                                 double correctedValue) {
         //传感器及其测量量实时数据捕获
         if (onDynamicValueCaptureListener != null) {
             onDynamicValueCaptureListener.onDynamicValueCapture(
@@ -75,6 +143,38 @@ public abstract class Sensor {
                     correctedTimestamp,
                     batteryVoltage,
                     correctedValue);
+        }
+    }
+
+    protected void notifyDynamicSensorInfoAchieved(int addMethodReturnValue, OnValueAchievedListener listener) {
+        if (listener != null) {
+            listener.onDynamicSensorInfoAchieved(this, addMethodReturnValue);
+        } else if (onValueAchievedListener != null) {
+            onValueAchievedListener.onDynamicSensorInfoAchieved(this, addMethodReturnValue);
+        }
+    }
+
+    protected void notifyHistorySensorInfoAchieved(int addMethodReturnValue, OnValueAchievedListener listener) {
+        if (listener != null) {
+            listener.onHistorySensorInfoAchieved(this, addMethodReturnValue);
+        } else if (onValueAchievedListener != null) {
+            onValueAchievedListener.onHistorySensorInfoAchieved(this, addMethodReturnValue);
+        }
+    }
+
+    protected void notifyDynamicMeasurementValueAchieved(@NonNull PracticalMeasurement measurement, int addMethodReturnValue, OnValueAchievedListener listener) {
+        if (listener != null) {
+            listener.onDynamicMeasurementValueAchieved(this, measurement, addMethodReturnValue);
+        } else if (onValueAchievedListener != null) {
+            onValueAchievedListener.onDynamicMeasurementValueAchieved(this, measurement, addMethodReturnValue);
+        }
+    }
+
+    protected void notifyHistoryMeasurementValueAchieved(@NonNull PracticalMeasurement measurement, int addMethodReturnValue, OnValueAchievedListener listener) {
+        if (listener != null) {
+            listener.onHistoryMeasurementValueAchieved(this, measurement, addMethodReturnValue);
+        } else if (onValueAchievedListener != null) {
+            onValueAchievedListener.onHistoryMeasurementValueAchieved(this, measurement, addMethodReturnValue);
         }
     }
 
@@ -95,6 +195,17 @@ public abstract class Sensor {
     public static final int NEVER_CONNECTED = 0;
     public static final int ON_LINE = 1;
     public static final int OFF_LINE = 2;
+
+    public static void setOnValueAchievedListener(OnValueAchievedListener listener) {
+        onValueAchievedListener = listener;
+    }
+
+    public interface OnValueAchievedListener {
+        void onDynamicSensorInfoAchieved(@NonNull Sensor sensor, int infoValuePosition);
+        void onDynamicMeasurementValueAchieved(@NonNull Sensor sensor, @NonNull PracticalMeasurement measurement, int measurementValuePosition);
+        void onHistorySensorInfoAchieved(@NonNull Sensor sensor, int infoValuePosition);
+        void onHistoryMeasurementValueAchieved(@NonNull Sensor sensor, @NonNull PracticalMeasurement measurement, int measurementValuePosition);
+    }
 
     public static void setOnDynamicValueCaptureListener(OnDynamicValueCaptureListener listener) {
         onDynamicValueCaptureListener = listener;
@@ -143,23 +254,28 @@ public abstract class Sensor {
             return EMPTY_CONFIGURATION;
         }
 
-        int addDynamicValue(long timestamp, float batteryVoltage) {
-            int result = getDynamicValueContainer().addValue(timestamp);
-            setValueContent(getValueByContainerAddMethodReturnValue(getDynamicValueContainer(), result), batteryVoltage);
-            return result;
-        }
+//        int addDynamicValue(long timestamp, float batteryVoltage) {
+//            int result = getDynamicValueContainer().addValue(timestamp);
+//            setValueContent(getValueByContainerAddMethodReturnValue(getDynamicValueContainer(), result), batteryVoltage);
+//            return result;
+//        }
 
-        private void setValueContent(Value value, float batteryVoltage) {
+        boolean setValueContent(@NonNull ValueContainer<Value> container, int addMethodReturnValue, float batteryVoltage) {
+            Value value = getValueByContainerAddMethodReturnValue(container, addMethodReturnValue);
             if (value != null) {
-                value.mBatteryVoltage = batteryVoltage;
+                if (addMethodReturnValue >= 0 || Math.abs(value.mBatteryVoltage - batteryVoltage) > 0.00001f) {
+                    value.mBatteryVoltage = batteryVoltage;
+                    return true;
+                }
             }
+            return false;
         }
 
-        public int addHistoryValue(long timestamp, float batteryVoltage) {
-            int result = getHistoryValueContainer().addValue(timestamp);
-            setValueContent(getValueByContainerAddMethodReturnValue(getHistoryValueContainer(), result), batteryVoltage);
-            return result;
-        }
+//        public int addHistoryValue(long timestamp, float batteryVoltage) {
+//            int result = getHistoryValueContainer().addValue(timestamp);
+//            setValueContent(getValueByContainerAddMethodReturnValue(getHistoryValueContainer(), result), batteryVoltage);
+//            return result;
+//        }
 
         public static class Value extends com.cjq.lib.weisi.iot.container.Value {
 

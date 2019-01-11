@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 
 
 import com.cjq.lib.weisi.util.SimpleCustomClassParcel;
+import com.wsn.lib.wsb.util.ExpandComparator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -209,15 +210,25 @@ public class Storage<E> implements Parcelable {
         return position != -1 ? getOrderPosition(position) : -1;
     }
 
-    public <T> int find(@NonNull T t, @NonNull Comparator<E, T> comparator) {
+    public <T> int find(@NonNull T t, @NonNull ExpandComparator<E, T> comparator) {
         int i = 0, count = size();
         for (;i < count;++i) {
-            if (comparator.equals(mElements.get(i), t)) {
+            if (comparator.compare(mElements.get(i), t) == 0) {
                 break;
             }
         }
         return i == count ? -1 : getOrderPosition(i);
     }
+
+//    public <T> int find(@NonNull T t, @NonNull Comparator<E, T> comparator) {
+//        int i = 0, count = size();
+//        for (;i < count;++i) {
+//            if (comparator.equals(mElements.get(i), t)) {
+//                break;
+//            }
+//        }
+//        return i == count ? -1 : getOrderPosition(i);
+//    }
 
     public Sorter<E> getSorter() {
         return mSorter;
@@ -271,7 +282,7 @@ public class Storage<E> implements Parcelable {
         }
     };
 
-    public interface Comparator<E, T> {
-        boolean equals(@NonNull E e, @NonNull T t);
-    }
+//    public interface Comparator<E, T> {
+//        boolean equals(@NonNull E e, @NonNull T t);
+//    }
 }

@@ -2,6 +2,7 @@ package com.cjq.tool.qqtoolbox.activity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.os.Environment;
 import android.support.annotation.IdRes;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -18,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cjq.tool.qqtoolbox.util.DebugTag;
 import com.wsn.lib.wsb.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.SerialPortKit;
 import com.cjq.lib.weisi.data.FilterCollection;
@@ -52,9 +54,14 @@ import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment2;
 import com.cjq.tool.qqtoolbox.switchable_fragment_manager.VisualFragment3;
 import com.cjq.tool.qqtoolbox.util.CrashHandler;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
+import jxl.Workbook;
+import jxl.write.Label;
+import jxl.write.WritableSheet;
+import jxl.write.WritableWorkbook;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 
@@ -74,7 +81,7 @@ public class MainActivity
 
     private static final int RC_WRITE_EXTERNAL_STORAGE = 1;
     private SwitchableFragmentManager mSwitchableFragmentManager;
-    private String[] mFragmentTags = new String[] {"visual1", "visual2", "visual3"};
+    private String[] mFragmentTags = new String[]{"visual1", "visual2", "visual3"};
     private SizeSelfAdaptionTextView mSizeSelfAdaptionTextView;
     private EditText mEtSetText;
     private SortDialog mSortDialog;
@@ -147,7 +154,8 @@ public class MainActivity
                 dialog.getCustomDecorator().setDrawSeparationLine(true);
                 dialog.show(getSupportFragmentManager(),
                         "test_confirm");
-            } break;
+            }
+            break;
             case R.id.btn_confirm_new_overall_decorator:
                 ConfirmDialog.Decorator decorator = ConfirmDialog.getOverallDecorator(ConfirmDialog.class);
                 decorator.reset();
@@ -212,23 +220,25 @@ public class MainActivity
             case R.id.btn_list_dialog: {
                 ListDialog listDialog = new ListDialog();
                 listDialog.setTitle("this is list dialog");
-                listDialog.setItems(new String[] { "item1", "item2" });
+                listDialog.setItems(new String[]{"item1", "item2"});
                 listDialog.show(getSupportFragmentManager(),
                         "test_list");
-            } break;
+            }
+            break;
             case R.id.btn_multi_list_dialog: {
                 ListDialog listDialog = new ListDialog();
                 listDialog.setTitle("请在已配置过的传感器中选择所需作为节点");
                 //listDialog.setTitle("this is multiple select list dialog");
                 String[] items = new String[40];
-                for (int i = 0;i < items.length;++i) {
+                for (int i = 0; i < items.length; ++i) {
                     items[i] = "item" + (i + 1);
                 }
                 listDialog.setItems(items);
                 listDialog.setMultipleSelect(true);
                 listDialog.show(getSupportFragmentManager(),
                         "test_mul_list");
-            } break;
+            }
+            break;
             case R.id.btn_set_base_decoration:
                 BaseDialog.Decorator decorator4 = BaseDialog.getBaseOverallDecorator();
                 decorator4.setTitleTextSize(R.dimen.super_text_size);
@@ -259,12 +269,12 @@ public class MainActivity
                 break;
             case R.id.btn_switch_fragment:
                 initSwitchableFragmentManager();
-                int index = v.getTag() == null ? 0 : (int)v.getTag();
+                int index = v.getTag() == null ? 0 : (int) v.getTag();
                 mSwitchableFragmentManager.switchTo(index == 3 ? null : mFragmentTags[index]);
                 if (index == 0) {
-                    VisualFragment fragment = (VisualFragment)mSwitchableFragmentManager.getCurrentFragment();
+                    VisualFragment fragment = (VisualFragment) mSwitchableFragmentManager.getCurrentFragment();
                     if (fragment != null) {
-                        fragment.setStudent(new VisualFragment.Student("fisrt", (int)(50.0 * Math.random())));
+                        fragment.setStudent(new VisualFragment.Student("fisrt", (int) (50.0 * Math.random())));
                     }
                 }
                 mSwitchableFragmentManager.notifyDataSetChanged();
@@ -276,10 +286,10 @@ public class MainActivity
                 break;
             case R.id.btn_notify_data_set_changed:
                 initSwitchableFragmentManager();
-                VisualFragment fragment = (VisualFragment)mSwitchableFragmentManager.getCurrentFragment();
+                VisualFragment fragment = (VisualFragment) mSwitchableFragmentManager.getCurrentFragment();
                 mSwitchableFragmentManager.notifyDataSetChanged();
                 if (fragment != null) {
-                    fragment.setStudent(new VisualFragment.Student("second", (int)(50.0 * Math.random())));
+                    fragment.setStudent(new VisualFragment.Student("second", (int) (50.0 * Math.random())));
                 }
                 break;
             case R.id.btn_set_text:
@@ -387,9 +397,9 @@ public class MainActivity
             case R.id.btn_filter_dialog:
                 if (mFilterDialog == null) {
                     mFilterDialog = new FilterDialog();
-                    mFilterDialog.addFilterType("协议", new String[] { "BLE", "ESB" });
-                    mFilterDialog.addFilterType("类型", new String[] { "温度传感器", "重力加速度", "智能避雷器", "液位传感器" });
-                    mFilterDialog.addFilterType("项目", new String[] { "水厂", "铝厂", "尼乐园南站", "WEISI", "测试", "ABCDEFG", "HIJKLMN", "OPQ", "RST", "UVW", "XYZ", "其他"});
+                    mFilterDialog.addFilterType("协议", new String[]{"BLE", "ESB"});
+                    mFilterDialog.addFilterType("类型", new String[]{"温度传感器", "重力加速度", "智能避雷器", "液位传感器"});
+                    mFilterDialog.addFilterType("项目", new String[]{"水厂", "铝厂", "尼乐园南站", "WEISI", "测试", "ABCDEFG", "HIJKLMN", "OPQ", "RST", "UVW", "XYZ", "其他"});
                     //FilterDialog.Decorator decorator5 = mFilterDialog.getCustomDecorator();
                     //decorator5.setDisplayTagAll(false);
                 }
@@ -447,6 +457,44 @@ public class MainActivity
             case R.id.btn_test_update_version:
                 startActivity(new Intent(this, TestUpdateVersionActivity.class));
                 break;
+            case R.id.btn_export_excel:
+                exportExcel();
+                break;
+            case R.id.btn_test_scroll_linearlayout:
+                startActivity(new Intent(this, TestScrollableLinearLayoutActivity.class));
+                break;
+            case R.id.btn_test_adaptive_table_layout:
+                startActivity(new Intent(this, TestAdaptiveTableLayoutActivity.class));
+                break;
+        }
+    }
+
+    private void exportExcel() {
+        try {
+            //打开文件
+            File directory = new File(Environment.getExternalStorageDirectory() +
+                    File.separator + "TestExcel");
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+            WritableWorkbook book = Workbook.createWorkbook(new File(directory.getAbsolutePath() + File.separator + "测试.xls"));
+            //生成名为"第一页"的工作表，参数0表示这是第一页
+            WritableSheet sheet = book.createSheet("第一页", 0);
+            //在Label对象的构造子中指名单元格位置是第一列第一行(0,0)
+            //以及单元格内容为test
+            Label label = new Label(0, 0,"test");
+            //将定义好的单元格添加到工作表中
+            sheet.addCell(label);
+            /*生成一个保存数字的单元格
+            必须使用Number的完整包路径，否则有语法歧义
+            单元格位置是第二列，第一行，值为789.123*/
+            jxl.write.Number number = new jxl.write.Number(1, 0, 789.123);
+            sheet.addCell(number);
+            //写入数据并关闭文件
+            book.write();
+            book.close();
+        } catch (Exception e) {
+            Log.d(DebugTag.GENERAL_LOG_TAG, e.getMessage());
         }
     }
 

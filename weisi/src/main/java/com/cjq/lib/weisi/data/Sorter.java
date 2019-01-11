@@ -1,5 +1,10 @@
 package com.cjq.lib.weisi.data;
 
+import android.support.annotation.NonNull;
+
+import com.wsn.lib.wsb.util.ExpandCollections;
+import com.wsn.lib.wsb.util.ExpandComparator;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -10,7 +15,7 @@ import java.util.List;
 
 public abstract class Sorter<E> implements Comparator<E> {
 
-    public int add(List<E> elements, E e) {
+    public int add(@NonNull List<E> elements, @NonNull E e) {
         int position = Collections.binarySearch(elements, e, this);
         if (position < 0) {
             position = -position - 1;
@@ -21,11 +26,11 @@ public abstract class Sorter<E> implements Comparator<E> {
         }
     }
 
-    public void sort(List<E> elements) {
+    public void sort(@NonNull List<E> elements) {
         Collections.sort(elements, this);
     }
 
-    public int find(List<E> elements, E e) {
+    public int find(@NonNull List<E> elements, E e) {
         return Collections.binarySearch(elements, e, this);
     }
 }

@@ -147,12 +147,12 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
         synchronized (this) {
             int position;
             if (mValueHead == 0) {
-                return ExpandCollections.INSTANCE.binarySearch(mValues,
+                return ExpandCollections.binarySearch(mValues,
                         timestamp,
                         SEARCH_HELPER);
             }
             if (timestamp >= mValues.get(0).mTimestamp) {
-                position = ExpandCollections.INSTANCE.binarySearch(
+                position = ExpandCollections.binarySearch(
                         mValues,
                         0,
                         mValueHead - 1,
@@ -162,7 +162,7 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                         ? MAX_VALUE_SIZE - mValueHead + position
                         : encodePosition(MAX_VALUE_SIZE - mValueHead + decodePosition(position));
             } else {
-                position = ExpandCollections.INSTANCE.binarySearch(
+                position = ExpandCollections.binarySearch(
                         mValues,
                         mValueHead,
                         mValues.size() - 1,

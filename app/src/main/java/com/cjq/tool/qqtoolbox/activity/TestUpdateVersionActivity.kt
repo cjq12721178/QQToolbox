@@ -26,6 +26,8 @@ import android.app.ProgressDialog
 import android.content.pm.PackageInfo
 import android.os.Environment
 import android.support.v7.preference.PreferenceManager
+import com.cjq.lib.weisi.iot.SensorManager
+import com.cjq.lib.weisi.iot.container.ValueContainer
 import java.io.BufferedInputStream
 import java.io.File
 import java.io.FileOutputStream
@@ -40,6 +42,9 @@ class TestUpdateVersionActivity : AppCompatActivity(), View.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_test_update_version)
+        val sensor = SensorManager.getPhysicalSensor(12)
+        val container: ValueContainer<*> = sensor.getMeasurementByPosition(0).historyValueContainer
+        container.detachSubValueContainer(container)
     }
 
     override fun onClick(v: View?) {

@@ -164,7 +164,7 @@ public abstract class BaseValueContainer<V extends Value>
     }
 
     @Override
-    public void detachSubValueContainer(ValueContainer<V> subContainer) {
+    public void detachSubValueContainer(ValueContainer subContainer) {
         if (subContainer instanceof OnValueAddListener) {
             unregisterOnValueAddListener((OnValueAddListener) subContainer);
         }

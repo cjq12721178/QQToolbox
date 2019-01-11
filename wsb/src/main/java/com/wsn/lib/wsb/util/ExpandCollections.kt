@@ -10,10 +10,12 @@ object ExpandCollections {
 
     private const val BINARY_SEARCH_THRESHOLD = 5000
 
+    @JvmStatic
     fun <V, K> binarySearch(list: List<V>, key: K, c: ExpandComparator<in V, K>): Int {
         return binarySearch(list, 0, list.size - 1, key, c)
     }
 
+    @JvmStatic
     fun <V, K> binarySearch(list: List<V>, start: Int, end: Int, key: K, c: ExpandComparator<in V, K>): Int {
         return if (list is RandomAccess || start + BINARY_SEARCH_THRESHOLD <= end)
             ExpandCollections.indexedBinarySearch(list, start, end, key, c)
