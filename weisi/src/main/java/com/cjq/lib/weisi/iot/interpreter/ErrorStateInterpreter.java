@@ -1,6 +1,7 @@
 package com.cjq.lib.weisi.iot.interpreter;
 
 import android.support.annotation.IntRange;
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.cjq.lib.weisi.iot.SensorManager;
@@ -15,7 +16,7 @@ public class ErrorStateInterpreter implements ValueInterpreter {
     }
 
     @Override
-    public String interpret(double value) {
+    public @NonNull String interpret(double value) {
         int rawValue = (int) value;
         if ((rawValue & 0xff) == 0) {
             return "正常";

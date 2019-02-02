@@ -21,7 +21,7 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     }
 
     @Override
-    public String formatValue(double rawValue) {
+    public @NonNull String formatValue(double rawValue, int para) {
         return mDataType.formatValue(rawValue);
     }
 
@@ -73,8 +73,8 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     boolean setValueContent(@NonNull ValueContainer<Value> container, int addMethodReturnValue, double rawValue) {
         Value value = getValueByContainerAddMethodReturnValue(container, addMethodReturnValue);
         if (value != null) {
-            if (addMethodReturnValue >= 0 || Math.abs(value.mRawValue - rawValue) > 0.00001) {
-                value.mRawValue = rawValue;
+            if (addMethodReturnValue >= 0 || Math.abs(value.getRawValue() - rawValue) > 0.00001) {
+                value.setRawValue(rawValue);
                 return true;
             }
         }
@@ -91,21 +91,22 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
 
         final byte mValue;
         private final int mCurveType;
-        private String mName;
+        private final String mName;
         ValueCorrector mCorrector;
         private ValueInterpreter mInterpreter = DefaultInterpreter.getInstance();
 
         public DataType(byte value) {
-            this(value, 0);
+            this(value, 0, null);
         }
 
-        public DataType(byte value, int curveType) {
+        public DataType(byte value, int curveType, String name) {
             mValue = value;
             if (curveType <= CURVE_TYPE_INVALID) {
                 mCurveType = getUnknownCurveType();
             } else {
                 mCurveType = curveType;
             }
+            mName = TextUtils.isEmpty(name) ? "未知测量量" : name;
         }
 
         public byte getValue() {
@@ -120,9 +121,9 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
             return String.format("%02X", mValue);
         }
 
-        void setName(String name) {
-            mName = TextUtils.isEmpty(name) ? "未知测量量" : name;
-        }
+//        void setName(String name) {
+//            mName = TextUtils.isEmpty(name) ? "未知测量量" : name;
+//        }
 
         public String getName() {
             return mName;
@@ -144,11 +145,7 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
 //            return mUnit;
 //        }
 
-        public String formatValue(Value value) {
-            return value != null ? formatValue(value.mRawValue) : "";
-        }
-
-        public String formatValue(double rawValue) {
+        public @NonNull String formatValue(double rawValue) {
             return mInterpreter.interpret(rawValue);
         }
 

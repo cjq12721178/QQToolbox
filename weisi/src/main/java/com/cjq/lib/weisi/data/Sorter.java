@@ -15,6 +15,7 @@ import java.util.List;
 
 public abstract class Sorter<E> implements Comparator<E> {
 
+    //成功返回元素位置，失败返回-1
     public int add(@NonNull List<E> elements, @NonNull E e) {
         int position = Collections.binarySearch(elements, e, this);
         if (position < 0) {
@@ -24,6 +25,19 @@ public abstract class Sorter<E> implements Comparator<E> {
         } else {
             return -1;
         }
+    }
+
+    public boolean removeAt(@NonNull List<E> elements, int position) {
+        if (position < 0 || position >= elements.size()) {
+            return false;
+        }
+        elements.remove(position);
+        return true;
+    }
+
+    public int remove(@NonNull List<E> elements, @NonNull E e) {
+        int position = find(elements, e);
+        return removeAt(elements, position) ? position : -1;
     }
 
     public void sort(@NonNull List<E> elements) {

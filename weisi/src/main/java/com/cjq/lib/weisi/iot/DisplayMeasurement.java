@@ -37,29 +37,9 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
         return v != null ? testValue(v) : Warner.RESULT_NORMAL;
     }
 
-    public String getFormattedRealTimeValue() {
-        return formatValue(getRealTimeValue());
-    }
-
-//    public String getFormattedRealTimeValueWithUnit() {
-//        return formatValueWithUnit(getRealTimeValue());
-//    }
-
-    public String formatValue(Value v) {
-        return formatValue(v.getRawValue());
-    }
-
-    public abstract String formatValue(double rawValue);
-
-//    public String formatValueWithUnit(@NonNull Value v) {
-//        return formatValueWithUnit(v.getRawValue());
-//    }
-
-    //public abstract String formatValueWithUnit(double rawValue);
-
     public static class Value extends com.cjq.lib.weisi.iot.container.Value {
 
-        double mRawValue;
+        private double mRawValue;
 
         public Value(long timeStamp) {
             super(timeStamp);
@@ -70,7 +50,16 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
             mTimestamp = timeStamp;
         }
 
+        void setRawValue(double rawValue) {
+            mRawValue = rawValue;
+        }
+
         public double getRawValue() {
+            return mRawValue;
+        }
+
+        @Override
+        public double getRawValue(int para) {
             return mRawValue;
         }
     }

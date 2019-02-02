@@ -54,11 +54,11 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         setExitType(EXIT_TYPE_NULL);
     }
 
-    public FilterDialog addFilterType(String label, String[] entries) {
+    public FilterDialog addFilterType(@NonNull String label, @NonNull String[] entries) {
         return addFilterType(label, entries, buildDefaultEntryValues(entries), null);
     }
 
-    private int[] buildDefaultEntryValues(String[] entries) {
+    private int[] buildDefaultEntryValues(@NonNull String[] entries) {
         int size = entries.length;
         int[] result = new int[size];
         for (int i = 0;i < size;++i) {
@@ -67,16 +67,16 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         return result;
     }
 
-    public FilterDialog addFilterType(String label, String[] entries, boolean[] entryDefaultStates) {
+    public FilterDialog addFilterType(@NonNull String label, @NonNull String[] entries, boolean[] entryDefaultStates) {
         return addFilterType(label, entries, buildDefaultEntryValues(entries), entryDefaultStates);
     }
 
     //entryValues不能相同
-    public FilterDialog addFilterType(String label, String[] entries, int[] entryValues) {
+    public FilterDialog addFilterType(@NonNull String label, @NonNull String[] entries, @NonNull int[] entryValues) {
         return addFilterType(label, entries, entryValues, null);
     }
 
-    public FilterDialog addFilterType(String label, String[] entries, int[] entryValues, boolean[] entryDefaultStates) {
+    public FilterDialog addFilterType(@NonNull String label, @NonNull String[] entries, @NonNull int[] entryValues, boolean[] entryDefaultStates) {
         if (entries == null || entryValues == null) {
             throw new NullPointerException("entry and value may not be null");
         }
@@ -929,6 +929,6 @@ public class FilterDialog extends BaseDialog<FilterDialog.Decorator> {
         //一维数组与FilterType[]一一对应，二维数组与Tag一一对应
         //当选中某个tag时，hasFilter=True，
         // 当所有tag均未选中或均选中时，hasFilter=False
-        void onFilterChange(FilterDialog dialog, boolean[] hasFilters, List<Integer>[] checkedFilterEntryValues);
+        void onFilterChange(@NonNull FilterDialog dialog, @NonNull boolean[] hasFilters, @NonNull List<Integer>[] checkedFilterEntryValues);
     }
 }

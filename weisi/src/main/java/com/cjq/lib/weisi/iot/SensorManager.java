@@ -816,179 +816,172 @@ public class SensorManager {
         @Override
         public void endElement(String uri, String localName, String qName) throws SAXException {
             super.endElement(uri, localName, qName);
-            switch (qName) {
-                case "curve":
-                    mCurveType = Integer.parseInt(getBuilder().toString());
-                    break;
-                case "value":
-                    mDataType = new PracticalMeasurement.DataType(getDataTypeValue(), mCurveType);
-                    break;
-                case "name":
-                    if (mType != null) {
-                        mVirtualMeasurementName = getBuilder().toString();
-                    } else {
-                        mDataType.setName(getBuilder().toString());
-                    }
-                    break;
-                case "decimal":
-                    mDecimal = Integer.parseInt(getBuilder().toString());
-                    break;
-                case "unit":
-                    mUnit = getBuilder().toString();
-                    break;
-                case "float":
-                    mValueInterpreter = new FloatInterpreter(mDecimal, mUnit);
-                    mDecimal = 3;
-                    mUnit = null;
-                    break;
-//                case "type":
-//                    mValueType = Integer.parseInt(getBuilder().toString());
-//                    break;
-//                case "signed":
-//                    mSigned = Boolean.parseBoolean(getBuilder().toString());
-//                    break;
-//                case "coefficient":
-//                    mCoefficient = Double.parseDouble(getBuilder().toString());
-//                    break;
-                case DATA_TYPE:
-                    mDataType.setInterpreter(mValueInterpreter);
-                    mValueInterpreter = null;
-//                    //根据mValueType为DataType配备不同的ValueBuilder
-//                    if (mValueType != -1) {
-//                        EsbAnalyzer.setValueBuilder(mDataType.mValue, mValueType, mSigned, mCoefficient);
-//                        mValueType = -1;
-//                        mCoefficient = 1;
-//                    }
-                    mDataTypeMap.put(mDataType.mValue, mDataType);
-                    break;
-                case "SensorName":
-                    mType.mSensorGeneralName = getBuilder().toString();
-                    break;
-                case "start":
-                    mType.mStartAddress = Integer.parseInt(getBuilder().toString(), 16);
-                    break;
-                case "end":
-                    mType.mEndAddress = Integer.parseInt(getBuilder().toString(), 16);
-                    break;
-                case "DataTypeValue":
-                    setDataTypeValue((byte)Integer.parseInt(getBuilder().toString(), 16));
-                    break;
-                case DATA_TYPE_CUSTOM_NAME:
-                    mDataTypeCustomName = getBuilder().toString();
-                    break;
-                case "hidden":
-                    mHiddenMeasurement = Boolean.parseBoolean(getBuilder().toString());
-                    break;
-                case "pattern":
-                    mVirtualMeasurementPattern = getBuilder().toString();
-                    break;
-                case "measurement":
-                    if (getDataTypeValue() != 0) {
-                        //生成PracticalMeasurementParameter
-                        //获取数据类型
-                        PracticalMeasurement.DataType dataType = mDataTypeMap.get(getDataTypeValue());
-                        if (dataType == null) {
-                            dataType = new PracticalMeasurement.DataType(getDataTypeValue());
-                            mDataTypeMap.put(getDataTypeValue(), dataType);
-                        }
-                        setDataTypeValue((byte) 0);
-                        //生成测量参数
-                        mPracticalMeasurementParameter = new PhysicalSensor.Type.PracticalMeasurementParameter(dataType,
-                                mDataTypeCustomName != null
-                                        ? (mCustomDataTypeNameType == 0
-                                        ? dataType.getName() + mDataTypeCustomName
-                                        : mDataTypeCustomName)
-                                        : null,
-                                mHiddenMeasurement);
-                        mDataTypeCustomName = null;
-                        mHiddenMeasurement = false;
-                        //若存在相同数据类型，则为阵列传感器，使用链式附加，否则按数据类型升序排列
-                        mIndex = findMeasureParameter(mPracticalMeasurementParameters, mPracticalMeasurementParameter);
-                        if (mIndex >= 0) {
-                            mPracticalMeasurementParameters.get(mIndex).getLast().mNext = mPracticalMeasurementParameter;
+            if (getElementConsumed()) {
+                switch (qName) {
+                    case DATA_TYPE:
+                        mDataType.setInterpreter(mValueInterpreter);
+                        mValueInterpreter = null;
+                        mDataTypeMap.put(mDataType.mValue, mDataType);
+                        break;
+                }
+            } else {
+                setElementConsumed(true);
+                switch (qName) {
+                    case "curve":
+                        mCurveType = Integer.parseInt(getBuilder().toString(), 16);
+                        break;
+//                    case "value":
+//                        mDataType = new PracticalMeasurement.DataType(getDataTypeValue(), mCurveType);
+//                        break;
+                    case "name":
+                        if (mType != null) {
+                            mVirtualMeasurementName = getBuilder().toString();
                         } else {
-                            mPracticalMeasurementParameters.add(-mIndex-1, mPracticalMeasurementParameter);
+                            //mDataType.setName(getBuilder().toString());
+                            mDataType = new PracticalMeasurement.DataType(getDataTypeValue(), mCurveType, getBuilder().toString());
                         }
-                    } else {
-                        //生成VirtualMeasurementParameter
-                        PhysicalSensor.Type.VirtualMeasurementParameter parameter = new PhysicalSensor.Type.VirtualMeasurementParameter(mVirtualMeasurementName, mVirtualMeasurementPattern, mValueInterpreter, mCurveType, mHiddenMeasurement);
-                        if (mType.mVirtualMeasurementParameters == null) {
-                            mType.mVirtualMeasurementParameters = new ArrayList<>();
+                        break;
+                    case "decimal":
+                        mDecimal = Integer.parseInt(getBuilder().toString());
+                        break;
+                    case "unit":
+                        mUnit = getBuilder().toString();
+                        break;
+                    case "float":
+                        mValueInterpreter = new FloatInterpreter(mDecimal, mUnit);
+                        mDecimal = 3;
+                        mUnit = null;
+                        break;
+                    case "SensorName":
+                        mType.mSensorGeneralName = getBuilder().toString();
+                        break;
+                    case "start":
+                        mType.mStartAddress = Integer.parseInt(getBuilder().toString(), 16);
+                        break;
+                    case "end":
+                        mType.mEndAddress = Integer.parseInt(getBuilder().toString(), 16);
+                        break;
+                    case "DataTypeValue":
+                        setDataTypeValue((byte)Integer.parseInt(getBuilder().toString(), 16));
+                        break;
+                    case DATA_TYPE_CUSTOM_NAME:
+                        mDataTypeCustomName = getBuilder().toString();
+                        break;
+                    case "hidden":
+                        mHiddenMeasurement = Boolean.parseBoolean(getBuilder().toString());
+                        break;
+                    case "pattern":
+                        mVirtualMeasurementPattern = getBuilder().toString();
+                        break;
+                    case "measurement":
+                        if (getDataTypeValue() != 0) {
+                            //生成PracticalMeasurementParameter
+                            //获取数据类型
+                            PracticalMeasurement.DataType dataType = mDataTypeMap.get(getDataTypeValue());
+                            if (dataType == null) {
+                                dataType = new PracticalMeasurement.DataType(getDataTypeValue());
+                                mDataTypeMap.put(getDataTypeValue(), dataType);
+                            }
+                            setDataTypeValue((byte) 0);
+                            //生成测量参数
+                            mPracticalMeasurementParameter = new PhysicalSensor.Type.PracticalMeasurementParameter(dataType,
+                                    mDataTypeCustomName != null
+                                            ? (mCustomDataTypeNameType == 0
+                                            ? dataType.getName() + mDataTypeCustomName
+                                            : mDataTypeCustomName)
+                                            : null,
+                                    mHiddenMeasurement);
+                            mDataTypeCustomName = null;
+                            mHiddenMeasurement = false;
+                            //若存在相同数据类型，则为阵列传感器，使用链式附加，否则按数据类型升序排列
+                            mIndex = findMeasureParameter(mPracticalMeasurementParameters, mPracticalMeasurementParameter);
+                            if (mIndex >= 0) {
+                                mPracticalMeasurementParameters.get(mIndex).getLast().mNext = mPracticalMeasurementParameter;
+                            } else {
+                                mPracticalMeasurementParameters.add(-mIndex-1, mPracticalMeasurementParameter);
+                            }
+                        } else {
+                            //生成VirtualMeasurementParameter
+                            PhysicalSensor.Type.VirtualMeasurementParameter parameter = new PhysicalSensor.Type.VirtualMeasurementParameter(mVirtualMeasurementName, mVirtualMeasurementPattern, mValueInterpreter, mCurveType, mHiddenMeasurement);
+                            if (mType.mVirtualMeasurementParameters == null) {
+                                mType.mVirtualMeasurementParameters = new ArrayList<>();
+                            }
+                            mType.mVirtualMeasurementParameters.add(parameter);
                         }
-                        mType.mVirtualMeasurementParameters.add(parameter);
-                    }
-                    break;
-                case "measurements":
-                    mType.mPracticalMeasurementParameters = new PhysicalSensor.Type.PracticalMeasurementParameter[mPracticalMeasurementParameters.size()];
-                    mPracticalMeasurementParameters.toArray(mType.mPracticalMeasurementParameters);
-                    mPracticalMeasurementParameters.clear();
-                    break;
-                case SENSOR_TYPE:
-                    mTypes.add(mType);
-                    mType = null;
-                    break;
-                case "on":
-                    mOn = getBuilder().toString();
-                    break;
-                case "off":
-                    mOff = getBuilder().toString();
-                    break;
-                case "status":
-                    mValueInterpreter = new StatusInterpreter(mOn, mOff);
-                    break;
-                case "number":
-                    mNumber = Double.parseDouble(getBuilder().toString());
-                    break;
-                case "text":
-                    mText = getBuilder().toString();
-                    break;
-                case "paraphrase":
-                    mParaphrases.put(mNumber, mText);
-                    break;
-                case PARAPHRASES:
-                    mValueInterpreter = new ParaphraseInterpreter(mParaphrases);
-                    break;
-                case "calendar":
-                    mValueInterpreter = CalendarInterpreter.from(getBuilder().toString());
-                    break;
-                case "interpreter":
-                    switch (getBuilder().toString()) {
-                        case "ground":mValueInterpreter = GroundLeadInterpreter.getInstance();
-                            break;
-                    }
-                    break;
-                case "SensorTypes":
-                    Collections.sort(mTypes, new Comparator<PhysicalSensor.Type>() {
-                        @Override
-                        public int compare(PhysicalSensor.Type c1, PhysicalSensor.Type c2) {
-                            return c1.mStartAddress - c2.mStartAddress;
+                        break;
+                    case "measurements":
+                        mType.mPracticalMeasurementParameters = new PhysicalSensor.Type.PracticalMeasurementParameter[mPracticalMeasurementParameters.size()];
+                        mPracticalMeasurementParameters.toArray(mType.mPracticalMeasurementParameters);
+                        mPracticalMeasurementParameters.clear();
+                        break;
+                    case SENSOR_TYPE:
+                        mTypes.add(mType);
+                        mType = null;
+                        break;
+                    case "on":
+                        mOn = getBuilder().toString();
+                        break;
+                    case "off":
+                        mOff = getBuilder().toString();
+                        break;
+                    case "status":
+                        mValueInterpreter = new StatusInterpreter(mOn, mOff);
+                        break;
+                    case "number":
+                        mNumber = Double.parseDouble(getBuilder().toString());
+                        break;
+                    case "text":
+                        mText = getBuilder().toString();
+                        break;
+                    case "paraphrase":
+                        mParaphrases.put(mNumber, mText);
+                        break;
+                    case PARAPHRASES:
+                        mValueInterpreter = new ParaphraseInterpreter(mParaphrases);
+                        break;
+                    case "calendar":
+                        mValueInterpreter = CalendarInterpreter.from(getBuilder().toString());
+                        break;
+                    case "interpreter":
+                        switch (getBuilder().toString()) {
+                            case "ground":mValueInterpreter = GroundLeadInterpreter.getInstance();
+                                break;
                         }
-                    });
-                    break;
-                case "label":
-                    mLabel = getBuilder().toString();
-                    break;
-                case "function":
-                    mScriptValueCorrectorBuilder.putScript(mLabel, getBuilder().toString());
-                    break;
-                case "ScriptValueCorrectorLabel":
-                    mDataType.mCorrector = mScriptValueCorrectorBuilder.getCorrector(getBuilder().toString());
-                    break;
-                case "pos":
-                    mErrorPos = Integer.parseInt(getBuilder().toString());
-                    break;
-                case "state":
-                    if (mErrorStateInterpreter == null) {
-                        mErrorStateInterpreter = new ErrorStateInterpreter();
-                    }
-                    mErrorStateInterpreter.setState(mErrorPos, getBuilder().toString());
-                    break;
-                case "ErrorState":
-                    mValueInterpreter = mErrorStateInterpreter;
-                    mErrorStateInterpreter = null;
-                    break;
-                default:
-                    break;
+                        break;
+                    case "SensorTypes":
+                        Collections.sort(mTypes, new Comparator<PhysicalSensor.Type>() {
+                            @Override
+                            public int compare(PhysicalSensor.Type c1, PhysicalSensor.Type c2) {
+                                return c1.mStartAddress - c2.mStartAddress;
+                            }
+                        });
+                        break;
+                    case "label":
+                        mLabel = getBuilder().toString();
+                        break;
+                    case "function":
+                        mScriptValueCorrectorBuilder.putScript(mLabel, getBuilder().toString());
+                        break;
+                    case "ScriptValueCorrectorLabel":
+                        mDataType.mCorrector = mScriptValueCorrectorBuilder.getCorrector(getBuilder().toString());
+                        break;
+                    case "pos":
+                        mErrorPos = Integer.parseInt(getBuilder().toString());
+                        break;
+                    case "state":
+                        if (mErrorStateInterpreter == null) {
+                            mErrorStateInterpreter = new ErrorStateInterpreter();
+                        }
+                        mErrorStateInterpreter.setState(mErrorPos, getBuilder().toString());
+                        break;
+                    case "ErrorState":
+                        mValueInterpreter = mErrorStateInterpreter;
+                        mErrorStateInterpreter = null;
+                        break;
+                    default:
+                        setElementConsumed(false);
+                        break;
+                }
             }
         }
 

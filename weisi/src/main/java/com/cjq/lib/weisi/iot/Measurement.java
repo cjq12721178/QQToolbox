@@ -1,11 +1,15 @@
 package com.cjq.lib.weisi.iot;
 
+import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.cjq.lib.weisi.iot.container.SubValueContainer;
 import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
+
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
 
 public abstract class Measurement<V extends Value, C extends Configuration<V>> implements Comparable<Measurement<V, C>> {
 
@@ -50,7 +54,18 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
 
     public abstract int getCurveType();
 
-    public int getCurvePattern() {
+    @IntDef({CP_ANALOG,
+            CP_STATUS,
+            CP_COUNT})
+    @Retention(RetentionPolicy.SOURCE)
+    @interface CurvePattern {
+    }
+
+    public final static int CP_ANALOG = 1;
+    public final static int CP_STATUS = 2;
+    public final static int CP_COUNT = 3;
+
+    public @CurvePattern int getCurvePattern() {
         return getCurveType() >> CURVE_PATTERN_BITS;
     }
 
@@ -92,36 +107,77 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
         return mDefaultName;
     }
 
-    public String getDecoratedName() {
+    public @NonNull String getDecoratedName() {
         Decorator<V> decorator = mConfiguration.getDecorator();
-        return decorator != null ? decorator.decorateName(getDefaultName()) : null;
+        return decorator != null ? decorator.decorateName(getDefaultName()) : "";
     }
 
     public @NonNull String getName() {
         String decoratedName = getDecoratedName();
-        return decoratedName != null ? decoratedName : getDefaultName();
+        return decoratedName.isEmpty() ? getDefaultName() : decoratedName;
     }
 
-    public String decorateValue(@NonNull V v) {
+    public @NonNull String getValueLabel(int para) {
+        return getName();
+    }
+
+    public @NonNull String getValueLabel() {
+        return getValueLabel(0);
+    }
+
+    public @NonNull String getFormattedRealTimeValue() {
+        return formatValue(getRealTimeValue());
+    }
+
+    public @NonNull String formatValue(V v) {
+        return formatValue(v, 0);
+    }
+
+    public @NonNull String formatValue(V v, int para) {
+        if (v == null) {
+            return "";
+        }
+        return formatValue(v.getRawValue(para), para);
+    }
+
+    public @NonNull String formatValue(double rawValue) {
+        return formatValue(rawValue, 0);
+    }
+
+    public abstract @NonNull String formatValue(double rawValue, int para);
+
+    public @NonNull String decorateValue(V v) {
         return decorateValue(v, 0);
     }
 
-    public String decorateValue(V v, int para) {
-        Decorator<V> decorator = mConfiguration.getDecorator();
-        return decorator != null
-                ? decorator.decorateValue(v, para)
-                : null;
+    public @NonNull String decorateValue(V v, int para) {
+        if (v == null) {
+            return "";
+        }
+        return decorateValue(v.getRawValue(para), para);
     }
 
-    public String getDecoratedRealTimeValue() {
+    public @NonNull String decorateValue(double rawValue, int para) {
+        Decorator<V> decorator = mConfiguration.getDecorator();
+        if (decorator != null) {
+            String result = decorator.decorateValue(rawValue, para);
+            if (!result.isEmpty()) {
+                return result;
+            }
+        }
+        return formatValue(rawValue, para);
+    }
+
+    public @NonNull String getDecoratedRealTimeValue() {
         return getDecoratedRealTimeValue(0);
     }
 
-    public String getDecoratedRealTimeValue(int para) {
-        V v = mDynamicValueContainer.getLatestValue();
-        return v != null
-                ? decorateValue(v, para)
-                : null;
+    public @NonNull String getDecoratedRealTimeValue(int para) {
+        return decorateValue(getRealTimeValue(), para);
+//        V v = mDynamicValueContainer.getLatestValue();
+//        return v != null
+//                ? decorateValue(v, para)
+//                : null;
     }
 
     public V getRealTimeValue() {
@@ -151,6 +207,10 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
 
     public boolean hasHistoryValue() {
         return !getHistoryValueContainer().empty();
+    }
+
+    public boolean hasValue() {
+        return hasRealTimeValue() || hasHistoryValue();
     }
 
     public boolean resetConfiguration() {

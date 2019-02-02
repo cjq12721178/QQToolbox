@@ -3,6 +3,7 @@ package com.cjq.tool.qqtoolbox.activity;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
@@ -307,30 +308,6 @@ public class TestRecyclerViewCursorLoaderActivity
     }
 
     @Override
-    public void onItemSelected(ListDialog dialog, int position) {
-        try {
-            int pos = dialog.getArguments().getInt("position");
-            ContentValues values = new ContentValues();
-            values.put("sex", position);
-
-            //同步
-            //mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(dialog.getArguments().getInt("position"))) });
-            //mAdapter.scheduleItemChange(position, MyRecyclerViewCursorAdapter.MODIFY_SEX);
-            //mCursorLoader.onContentChanged();
-
-            //异步
-            mAsyncEventHandler.startUpdate(TOKEN_MODIFY_SEX,
-                    new RecyclerViewCursorAdapter.ItemMotion(pos, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_CHANGE),
-                    "student", values,
-                    "_id = ?",
-                    new String[] { String.valueOf(mAdapter.getItemId(pos)) },
-                    SQLiteDatabase.CONFLICT_NONE);
-        } catch (Exception e) {
-            ExceptionLog.display(e);
-        }
-    }
-
-    @Override
     public void onQueryComplete(int token, Object cookie, Cursor cursor) {
 
     }
@@ -367,6 +344,30 @@ public class TestRecyclerViewCursorLoaderActivity
     @Override
     public void onExecSqlComplete(int token, Object cookie, boolean result) {
 
+    }
+
+    @Override
+    public void onItemSelected(@NonNull ListDialog dialog, int position, @NonNull Object[] items) {
+        try {
+            int pos = dialog.getArguments().getInt("position");
+            ContentValues values = new ContentValues();
+            values.put("sex", position);
+
+            //同步
+            //mOpenHelper.getWritableDatabase().update("student", values, "_id = ?", new String[] { String.valueOf(mAdapter.getItemId(dialog.getArguments().getInt("position"))) });
+            //mAdapter.scheduleItemChange(position, MyRecyclerViewCursorAdapter.MODIFY_SEX);
+            //mCursorLoader.onContentChanged();
+
+            //异步
+            mAsyncEventHandler.startUpdate(TOKEN_MODIFY_SEX,
+                    new RecyclerViewCursorAdapter.ItemMotion(pos, 1, RecyclerViewCursorAdapter.ItemMotion.MOTION_CHANGE),
+                    "student", values,
+                    "_id = ?",
+                    new String[] { String.valueOf(mAdapter.getItemId(pos)) },
+                    SQLiteDatabase.CONFLICT_NONE);
+        } catch (Exception e) {
+            ExceptionLog.display(e);
+        }
     }
 }
 

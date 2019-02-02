@@ -13,7 +13,7 @@ import static com.cjq.lib.weisi.iot.container.Value.SEARCH_HELPER;
 
 public abstract class HistoryValueContainer<V extends Value> extends BaseValueContainer<V> {
 
-    private List<V> mValues = new ArrayList<>();
+    private final List<V> mValues = new ArrayList<>();
 
     @Override
     protected int onAddValue(long timestamp) {
@@ -70,8 +70,8 @@ public abstract class HistoryValueContainer<V extends Value> extends BaseValueCo
 
     @Override
     public int findValuePosition(long timestamp) {
-        synchronized (mValues) {
-            return ExpandCollections.INSTANCE.binarySearch(mValues,
+        synchronized (this) {
+            return ExpandCollections.binarySearch(mValues,
                     timestamp,
                     SEARCH_HELPER);
         }

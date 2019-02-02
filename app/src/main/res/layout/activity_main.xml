@@ -364,6 +364,14 @@
             android:onClick="onClick"
             app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
             app:layout_constraintTop_toBottomOf="@id/btn_test_dialog_fragment_linear_layout_match_parent"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/btn_test_constraint_layout"
+            android:text="测试ConstraintLayout"
+            android:onClick="onClick"
+            app:layout_constraintLeft_toLeftOf="@id/tv_label_size_self_adaption"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_dialog_fragment_relative_layout_match_parent"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -372,7 +380,7 @@
             android:text="Lifecycle"
             android:layout_marginLeft="16dp"
             android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/btn_test_dialog_fragment_relative_layout_match_parent"
+            app:layout_constraintTop_toBottomOf="@id/btn_test_constraint_layout"
             app:layout_constraintLeft_toLeftOf="parent"
             android:layout_marginStart="16dp"/>
         <Button

@@ -21,8 +21,8 @@
 <Sensor>
 	<DataTypes>
 		<DataType>
-			<curve>10002</curve>
 			<value>01</value>
+			<curve>10002</curve>
 			<name>最高温度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -33,8 +33,8 @@
 			<coefficient>0.0078125</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10002</curve>
 			<value>02</value>
+			<curve>10002</curve>
 			<name>最低温度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -45,8 +45,8 @@
 			<coefficient>0.0078125</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10002</curve>
 			<value>03</value>
+			<curve>10002</curve>
 			<name>平均温度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -57,8 +57,8 @@
 			<coefficient>0.0078125</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10002</curve>
 			<value>04</value>
+			<curve>10002</curve>
 			<name>点阵温度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -69,8 +69,8 @@
 			<coefficient>0.0078125</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10002</curve>
 			<value>05</value>
+			<curve>10002</curve>
 			<name>温度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -81,8 +81,8 @@
 			<coefficient>0.0078125</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10002</curve>
 			<value>06</value>
+			<curve>10002</curve>
 			<name>背景温度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -93,8 +93,8 @@
 			<coefficient>0.0078125</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10002</curve>
 			<value>07</value>
+			<curve>10002</curve>
 			<name>宽温</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -105,8 +105,8 @@
 			<coefficient>0.0625</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10002</curve>
 			<value>08</value>
+			<curve>10002</curve>
 			<name>空气露点温度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -117,8 +117,8 @@
 			<coefficient>0.0078125</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10003</curve>
 			<value>10</value>
+			<curve>10003</curve>
 			<name>避雷器泄露电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -129,8 +129,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>30004</curve>
 			<value>11</value>
+			<curve>30004</curve>
 			<name>避雷器动作次数</name>
 			<type>2</type>
 			<signed>false</signed>
@@ -140,8 +140,8 @@
 			</float>
 		</DataType>
 		<DataType>
-			<curve>10003</curve>
 			<value>12</value>
+			<curve>10003</curve>
 			<name>基波</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -152,8 +152,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10003</curve>
 			<value>13</value>
+			<curve>10003</curve>
 			<name>基波电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -164,8 +164,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10003</curve>
 			<value>14</value>
+			<curve>10003</curve>
 			<name>三次谐波电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -176,8 +176,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10003</curve>
 			<value>15</value>
+			<curve>10003</curve>
 			<name>阻性电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -188,8 +188,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>16</value>
+			<curve>10005</curve>
 			<name>阻性电流相角</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -200,8 +200,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10003</curve>
 			<value>1A</value>
+			<curve>10003</curve>
 			<name>避雷器泄露电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -212,8 +212,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10006</curve>
 			<value>1C</value>
+			<curve>10006</curve>
 			<name>剩余电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -224,8 +224,8 @@
 			<coefficient>0.001</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10007</curve>
 			<value>1D</value>
+			<curve>10007</curve>
 			<name>小电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -236,8 +236,8 @@
 			<coefficient>0.05</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10006</curve>
 			<value>1E</value>
+			<curve>10006</curve>
 			<name>大电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -248,8 +248,8 @@
 			<coefficient>0.05</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10006</curve>
 			<value>1F</value>
+			<curve>10006</curve>
 			<name>零序电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -260,8 +260,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10008</curve>
 			<value>20</value>
+			<curve>10008</curve>
 			<name>相位总电压</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -272,8 +272,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10008</curve>
 			<value>21</value>
+			<curve>10008</curve>
 			<name>相位基波</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -284,8 +284,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10008</curve>
 			<value>22</value>
+			<curve>10008</curve>
 			<name>相位三次谐波</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -296,8 +296,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10008</curve>
 			<value>28</value>
+			<curve>10008</curve>
 			<name>分流器电压</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -308,8 +308,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>29</value>
+			<curve>10009</curve>
 			<name>直流电压</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -320,8 +320,8 @@
 			<coefficient>0.05</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>2A</value>
+			<curve>10009</curve>
 			<name>交流电压</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -332,8 +332,8 @@
 			<coefficient>0.05</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1000A</curve>
 			<value>2C</value>
+			<curve>1000A</curve>
 			<name>发送信号增益</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -344,8 +344,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1000B</curve>
 			<value>2D</value>
+			<curve>1000B</curve>
 			<name>接收信号电平</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -356,8 +356,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>2000C</curve>
 			<value>30</value>
+			<curve>2000C</curve>
 			<name>变压器防盗</name>
 			<type>1</type>
 			<signed/>
@@ -367,8 +367,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>1000D</curve>
 			<value>40</value>
+			<curve>1000D</curve>
 			<name>湿度</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -379,8 +379,8 @@
 			<coefficient>0.5</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1000E</curve>
 			<value>42</value>
+			<curve>1000E</curve>
 			<name>水位</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -391,8 +391,8 @@
 			<coefficient>0.001</coefficient>
 		</DataType>
 		<DataType>
-			<curve>30004</curve>
 			<value>43</value>
+			<curve>30004</curve>
 			<name>水浸次数</name>
 			<type>2</type>
 			<signed>false</signed>
@@ -402,8 +402,8 @@
 			</float>
 		</DataType>
 		<DataType>
-			<curve>1000E</curve>
 			<value>44</value>
+			<curve>1000E</curve>
 			<name>雨量</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -414,8 +414,8 @@
 			<coefficient>0.05</coefficient>
 		</DataType>
 		<DataType>
-			<curve>2000F</curve>
 			<value>45</value>
+			<curve>2000F</curve>
 			<name>磁控开关</name>
 			<type>1</type>
 			<status>
@@ -424,8 +424,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>20010</curve>
 			<value>47</value>
+			<curve>20010</curve>
 			<name>热释电红外</name>
 			<type>1</type>
 			<status>
@@ -434,8 +434,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>20011</curve>
 			<value>48</value>
+			<curve>20011</curve>
 			<name>烟雾报警</name>
 			<type>1</type>
 			<status>
@@ -444,8 +444,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>10012</curve>
 			<value>49</value>
+			<curve>10012</curve>
 			<name>光照(低)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -456,8 +456,8 @@
 			<coefficient>5</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10012</curve>
 			<value>4A</value>
+			<curve>10012</curve>
 			<name>光照(高)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -468,16 +468,16 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10013</curve>
 			<value>4C</value>
+			<curve>10013</curve>
 			<name>接地桩/线地址</name>
 			<type>0</type>
 			<signed>false</signed>
 			<interpreter>ground</interpreter>
 		</DataType>
 		<DataType>
-			<curve>10014</curve>
 			<value>4D</value>
+			<curve>10014</curve>
 			<name>Z轴形变</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -488,8 +488,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10014</curve>
 			<value>4E</value>
+			<curve>10014</curve>
 			<name>Y轴形变</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -500,8 +500,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10014</curve>
 			<value>4F</value>
+			<curve>10014</curve>
 			<name>X轴形变</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -512,8 +512,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>20015</curve>
 			<value>50</value>
+			<curve>20015</curve>
 			<name>震动状态</name>
 			<type>1</type>
 			<status>
@@ -522,8 +522,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>20016</curve>
 			<value>52</value>
+			<curve>20016</curve>
 			<name>应急灯状态</name>
 			<type>1</type>
 			<status>
@@ -532,8 +532,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>10017</curve>
 			<value>54</value>
+			<curve>10017</curve>
 			<name>无功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -544,8 +544,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10018</curve>
 			<value>55</value>
+			<curve>10018</curve>
 			<name>有功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -556,8 +556,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10019</curve>
 			<value>56</value>
+			<curve>10019</curve>
 			<name>视在功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -568,8 +568,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1001A</curve>
 			<value>57</value>
+			<curve>1001A</curve>
 			<name>电量</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -580,8 +580,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>58</value>
+			<curve>10005</curve>
 			<name>功率因素</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -592,8 +592,8 @@
 			<coefficient>0.0001</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1001B</curve>
 			<value>59</value>
+			<curve>1001B</curve>
 			<name>频率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -604,8 +604,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1001C</curve>
 			<value>60</value>
+			<curve>1001C</curve>
 			<name>气压</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -616,8 +616,8 @@
 			<coefficient>2</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1001D</curve>
 			<value>61</value>
+			<curve>1001D</curve>
 			<name>风速</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -628,8 +628,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>62</value>
+			<curve>10005</curve>
 			<name>风向</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -640,8 +640,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1001E</curve>
 			<value>63</value>
+			<curve>1001E</curve>
 			<name>导线拉力</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -652,8 +652,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1001F</curve>
 			<value>64</value>
+			<curve>1001F</curve>
 			<name>气压(绝对)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -664,8 +664,8 @@
 			<coefficient>0.05</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10020</curve>
 			<value>65</value>
+			<curve>10020</curve>
 			<name>重力加速度X轴(高)</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -676,8 +676,8 @@
 			<coefficient>0.25</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10020</curve>
 			<value>66</value>
+			<curve>10020</curve>
 			<name>重力加速度Y轴(高)</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -688,8 +688,8 @@
 			<coefficient>0.25</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10020</curve>
 			<value>67</value>
+			<curve>10020</curve>
 			<name>重力加速度Z轴(高)</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -700,8 +700,8 @@
 			<coefficient>0.25</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1000D</curve>
 			<value>6A</value>
+			<curve>1000D</curve>
 			<name>土壤容积含水率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -712,8 +712,8 @@
 			<coefficient>10.5</coefficient>
 		</DataType>
 		<DataType>
-			<curve>1000A</curve>
 			<value>6B</value>
+			<curve>1000A</curve>
 			<name>声音强度</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -724,8 +724,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>6C</value>
+			<curve>10005</curve>
 			<name>X轴角度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -736,8 +736,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>6D</value>
+			<curve>10005</curve>
 			<name>Y轴角度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -748,8 +748,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>6E</value>
+			<curve>10005</curve>
 			<name>Z轴角度</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -760,8 +760,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10021</curve>
 			<value>6F</value>
+			<curve>10021</curve>
 			<name>位移</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -772,8 +772,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10021</curve>
 			<value>70</value>
+			<curve>10021</curve>
 			<name>距离</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -784,8 +784,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10020</curve>
 			<value>71</value>
+			<curve>10020</curve>
 			<name>重力加速度X轴(低)</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -796,8 +796,8 @@
 			<coefficient>2.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10020</curve>
 			<value>72</value>
+			<curve>10020</curve>
 			<name>重力加速度Y轴(低)</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -808,8 +808,8 @@
 			<coefficient>2.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10020</curve>
 			<value>73</value>
+			<curve>10020</curve>
 			<name>重力加速度Z轴(低)</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -820,8 +820,8 @@
 			<coefficient>2.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10021</curve>
 			<value>74</value>
+			<curve>10021</curve>
 			<name>直线位移</name>
 			<type>0</type>
 			<signed>true</signed>
@@ -832,8 +832,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10022</curve>
 			<value>75</value>
+			<curve>10022</curve>
 			<name>氧气体积</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -844,8 +844,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10023</curve>
 			<value>77</value>
+			<curve>10023</curve>
 			<name>一氧化碳体积</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -856,8 +856,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10023</curve>
 			<value>78</value>
+			<curve>10023</curve>
 			<name>二氧化碳体积</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -868,8 +868,8 @@
 			<coefficient>1.0</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10022</curve>
 			<value>79</value>
+			<curve>10022</curve>
 			<name>甲烷体积</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -880,8 +880,8 @@
 			<coefficient>0.1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>20024</curve>
 			<value>81</value>
+			<curve>20024</curve>
 			<name>继电器状态(通道1)</name>
 			<type>1</type>
 			<status>
@@ -890,8 +890,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>20024</curve>
 			<value>82</value>
+			<curve>20024</curve>
 			<name>继电器状态(通道2)</name>
 			<type>1</type>
 			<status>
@@ -900,8 +900,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>20024</curve>
 			<value>83</value>
+			<curve>20024</curve>
 			<name>继电器状态(通道3)</name>
 			<type>1</type>
 			<status>
@@ -910,8 +910,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>20024</curve>
 			<value>84</value>
+			<curve>20024</curve>
 			<name>继电器状态(通道4)</name>
 			<type>1</type>
 			<status>
@@ -920,8 +920,8 @@
 			</status>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>8A</value>
+			<curve>10009</curve>
 			<name>输入电压(通道1)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -932,8 +932,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>8B</value>
+			<curve>10009</curve>
 			<name>输入电压(通道2)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -944,8 +944,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>8C</value>
+			<curve>10009</curve>
 			<name>输出电压(通道1)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -956,8 +956,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>8D</value>
+			<curve>10009</curve>
 			<name>输出电压(通道2)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -968,8 +968,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10006</curve>
 			<value>8E</value>
+			<curve>10006</curve>
 			<name>输出电流(通道1)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -980,8 +980,8 @@
 			<coefficient>0.001</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10006</curve>
 			<value>8F</value>
+			<curve>10006</curve>
 			<name>输出电流(通道2)</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -992,8 +992,8 @@
 			<coefficient>0.001</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10018</curve>
 			<value>A0</value>
+			<curve>10018</curve>
 			<name>A相有功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1004,8 +1004,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10017</curve>
 			<value>A1</value>
+			<curve>10017</curve>
 			<name>A相无功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1016,8 +1016,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10019</curve>
 			<value>A2</value>
+			<curve>10019</curve>
 			<name>A相视在功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1028,8 +1028,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>A3</value>
+			<curve>10005</curve>
 			<name>A相功率因素</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1040,8 +1040,8 @@
 			<coefficient>0.0001</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10006</curve>
 			<value>A4</value>
+			<curve>10006</curve>
 			<name>A相电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1052,8 +1052,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>A5</value>
+			<curve>10009</curve>
 			<name>A相电压</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1064,8 +1064,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10018</curve>
 			<value>B0</value>
+			<curve>10018</curve>
 			<name>B相有功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1076,8 +1076,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10017</curve>
 			<value>B1</value>
+			<curve>10017</curve>
 			<name>B相无功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1088,8 +1088,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10019</curve>
 			<value>B2</value>
+			<curve>10019</curve>
 			<name>B相视在功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1100,8 +1100,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>B3</value>
+			<curve>10005</curve>
 			<name>B相功率因素</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1112,8 +1112,8 @@
 			<coefficient>0.0001</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10006</curve>
 			<value>B4</value>
+			<curve>10006</curve>
 			<name>B相电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1124,8 +1124,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>B5</value>
+			<curve>10009</curve>
 			<name>B相电压</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1136,8 +1136,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10018</curve>
 			<value>C0</value>
+			<curve>10018</curve>
 			<name>C相有功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1148,8 +1148,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10017</curve>
 			<value>C1</value>
+			<curve>10017</curve>
 			<name>C相无功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1160,8 +1160,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10019</curve>
 			<value>C2</value>
+			<curve>10019</curve>
 			<name>C相视在功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1172,8 +1172,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10005</curve>
 			<value>C3</value>
+			<curve>10005</curve>
 			<name>C相功率因素</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1184,8 +1184,8 @@
 			<coefficient>0.0001</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10006</curve>
 			<value>C4</value>
+			<curve>10006</curve>
 			<name>C相电流</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1196,8 +1196,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10009</curve>
 			<value>C5</value>
+			<curve>10009</curve>
 			<name>C相电压</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1208,8 +1208,8 @@
 			<coefficient>0.01</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10018</curve>
 			<value>DF</value>
+			<curve>10018</curve>
 			<name>有功功率</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1220,8 +1220,8 @@
 			<coefficient>1</coefficient>
 		</DataType>
 		<DataType>
-			<curve>10025</curve>
 			<value>F1</value>
+			<curve>10025</curve>
 			<name>异常指示</name>
 			<type>0</type>
 			<signed>false</signed>
@@ -1254,8 +1254,8 @@
 			</ErrorState>
 		</DataType>
 		<DataType>
-			<curve>30026</curve>
 			<value>F5</value>
+			<curve>30026</curve>
 			<name>无线中继器状态信息</name>
 			<type>2</type>
 			<signed>false</signed>

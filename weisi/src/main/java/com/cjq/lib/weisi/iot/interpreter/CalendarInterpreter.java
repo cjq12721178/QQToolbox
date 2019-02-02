@@ -1,5 +1,6 @@
 package com.cjq.lib.weisi.iot.interpreter;
 
+import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import java.text.SimpleDateFormat;
@@ -38,7 +39,7 @@ public class CalendarInterpreter implements ValueInterpreter {
     }
 
     @Override
-    public String interpret(double value) {
+    public @NonNull String interpret(double value) {
         //原始数据为秒，且为int，后为了与其他传感器统一，转为float
         DATE.setTime((long)Float.floatToIntBits((float)value) * 1000 - TIME_DIFFERENCE);
         return dateFormat.format(DATE);

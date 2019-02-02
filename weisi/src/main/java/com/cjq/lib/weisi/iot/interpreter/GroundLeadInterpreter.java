@@ -1,5 +1,7 @@
 package com.cjq.lib.weisi.iot.interpreter;
 
+import android.support.annotation.NonNull;
+
 /**
  * Created by CJQ on 2017/8/8.
  */
@@ -24,7 +26,7 @@ public class GroundLeadInterpreter implements ValueInterpreter {
     }
 
     @Override
-    public String interpret(double value) {
+    public @NonNull String interpret(double value) {
         int address = (int) value;
         int stubAddress = address & 0xff00;
         int lineAddress = address & 0xff;

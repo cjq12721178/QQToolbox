@@ -7,8 +7,8 @@ android {
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 27
-        versionCode 148
-        versionName "7.1.5"
+        versionCode 152
+        versionName "7.1.9"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -40,6 +40,10 @@ android {
         cmake {
             path 'CMakeLists.txt'
         }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 

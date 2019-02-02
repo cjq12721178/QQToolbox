@@ -466,6 +466,9 @@ public class MainActivity
             case R.id.btn_test_adaptive_table_layout:
                 startActivity(new Intent(this, TestAdaptiveTableLayoutActivity.class));
                 break;
+            case R.id.btn_test_constraint_layout:
+                startActivity(new Intent(this, TestConstraintLayoutActivity.class));
+                break;
         }
     }
 
@@ -698,7 +701,7 @@ public class MainActivity
     }
 
     @Override
-    public void onItemsSelected(ListDialog dialog, int[] positions) {
+    public void onItemsSelected(@NonNull ListDialog dialog, @NonNull int[] positions, @NonNull Object[] items) {
         StringBuilder builder = new StringBuilder();
         builder.append("selected items: ");
         if (positions.length > 0) {

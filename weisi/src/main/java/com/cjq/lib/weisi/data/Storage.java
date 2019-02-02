@@ -124,6 +124,7 @@ public class Storage<E> implements Parcelable {
         int previousSize = size();
         mElements.clear();
         mElementsProvider.onProvideElements(mElements, mFilters);
+        resort(null);
         notifyFilterChangeListener(listener, previousSize);
         return previousSize;
     }
@@ -196,18 +197,58 @@ public class Storage<E> implements Parcelable {
         return position != -1 ? getOrderPosition(position) : -1;
     }
 
+    //返回值大于等于0，表示找到该元素，返回值表示元素position
+    //返回值等于-1，表示未找到该元素
     public int find(@NonNull E e) {
-        int position;
-        if (mFilters.match(e)) {
-            if (mSorter != null) {
-                position = mSorter.find(mElements, e);
-            } else {
-                position = mElements.indexOf(e);
+        return find(e, true);
+//        int position;
+//        if (mFilters.match(e)) {
+//            if (mSorter != null) {
+//                position = mSorter.find(mElements, e);
+//            } else {
+//                position = mElements.indexOf(e);
+//            }
+//        } else {
+//            position = -1;
+//        }
+//        return position >= 0
+//                ? getOrderPosition(position)
+//                : -1;
+    }
+
+    public int find(@NonNull E e, boolean allowFilter) {
+        return find(e, allowFilter, true);
+//        if (allowFilter) {
+//            if (!mFilters.match(e)) {
+//                return -1;
+//            }
+//        }
+//        int position;
+//        if (mSorter != null) {
+//            position = mSorter.find(mElements, e);
+//        } else {
+//            position = mElements.indexOf(e);
+//        }
+//        return position >= 0
+//                ? getOrderPosition(position)
+//                : -1;
+    }
+
+    public int find(@NonNull E e, boolean allowFilter, boolean binarySearch) {
+        if (allowFilter) {
+            if (!mFilters.match(e)) {
+                return -1;
             }
-        } else {
-            position = -1;
         }
-        return position != -1 ? getOrderPosition(position) : -1;
+        int position;
+        if (mSorter != null && binarySearch) {
+            position = mSorter.find(mElements, e);
+        } else {
+            position = mElements.indexOf(e);
+        }
+        return position >= 0
+                ? getOrderPosition(position)
+                : -1;
     }
 
     public <T> int find(@NonNull T t, @NonNull ExpandComparator<E, T> comparator) {
@@ -218,6 +259,38 @@ public class Storage<E> implements Parcelable {
             }
         }
         return i == count ? -1 : getOrderPosition(i);
+    }
+
+    //是否包含e本身
+    public boolean contains(@NonNull E e, boolean binarySearch, boolean allowFilter) {
+        return find(e, allowFilter, binarySearch) != -1;
+//        if (binarySearch) {
+//            return find(e, allowFilter) >= 0;
+//        }
+//        if (allowFilter) {
+//            if (!mFilters.match(e)) {
+//                return false;
+//            }
+//        }
+//        return mElements.contains(e);
+    }
+
+    public boolean removeAt(int position) {
+        return position >= 0
+                && position < mElements.size()
+                && mSorter.removeAt(mElements, getOrderPosition(position));
+    }
+
+    public int remove(@NonNull E e, boolean binarySearch, boolean allowFilter) {
+        int position = find(e, allowFilter, binarySearch);
+        return removeAt(position) ? position : -1;
+//        if (allowFilter) {
+//            if (!mFilters.match(e)) {
+//                return -1;
+//            }
+//        }
+//        int result = binarySearch ? mSorter.remove(mElements, e) : mElements.indexOf(e);
+//        return result != -1 ? getOrderPosition(result) : result;
     }
 
 //    public <T> int find(@NonNull T t, @NonNull Comparator<E, T> comparator) {
@@ -281,7 +354,6 @@ public class Storage<E> implements Parcelable {
             return new Storage[size];
         }
     };
-
 //    public interface Comparator<E, T> {
 //        boolean equals(@NonNull E e, @NonNull T t);
 //    }

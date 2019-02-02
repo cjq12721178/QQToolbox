@@ -180,7 +180,7 @@ public class TestSimpleCursorLoaderActivity
     }
 
     @Override
-    public void onItemSelected(ListDialog dialog, int position) {
+    public void onItemSelected(@NonNull ListDialog dialog, int position, @NonNull Object[] items) {
         try {
             ContentValues values = new ContentValues();
             values.put("sex", position);

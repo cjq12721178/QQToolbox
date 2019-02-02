@@ -1,5 +1,7 @@
 package com.cjq.lib.weisi.iot.interpreter;
 
+import android.support.annotation.NonNull;
+
 import java.util.Map;
 
 /**
@@ -14,7 +16,11 @@ public class ParaphraseInterpreter implements ValueInterpreter {
     }
 
     @Override
-    public String interpret(double value) {
-        return paraphrases.get(value);
+    public @NonNull String interpret(double value) {
+        String result = paraphrases.get(value);
+        if (result != null) {
+            return result;
+        }
+        return "";
     }
 }

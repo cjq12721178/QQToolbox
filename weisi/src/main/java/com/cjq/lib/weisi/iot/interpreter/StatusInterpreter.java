@@ -1,5 +1,7 @@
 package com.cjq.lib.weisi.iot.interpreter;
 
+import android.support.annotation.NonNull;
+
 /**
  * Created by KAT on 2016/11/23.
  */
@@ -14,7 +16,7 @@ public class StatusInterpreter implements ValueInterpreter {
     }
 
     @Override
-    public String interpret(double value) {
+    public @NonNull String interpret(double value) {
         return value == 1 ? on : off;
     }
 }

@@ -13,7 +13,9 @@ open class ConfigurationImporter : DefaultHandler() {
 
     @JvmField
     protected val DATA_TYPE = "DataType"
+    protected val DATA_TYPE_VALUE = "value"
 
+    protected var elementConsumed = false
     protected val builder = StringBuilder()
     protected var dataTypeValue:Byte = 0
     private var valueType = -1
@@ -50,8 +52,9 @@ open class ConfigurationImporter : DefaultHandler() {
 
     @Throws(SAXException::class)
     override fun endElement(uri:String?, localName:String?, qName:String?) {
+        elementConsumed = true
         when (qName) {
-            "value" -> dataTypeValue = Integer.parseInt(builder.toString(), 16).toByte()
+            DATA_TYPE_VALUE -> dataTypeValue = Integer.parseInt(builder.toString(), 16).toByte()
             "type" -> valueType = Integer.parseInt(builder.toString())
             "signed" -> signed = java.lang.Boolean.parseBoolean(builder.toString())
             "coefficient" -> coefficient = java.lang.Double.parseDouble(builder.toString())
@@ -62,6 +65,9 @@ open class ConfigurationImporter : DefaultHandler() {
                     valueType = -1
                     coefficient = 1.0
                 }
+            }
+            else -> {
+                elementConsumed = false
             }
         }
     }

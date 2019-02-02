@@ -57,6 +57,8 @@
         </activity>
         <activity android:name=".activity.TestAdaptiveTableLayoutActivity">
         </activity>
+        <activity android:name=".activity.TestConstraintLayoutActivity">
+        </activity>
     </application>
 
 </manifest>

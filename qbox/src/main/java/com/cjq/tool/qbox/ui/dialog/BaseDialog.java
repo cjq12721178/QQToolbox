@@ -533,28 +533,13 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         View vContent = onCreateContentView(inflater, clBase, decorator, savedInstanceState);
         //安排位置并设置分隔线
         arrangeViewPositionAndSetSeparationLine(clBase, vTitle, vExit, vContent, decorator);
-        //return clBase;
-//        onSetContentView(vContent, decorator, savedInstanceState);
-//        ConstraintSet constraintSet = new ConstraintSet();
-//        constraintSet.clone(clBase);
-//        constraintSet.constrainHeight(vContent.getId(), getProperContentGroupHeight(vContent, decorator));
-//        constraintSet.applyTo(clBase);
         return clBase;
-        //getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-        //return onPostCreateView(clBase, decorator, savedInstanceState);
     }
-
-//    protected View onPostCreateView(View baseView, D decorator, @Nullable Bundle savedInstanceState) {
-//        return baseView;
-//    }
 
     private ConstraintLayout inflateBaseView(LayoutInflater inflater,
                                              D decorator) {
-        //LinearLayout layout = (LinearLayout)inflater.inflate(R.layout.qbox_dialog_base, null);
-        //ConstraintLayout layout = (ConstraintLayout) inflater.inflate(R.layout.qbox_dialog_base, null);
-        //ConstraintLayout layout = (ConstraintLayout)inflater.inflate(R.layout.qbox_dialog_base, getDialog().getWindow().findViewById(android.R.id.content), false);
-        //getDialog().getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         ConstraintLayout layout = new ConstraintLayout(getContext());
+        //layout.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         setViewBackground(layout, decorator.getBaseBackgroundRes());
         Resources resources = getResources();
         int leftPaddingDimenRes = decorator.getBaseLeftPaddingDimenRes();
@@ -609,16 +594,6 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         if (contentLayoutRes != 0) {
             View contentView = inflater.inflate(contentLayoutRes, baseView, false);
             onSetContentView(contentView, decorator, savedInstanceState);
-//            int intervalRes = decorator.getViewVerticalIntervalDimenRes();
-//            if (intervalRes != 0) {
-//                int interval = getResources().getDimensionPixelSize(intervalRes);
-//                for (int i = 2, n = baseView.getChildCount();i < n;++i) {
-//                    View childView = baseView.getChildAt(i);
-//                    LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) childView.getLayoutParams();
-//                    params.setMargins(params.leftMargin, interval, params.rightMargin, params.bottomMargin);
-//                    childView.setLayoutParams(params);
-//                }
-//            }
             ensureViewIdExist(contentView);
             return contentView;
         }
@@ -640,12 +615,10 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         if (isDrawTitle()) {
             String title = getTitle();
             if (!TextUtils.isEmpty(title)) {
-                //ViewStub vsTitle = baseView.findViewById(R.id.vs_title_dialog_base);
                 TextView tvTitle;
                 View vTitleCarrier;
                 int titleLayoutRes = decorator.getTitleLayoutRes();
                 if (titleLayoutRes != 0) {
-                    //vsTitle.setLayoutResource(titleLayoutRes);
                     vTitleCarrier = LayoutInflater.from(getContext()).inflate(titleLayoutRes, baseView, false);
                     if (vTitleCarrier instanceof TextView) {
                         tvTitle = (TextView) vTitleCarrier;
@@ -667,42 +640,10 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                 tvTitle.setText(title);
                 ensureViewIdExist(vTitleCarrier);
                 return vTitleCarrier;
-                //inflateSeparationLine(baseView, attachView, decorator, false);
             }
         }
         return null;
     }
-
-//    private View onCreateTitle(ConstraintLayout baseView,
-//                               D decorator) {
-//        if (isDrawTitle()) {
-//            String title = getTitle();
-//            if (!TextUtils.isEmpty(title)) {
-//                ViewStub vsTitle = baseView.findViewById(R.id.vs_title_dialog_base);
-//                TextView tvTitle;
-//                View vTitleCarrier;
-//                int titleLayoutRes = decorator.getTitleLayoutRes();
-//                int titleId = decorator.getTitleId();
-//                if (titleLayoutRes != 0 && titleId != 0) {
-//                    vsTitle.setLayoutResource(titleLayoutRes);
-//                    vTitleCarrier = vsTitle.inflate();
-//                    tvTitle = vTitleCarrier.findViewById(titleId);
-//                } else {
-//                    tvTitle = (TextView) vsTitle.inflate();
-//                    vTitleCarrier = tvTitle;
-//                }
-//                int titleSizeRes = decorator.getTitleTextSizeDimenRes();
-//                if (titleSizeRes != 0) {
-//                    setTextViewSize(tvTitle, titleSizeRes);
-//                }
-//                tvTitle.setText(title);
-//                ensureViewIdExist(vTitleCarrier);
-//                return vTitleCarrier;
-//                //inflateSeparationLine(baseView, attachView, decorator, false);
-//            }
-//        }
-//        return null;
-//    }
 
     private void arrangeViewPositionAndSetSeparationLine(ConstraintLayout clBase, View vTitle, View vExit, View vContent, D decorator) {
         ConstraintSet constraintSet = new ConstraintSet();
@@ -714,6 +655,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             int titleId = vTitle.getId();
             constraintSet.clear(titleId);
             constraintSet.constrainWidth(titleId, decorator.getTitleWidth());
+            //constraintSet.constrainWidth(titleId, ConstraintSet.WRAP_CONTENT);
             constraintSet.constrainHeight(titleId, ConstraintSet.WRAP_CONTENT);
             constraintSet.connect(titleId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
             constraintSet.connect(titleId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
@@ -725,6 +667,7 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             clBase.addView(vExit);
             int exitId = vExit.getId();
             constraintSet.constrainWidth(exitId, decorator.getExitGroupWidth());
+            //constraintSet.constrainWidth(exitId, ConstraintSet.WRAP_CONTENT);
             constraintSet.constrainHeight(exitId, ConstraintSet.WRAP_CONTENT);
             constraintSet.connect(exitId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
             constraintSet.connect(exitId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
@@ -736,11 +679,9 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
             //安排内容位置
             clBase.addView(vContent);
             int contentId = vContent.getId();
-            constraintSet.constrainWidth(contentId, getProperContentGroupWidth(vTitle, vContent, clBase, decorator));
-            //constraintSet.constrainWidth(contentId, decorator.getContentGroupWidth());
+            constraintSet.constrainWidth(contentId, getProperContentGroupWidth(vTitle, vExit, vContent, decorator));
+            //constraintSet.constrainWidth(contentId, ConstraintSet.WRAP_CONTENT);
             constraintSet.constrainHeight(contentId, getProperContentGroupHeight(vContent, decorator));
-            //constraintSet.constrainHeight(contentId, decorator.getContentGroupHeight());
-            //constraintSet.constrainHeight(contentId, 300);
             constraintSet.connect(contentId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
             constraintSet.connect(contentId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
 
@@ -762,62 +703,11 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
                     constraintSet.connect(vExit.getId(), ConstraintSet.TOP, contentId, ConstraintSet.BOTTOM);
                 }
             }
-
-//            //设置标题下方分隔线
-//            View vTop;
-//            if (vTitle != null) {
-//                if (drawSeparationLine) {
-//                    vTop = onCreateSeparationLine(clBase, constraintSet, vTitle, vContent, decorator);
-//                    //constraintSet.connect(vTitle.getId(), ConstraintSet.BOTTOM, vTop.getId(), ConstraintSet.TOP);
-//                } else {
-//                    vTop = vTitle;
-//                }
-//            } else {
-//                vTop = null;
-//            }
-//            //设置确认/取消按钮上方分隔线
-//            View vBottom;
-//            if (vExit != null) {
-//                if (drawSeparationLine) {
-//                    vBottom = onCreateSeparationLine(clBase, constraintSet, vContent, vExit, decorator);
-//                    //constraintSet.connect(vExit.getId(), ConstraintSet.TOP, vBottom.getId(), ConstraintSet.BOTTOM);
-//                } else {
-//                    vBottom = vExit;
-//                }
-//            } else {
-//                vBottom = null;
-//            }
-//            //安排内容位置
-//            clBase.addView(vContent);
-//            int contentId = vContent.getId();
-//            constraintSet.constrainWidth(contentId, ConstraintSet.MATCH_CONSTRAINT);
-//            constraintSet.constrainHeight(contentId, ConstraintSet.WRAP_CONTENT);
-//            constraintSet.connect(contentId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
-//            constraintSet.connect(contentId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
-//            if (vTop != null) {
-//                //constraintSet.connect(contentId, ConstraintSet.TOP, vTop.getId(), ConstraintSet.BOTTOM);
-//                //constraintSet.connect(vTop.getId(), ConstraintSet.BOTTOM, contentId, ConstraintSet.TOP);
-//            } else {
-//                constraintSet.connect(contentId, ConstraintSet.TOP, ConstraintSet.PARENT_ID, ConstraintSet.TOP);
-//            }
-//            if (vBottom != null) {
-//                //constraintSet.connect(contentId, ConstraintSet.BOTTOM, vBottom.getId(), ConstraintSet.TOP);
-//                //constraintSet.connect(vBottom.getId(), ConstraintSet.TOP, contentId, ConstraintSet.BOTTOM);
-//            } else {
-//                constraintSet.connect(contentId, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-//            }
         } else {
             if (vTitle != null && vExit != null) {
                 if (drawSeparationLine) {
                     onCreateSeparationLine(clBase, constraintSet, vTitle, vExit, decorator);
-                    //constraintSet.clear(vExit.getId(), ConstraintSet.TOP);
-                    //constraintSet.connect(vLine.getId(), ConstraintSet.TOP, vTitle.getId(), ConstraintSet.BOTTOM);
-                    //constraintSet.connect(vTitle.getId(), ConstraintSet.BOTTOM, vLine.getId(), ConstraintSet.TOP);
-                    //constraintSet.connect(vLine.getId(), ConstraintSet.BOTTOM, vExit.getId(), ConstraintSet.TOP);
-                    //constraintSet.connect(vExit.getId(), ConstraintSet.TOP, vLine.getId(), ConstraintSet.BOTTOM);
                 } else {
-                    //constraintSet.addToVerticalChain(vTitle.getId(), ConstraintSet.PARENT_ID, vExit.getId());
-                    //constraintSet.addToVerticalChain(vExit.getId(), vTitle.getId(), ConstraintSet.PARENT_ID);
                     constraintSet.connect(vTitle.getId(), ConstraintSet.BOTTOM, vExit.getId(), ConstraintSet.TOP);
                     constraintSet.connect(vExit.getId(), ConstraintSet.TOP, vTitle.getId(), ConstraintSet.BOTTOM);
                 }
@@ -826,68 +716,49 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         constraintSet.applyTo(clBase);
     }
 
-//    protected int getProperContentGroupWidth(View vTitle, View vContent, ConstraintLayout clBase, D decorator) {
-//        return decorator.getContentGroupWidth();
-//    }
-
-    protected int getProperContentGroupWidth(View vTitle, View vContent, ConstraintLayout clBase, D decorator) {
+    protected int getProperContentGroupWidth(View vTitle, View vExit, View vContent, D decorator) {
         int width = decorator.getContentGroupWidth();
-        if (vTitle == null
+        if ((vTitle == null && vExit == null)
                 || width != ConstraintSet.MATCH_CONSTRAINT) {
             return width;
         }
-        vTitle.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-        int titleWidth = vTitle.getMeasuredWidth();
+        int titleWidth;
+        if (vTitle != null) {
+            vTitle.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            titleWidth = vTitle.getMeasuredWidth();
+        } else {
+            titleWidth = 0;
+        }
+        int exitWidth;
+        if (vExit != null) {
+            vExit.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            exitWidth = vExit.getMeasuredWidth();
+        } else {
+            exitWidth = 0;
+        }
+        int wrapperWidth = Math.max(titleWidth, exitWidth);
         vContent.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
         int contentWidth = vContent.getMeasuredWidth();
-        if (contentWidth >= titleWidth) {
+        if (contentWidth >= wrapperWidth) {
             return ConstraintSet.WRAP_CONTENT;
-            //return contentWidth;
         }
-        return titleWidth;
-        //return titleWidth - getDialogPaddingStartAndEnd(decorator);
+        return wrapperWidth;
     }
 
-    private int getDialogPaddingStartAndEnd(D decorator) {
-        int paddingRes = decorator.getBasePaddingDimenRes();
-        int innerPadding;
-        if (paddingRes != 0) {
-            innerPadding = getResources().getDimensionPixelSize(paddingRes) * 2;
-        } else {
-            int paddingLeftRes = decorator.getBaseLeftPaddingDimenRes();
-            int paddingRightRes = decorator.getBaseRightPaddingDimenRes();
-            innerPadding = (paddingLeftRes != 0 ? getResources().getDimensionPixelSize(paddingLeftRes) : 0)
-                    + (paddingRightRes != 0 ? getResources().getDimensionPixelSize(paddingRightRes) : 0);
-        }
-        int outerPadding = getDialog().getWindow().getDecorView().getPaddingStart()
-                + getDialog().getWindow().getDecorView().getPaddingEnd();
-        return innerPadding + outerPadding;
-    }
-
-//    protected int getProperContentGroupWidth(View vTitle, View vContent, ConstraintLayout clBase, D decorator) {
-//        int width = decorator.getContentGroupWidth();
-//        if (vTitle == null
-//                || width != ConstraintSet.MATCH_CONSTRAINT
-//                || !(vContent instanceof RecyclerView)) {
-//            return width;
+//    private int getDialogPaddingStartAndEnd(D decorator) {
+//        int paddingRes = decorator.getBasePaddingDimenRes();
+//        int innerPadding;
+//        if (paddingRes != 0) {
+//            innerPadding = getResources().getDimensionPixelSize(paddingRes) * 2;
+//        } else {
+//            int paddingLeftRes = decorator.getBaseLeftPaddingDimenRes();
+//            int paddingRightRes = decorator.getBaseRightPaddingDimenRes();
+//            innerPadding = (paddingLeftRes != 0 ? getResources().getDimensionPixelSize(paddingLeftRes) : 0)
+//                    + (paddingRightRes != 0 ? getResources().getDimensionPixelSize(paddingRightRes) : 0);
 //        }
-//        vTitle.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//        int titleWidth = vTitle.getMeasuredWidth();
-//        vContent.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED), View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
-//        int contentWidth = vContent.getMeasuredWidth();
-//        if (contentWidth >= titleWidth) {
-//            return ConstraintSet.WRAP_CONTENT;
-//            //return contentWidth;
-//        }
-//        return titleWidth - getDialogPaddingStartAndEnd(decorator);
-//    }
-
-//    private int getDialogDefaultWidth() {
-//        int screenWidth = getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT
-//                ? getResources().getDisplayMetrics().widthPixels
-//                : getResources().getDisplayMetrics().heightPixels;
-//        return screenWidth - getDialog().getWindow().getDecorView().getPaddingStart()
-//                - getDialog().getWindow().getDecorView().getPaddingEnd();
+//        int outerPadding = getDialog().getWindow().getDecorView().getPaddingStart()
+//                + getDialog().getWindow().getDecorView().getPaddingEnd();
+//        return innerPadding + outerPadding;
 //    }
 
     private int getProperContentGroupHeight(View vContent, D decorator) {
@@ -919,76 +790,24 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         vLine.setId(View.generateViewId());
         int lineId = vLine.getId();
         clBase.addView(vLine);
-        //tvLine.setTag(FLAG_SEPARATION_LINE);
         Resources resources = getResources();
         int interval = resources.getDimensionPixelSize(decorator.getViewVerticalIntervalDimenRes());
         int separationWidth = resources.getDimensionPixelSize(decorator.getSeparationLineWidthDimenRes());
-        //LinearLayout.LayoutParams params;
         constraintSet.constrainWidth(lineId, ConstraintSet.MATCH_CONSTRAINT);
         constraintSet.connect(lineId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
         constraintSet.connect(lineId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
         constraintSet.connect(lineId, ConstraintSet.TOP, vTop.getId(), ConstraintSet.BOTTOM);
-        //constraintSet.connect(lineId, ConstraintSet.BOTTOM, vBottom.getId(), ConstraintSet.TOP);
         constraintSet.connect(vBottom.getId(), ConstraintSet.TOP, lineId, ConstraintSet.BOTTOM);
-        //constraintSet.connect(vTop.getId(), ConstraintSet.BOTTOM, lineId, ConstraintSet.TOP);
         if (separationWidth > 0) {
             vLine.setBackgroundResource(decorator.getSeparationLineBackgroundRes());
-//            params = new LinearLayout.LayoutParams(
-//                    LinearLayout.LayoutParams.MATCH_PARENT,
-//                    separationWidth);
-//            params.setMargins(0, interval / 2, 0, interval / 2);
             constraintSet.constrainHeight(lineId, separationWidth);
             constraintSet.setMargin(lineId, ConstraintSet.TOP, interval / 2);
-            //constraintSet.setMargin(lineId, ConstraintSet.BOTTOM, interval / 2);
             constraintSet.setMargin(vBottom.getId(), ConstraintSet.TOP, interval / 2);
         } else {
-//            params = new LinearLayout.LayoutParams(
-//                    LinearLayout.LayoutParams.MATCH_PARENT,
-//                    interval);
             constraintSet.constrainHeight(lineId, interval);
         }
         return vLine;
     }
-
-//    private void inflateSeparationLine(ConstraintLayout baseView,
-//                                       View attachView,
-//                                       D decorator,
-//                                       boolean isAbove) {
-//        //获取tvLine在baseView中应该添加的位置
-//        int position = baseView.indexOfChild(attachView) + (isAbove ? 0 : 1);
-//
-//        //判断是否需要渲染分隔线
-//        boolean isSeparationLine = false;
-//        if (decorator.isDrawSeparationLine() && position >= 0) {
-//            View aboveView = baseView.getChildAt(position - 1);
-//            //若上一个view即为分隔线，则无需再次添加
-//            if (aboveView == null || !FLAG_SEPARATION_LINE.equals(aboveView.getTag())) {
-//                isSeparationLine = true;
-//            } else {
-//                return;
-//            }
-//        }
-//
-//        //创建分隔线，同时设置baseView中各子view间隔
-//        TextView tvLine = new TextView(getActivity());
-//        tvLine.setTag(FLAG_SEPARATION_LINE);
-//        Resources resources = getResources();
-//        int interval = resources.getDimensionPixelSize(decorator.getViewVerticalIntervalDimenRes());
-//        int separationWidth = resources.getDimensionPixelSize(decorator.getSeparationLineWidthDimenRes());
-//        LinearLayout.LayoutParams params;
-//        if (isSeparationLine && separationWidth > 0) {
-//            tvLine.setBackgroundResource(decorator.getSeparationLineBackgroundRes());
-//            params = new LinearLayout.LayoutParams(
-//                    LinearLayout.LayoutParams.MATCH_PARENT,
-//                    separationWidth);
-//            params.setMargins(0, interval / 2, 0, interval / 2);
-//        } else {
-//            params = new LinearLayout.LayoutParams(
-//                    LinearLayout.LayoutParams.MATCH_PARENT,
-//                    interval);
-//        }
-//        baseView.addView(tvLine, position, params);
-//    }
 
     private View onCreateExitGroup(LayoutInflater inflater,
                                    ConstraintLayout baseView,
@@ -1004,21 +823,10 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         }
         if (grpExit != null) {
             ensureViewIdExist(grpExit);
-//            ConstraintSet constraintSet = new ConstraintSet();
-//            constraintSet.clone(baseView);
-//            baseView.addView(grpExit);
-//            int targetId = grpExit.getId();
-//            constraintSet.constrainWidth(targetId, ConstraintSet.MATCH_CONSTRAINT);
-//            constraintSet.constrainHeight(targetId, ConstraintSet.WRAP_CONTENT);
-//            constraintSet.connect(targetId, ConstraintSet.START, ConstraintSet.PARENT_ID, ConstraintSet.START);
-//            constraintSet.connect(targetId, ConstraintSet.END, ConstraintSet.PARENT_ID, ConstraintSet.END);
-//            constraintSet.connect(targetId, ConstraintSet.BOTTOM, ConstraintSet.PARENT_ID, ConstraintSet.BOTTOM);
-//            constraintSet.applyTo(baseView);
             setExitButton(grpExit, decorator, true);
             if (exitType == EXIT_TYPE_OK_CANCEL) {
                 setExitButton(grpExit, decorator, false);
             }
-            //inflateSeparationLine(baseView, grpExit, decorator, true);
         }
         return grpExit;
     }
@@ -1035,8 +843,6 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
         int textSizeRes = decorator.getExitButtonTextSizeDimenRes();
         if (textSizeRes != 0) {
             setTextViewSize(btn, textSizeRes);
-//            btn.setTextSize(TypedValue.COMPLEX_UNIT_PX,
-//                    getResources().getDimensionPixelSize(textSizeRes));
         }
         int textColorRes = decorator.getExitButtonTextColorRes();
         if (textColorRes != 0) {

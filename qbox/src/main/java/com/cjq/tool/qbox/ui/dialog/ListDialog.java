@@ -3,6 +3,8 @@ package com.cjq.tool.qbox.ui.dialog;
 import android.content.res.Configuration;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.DimenRes;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
@@ -23,8 +25,14 @@ import com.cjq.tool.qbox.ui.adapter.RecyclerViewBaseAdapter;
 import com.cjq.tool.qbox.ui.decoration.SpaceItemDecoration;
 import com.cjq.tool.qbox.ui.gesture.SimpleRecyclerViewItemTouchListener;
 
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * Created by KAT on 2017/4/11.
@@ -33,6 +41,7 @@ import java.util.List;
 public class ListDialog extends BaseDialog<ListDialog.Decorator> {
 
     private static final String ARGUMENT_KEY_ITEMS = "items";
+    private static final String ARGUMENT_KEY_ITEM_DECORATOR = "item_decorator";
     private static final String ARGUMENT_KEY_MULTIPLE_SELECT = "mul_select";
     private ItemAdapter mItemAdapter;
 
@@ -116,19 +125,29 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
                     mItemAdapter.notifyItemChanged(position);
                 } else {
                     OnItemSelectedListener listener = getListener(OnItemSelectedListener.class);
-                    if (listener != null && mItemAdapter != null && mItemAdapter.getItems() != null) {
-                        listener.onItemSelected(ListDialog.this, position);
+                    if (listener != null && mItemAdapter != null) {
+                        listener.onItemSelected(ListDialog.this, position, getItems());
                     }
                     dismiss();
                 }
             }
         });
-        mItemAdapter = new ItemAdapter(getArguments().getStringArray(ARGUMENT_KEY_ITEMS),
+        Bundle arguments = getArguments();
+        //String[] tmpItems = arguments.getStringArray(ARGUMENT_KEY_ITEMS);
+        mItemAdapter = new ItemAdapter(getItems(),
+                (ItemDecorator) arguments.getSerializable(ARGUMENT_KEY_ITEM_DECORATOR),
                 getResources().getDimensionPixelSize(decorator.getItemTextSizeDimenRes()),
                 isMultipleSelect()
                         ? getResources().getDrawable(decorator.getSelectedBackgroundDrawableRes())
                         : null);
-        //mItemAdapter.setOnItemClickListener(this);
+//        Bundle arguments = getArguments();
+//        String[] tmpItems = arguments.getStringArray(ARGUMENT_KEY_ITEMS);
+//        mItemAdapter = new ItemAdapter(tmpItems != null ? tmpItems : arguments.getParcelableArray(ARGUMENT_KEY_ITEMS),
+//                arguments.getParcelable(ARGUMENT_KEY_ITEM_DECORATOR),
+//                getResources().getDimensionPixelSize(decorator.getItemTextSizeDimenRes()),
+//                isMultipleSelect()
+//                        ? getResources().getDrawable(decorator.getSelectedBackgroundDrawableRes())
+//                        : null);
         rvItems.setAdapter(mItemAdapter);
     }
 
@@ -154,7 +173,7 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
                 positions[j++] = i;
             }
         }
-        listener.onItemsSelected(this, positions);
+        listener.onItemsSelected(this, positions, getItems());
         return true;
     }
 
@@ -168,7 +187,58 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
     }
 
     public void setItems(String[] items) {
-        getArguments().putStringArray(ARGUMENT_KEY_ITEMS, items);
+        //getArguments().putStringArray(ARGUMENT_KEY_ITEMS, items);
+        //setItemDecorator(null);
+        setItems(items, null);
+    }
+
+    public <I> void setItems(@NonNull I[] items, ItemDecorator<I> decorator) {
+        //getArguments().putStringArray(ARGUMENT_KEY_ITEMS, items);
+
+        //getArguments().putInt(ARGUMENT_KEY_ITEMS, items);
+        //setItemDecorator(decorator);
+
+        Bundle arguments = getArguments();
+        if (items instanceof String[]) {
+            arguments.putStringArray(ARGUMENT_KEY_ITEMS, (String[]) items);
+        } else if (items instanceof Parcelable[]) {
+            arguments.putParcelableArray(ARGUMENT_KEY_ITEMS, (Parcelable[]) items);
+        } else if (items instanceof Integer[]) {
+            arguments.putIntArray(ARGUMENT_KEY_ITEMS, ArrayUtils.toPrimitive((Integer[]) items));
+        } else if (items instanceof Long[]) {
+            arguments.putLongArray(ARGUMENT_KEY_ITEMS, ArrayUtils.toPrimitive((Long[]) items));
+        } else if (items instanceof Float[]) {
+            arguments.putFloatArray(ARGUMENT_KEY_ITEMS, ArrayUtils.toPrimitive((Float[]) items));
+        } else if (items instanceof Double[]) {
+            arguments.putDoubleArray(ARGUMENT_KEY_ITEMS, ArrayUtils.toPrimitive((Double[]) items));
+        } else if (items instanceof Short[]) {
+            arguments.putShortArray(ARGUMENT_KEY_ITEMS, ArrayUtils.toPrimitive((Short[]) items));
+        } else if (items instanceof Character[]) {
+            arguments.putCharArray(ARGUMENT_KEY_ITEMS, ArrayUtils.toPrimitive((Character[]) items));
+        } else if (items instanceof CharSequence[]) {
+            arguments.putCharSequenceArray(ARGUMENT_KEY_ITEMS, (CharSequence[]) items);
+        } else if (items instanceof Byte[]) {
+            arguments.putByteArray(ARGUMENT_KEY_ITEMS, ArrayUtils.toPrimitive((Byte[]) items));
+        } else if (items instanceof Boolean[]) {
+            arguments.putBooleanArray(ARGUMENT_KEY_ITEMS, ArrayUtils.toPrimitive((Boolean[]) items));
+        } else {
+            throw new IllegalArgumentException("invalid items");
+        }
+        arguments.putSerializable(ARGUMENT_KEY_ITEM_DECORATOR, decorator != null ? decorator : new DefaultItemDecorator());
+    }
+
+//    private <I extends Parcelable> void setItemDecorator(ItemDecorator<I> decorator) {
+//        getArguments().putParcelable(ARGUMENT_KEY_ITEM_DECORATOR, decorator != null ? decorator : new DefaultItemDecorator());
+//    }
+
+    private Object[] getItems() {
+//        String[] items = getArguments().getStringArray(ARGUMENT_KEY_ITEMS);
+//        if (items != null) {
+//            return items;
+//        }
+//        return getArguments().getParcelableArray(ARGUMENT_KEY_ITEMS);
+        Object items = getArguments().get(ARGUMENT_KEY_ITEMS);
+        return items != null ? (Object[]) items : null;
     }
 
     public void setMultipleSelect(boolean enabled) {
@@ -184,16 +254,35 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         return getArguments().getBoolean(ARGUMENT_KEY_MULTIPLE_SELECT, false);
     }
 
-    private static class ItemAdapter extends RecyclerViewBaseAdapter<String> {
+    public interface ItemDecorator<I> extends Serializable {
+        String decorate(I item);
+    }
 
-        private String[] mItems;
+    private static class DefaultItemDecorator implements ItemDecorator<Object> {
+
+        private static final long serialVersionUID = 4081285457564809055L;
+
+        public DefaultItemDecorator() {
+        }
+
+        @Override
+        public String decorate(Object item) {
+            return item.toString();
+        }
+    }
+
+    private static class ItemAdapter<I> extends RecyclerViewBaseAdapter<I> {
+
+        private final I[] mItems;
+        private final ItemDecorator<I> mItemDecorator;
         private final float mItemTextSize;
         private final Drawable mSelectedBackground;
         private final boolean[] mSelections;
 
-        public ItemAdapter(String[] items, float itemTextSize, Drawable selectedBackground) {
+        public ItemAdapter(@NonNull I[] items, ItemDecorator<I> decorator, float itemTextSize, Drawable selectedBackground) {
             //super();
             mItems = items;
+            mItemDecorator = decorator;
             mItemTextSize = itemTextSize;
             mSelectedBackground = selectedBackground;
             mSelections = selectedBackground != null
@@ -202,7 +291,7 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         }
 
         @Override
-        public String getItemByPosition(int position) {
+        public I getItemByPosition(int position) {
             return mItems[position];
         }
 
@@ -211,9 +300,9 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
             return mItems != null ? mItems.length : 0;
         }
 
-        public String[] getItems() {
-            return mItems;
-        }
+//        public String[] getItems() {
+//            return mItems;
+//        }
 
         @Override
         public int getItemViewType() {
@@ -244,9 +333,9 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
         }
 
         @Override
-        public void onBindViewHolder(RecyclerView.ViewHolder holder, String item, int position) {
+        public void onBindViewHolder(RecyclerView.ViewHolder holder, I item, int position) {
             ViewHolder viewHolder = (ViewHolder) holder;
-            viewHolder.mTvItem.setText(item);
+            viewHolder.mTvItem.setText(mItemDecorator.decorate(item));
             if (mSelections != null) {
                 viewHolder.mTvItem.setBackground(mSelections[position] ? mSelectedBackground : null);
             }
@@ -265,10 +354,10 @@ public class ListDialog extends BaseDialog<ListDialog.Decorator> {
     }
 
     public interface OnItemSelectedListener {
-        void onItemSelected(@NonNull ListDialog dialog, int position);
+        void onItemSelected(@NonNull ListDialog dialog, int position, @NonNull Object[] items);
     }
 
     public interface OnMultipleItemSelectedListener {
-        void onItemsSelected(@NonNull ListDialog dialog, @NonNull int[] positions);
+        void onItemsSelected(@NonNull ListDialog dialog, @NonNull int[] positions, @NonNull Object[] items);
     }
 }

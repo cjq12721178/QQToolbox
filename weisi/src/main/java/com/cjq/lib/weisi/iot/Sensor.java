@@ -254,7 +254,24 @@ public abstract class Sensor {
             return EMPTY_CONFIGURATION;
         }
 
-//        int addDynamicValue(long timestamp, float batteryVoltage) {
+        @Override
+        public @NonNull String formatValue(double rawValue, int para) {
+            if (para == 0) {
+                return Value.getFormattedBatteryVoltage(rawValue);
+            } else {
+                return "";
+            }
+        }
+
+        @Override
+        public @NonNull String getValueLabel(int para) {
+            if (para == 0) {
+                return "电源电压";
+            }
+            return "";
+        }
+
+        //        int addDynamicValue(long timestamp, float batteryVoltage) {
 //            int result = getDynamicValueContainer().addValue(timestamp);
 //            setValueContent(getValueByContainerAddMethodReturnValue(getDynamicValueContainer(), result), batteryVoltage);
 //            return result;
@@ -294,10 +311,22 @@ public abstract class Sensor {
                 return mBatteryVoltage;
             }
 
-            public String getFormattedBatteryVoltage() {
-                return mBatteryVoltage < 0
-                        ? String.format("%d%%", ((int) mBatteryVoltage) & 0x7F)
-                        : String.format("%.2fV", mBatteryVoltage);
+            public @NonNull String getFormattedBatteryVoltage() {
+                return getFormattedBatteryVoltage(mBatteryVoltage);
+            }
+
+            @Override
+            public double getRawValue(int para) {
+                if (para == 0) {
+                    return mBatteryVoltage;
+                }
+                return 0;
+            }
+
+            static @NonNull String getFormattedBatteryVoltage(double voltage) {
+                return voltage < 0
+                        ? String.format("%d%%", ((int) voltage) & 0x7F)
+                        : String.format("%.2fV", voltage);
             }
         }
 

@@ -81,7 +81,7 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
 
     @Override
     protected void onSetContentView(View contentView, Decorator decorator, @Nullable Bundle savedInstanceState) {
-        RadioGroup rgSort = (RadioGroup) contentView.findViewById(R.id.rg_sort);
+        RadioGroup rgSort = contentView.findViewById(R.id.rg_sort);
         Bundle arguments = getArguments();
         ArrayList<SortType> sortTypes = arguments.getParcelableArrayList(ARGUMENT_KEY_SORT_TYPES);
         int selectedId = getSelectedId(arguments);
@@ -188,11 +188,6 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
 
         public @DimenRes int getDefaultSortTypeTextSizeRes() {
             return R.dimen.qbox_size_text_dialog_view;
-        }
-
-        @Override
-        public int getDefaultExitGroupWidth() {
-            return ConstraintSet.WRAP_CONTENT;
         }
     }
 

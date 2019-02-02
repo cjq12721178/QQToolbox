@@ -577,3 +577,21 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20190118-7.1.5(148):
 1. Measurement新增getCurvePattern方法，同时修改EsbSensorConfiguration.xml和BleSensorConfiguration.xml配置文件中的curve参数
+
+20190121-7.1.6(149):
+1. Measurement新增@CurvePattern，用于标识getCurvePattern方法返回值
+
+20190122-7.1.7(150):
+1. 修改SensorManager.ConfigurationImporter.endElement方法中对curve的解析
+2. Measurement新增formatValue(double,int)，getLabelValue(int)方法
+
+20190128-7.1.8(151):
+1. 修复DataType.getName可能为空的问题
+2. 优化SensorManager.ConfigurationImporter.endElement方法
+
+20190131-7.1.9(152):
+1. 优化HistoryValueContainer的部分synchronized块
+2. 修复Storage.find返回值有误的问题
+3. 新增Storage.contains方法，用于穷举查询对象自身
+4. 修复Storage.reFiltrate方法未排序的问题
+5. 添加Storage.remove、Storage.removeAt、Sorter.remove、Sorter.removeAt方法

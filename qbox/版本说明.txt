@@ -304,3 +304,14 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20181123-1.7.5(86):
 1. 修复Dialog类簇宽度显示异常的问题
+
+20190118-1.7.6(87):
+1. ListDialog新增方法setItems(@NonNull I[] items, ItemDecorator<I> decorator)，用于支持自定义数据
+2. ListDialog修改OnItemSelectedListener、OnMultipleItemSelectedListener接口，分别在方法中添加参数@NonNull Object[] items
+
+20190128-1.7.7(88):
+1. 修复SortDialog排序选项显示有误的问题
+2. 修改ListDialog.setItems，同时将ListDialog.ItemDecorator改为Serializable
+
+20190131-1.7.8(89):
+1. 优化FilterDialog方法参数，添加@NonNull

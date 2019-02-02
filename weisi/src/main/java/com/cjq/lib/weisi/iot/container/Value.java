@@ -44,6 +44,10 @@ public class Value implements Cloneable {
         mTimestamp = timeStamp;
     }
 
+    public double getRawValue(int para) {
+        return 0;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) {

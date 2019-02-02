@@ -35,7 +35,7 @@ public class RatchetWheelMeasurementA extends RatchetWheelMeasurement {
                 return null;
             }
             mValue.setTimestamp(src.getTimestamp());
-            mValue.mRawValue = mInitialValue + src.mRawValue - mInitialDistance;
+            mValue.setRawValue(mInitialValue + src.getRawValue() - mInitialDistance);
             return mValue;
         }
 
