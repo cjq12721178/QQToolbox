@@ -600,3 +600,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 1. 修复DynamicValueContainer.interpretAddResult在多线程时可能会将NEW_VALUE_ADDED解析为LOOP_VALUE_ADDED的问题
 2. 去除DynamicValueContainer多余字段mOnceExistValueSize
 3. 修复Measurement.getValueByContainerAddMethodReturnValue当container为DynamicValueContainer时，获取循环数据数组越界的问题
+
+20190214-7.2.0(154):
+1. Sensor新增OnValueAlarmListener接口，及方法setOnValueAlarmListener，提供实时数据告警接口

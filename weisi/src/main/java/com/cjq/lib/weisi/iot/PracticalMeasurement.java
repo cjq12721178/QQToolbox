@@ -13,6 +13,7 @@ import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
 public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.Configuration> {
 
     private static final Configuration EMPTY_CONFIGURATION = new DisplayMeasurement.EmptyConfiguration();
+
     private final DataType mDataType;
 
     protected PracticalMeasurement(@NonNull ID id, @NonNull DataType dataType, String name, boolean hidden) {
@@ -52,33 +53,16 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
         return mDataType;
     }
 
-//    int addDynamicValue(long timestamp, double rawValue) {
-//        int result = getDynamicValueContainer().addValue(timestamp);
-//        setValueContent(getValueByContainerAddMethodReturnValue(getDynamicValueContainer(), result), rawValue);
-//        return result;
-//    }
-//
-//    private void setValueContent(Value value, double rawValue) {
-//        if (value != null) {
-//            value.mRawValue = rawValue;
-//        }
-//    }
-//
-//    public int addHistoryValue(long timestamp, double rawValue) {
-//        int result = getHistoryValueContainer().addValue(timestamp);
-//        setValueContent(getValueByContainerAddMethodReturnValue(getHistoryValueContainer(), result), rawValue);
-//        return result;
-//    }
-
-    boolean setValueContent(@NonNull ValueContainer<Value> container, int addMethodReturnValue, double rawValue) {
+    Value setValueContent(@NonNull ValueContainer<Value> container, int addMethodReturnValue, double rawValue) {
         Value value = getValueByContainerAddMethodReturnValue(container, addMethodReturnValue);
         if (value != null) {
             if (addMethodReturnValue >= 0 || Math.abs(value.getRawValue() - rawValue) > 0.00001) {
                 value.setRawValue(rawValue);
-                return true;
+                //return true;
             }
         }
-        return false;
+        //return false;
+        return value;
     }
 
     double correctRawValue(double value) {
@@ -121,17 +105,9 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
             return String.format("%02X", mValue);
         }
 
-//        void setName(String name) {
-//            mName = TextUtils.isEmpty(name) ? "未知测量量" : name;
-//        }
-
         public String getName() {
             return mName;
         }
-
-//        public String getDefaultName() {
-//            return TextUtils.isEmpty(mName) ? "未知测量量" : mName;
-//        }
 
         void setInterpreter(ValueInterpreter interpreter) {
             mInterpreter = interpreter != null ? interpreter : DefaultInterpreter.getInstance();
@@ -141,23 +117,9 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
             return mInterpreter;
         }
 
-        //        public String getUnit() {
-//            return mUnit;
-//        }
-
         public @NonNull String formatValue(double rawValue) {
             return mInterpreter.interpret(rawValue);
         }
-
-//        public String formatValueWithUnit(Value value) {
-//            return value != null ? formatValueWithUnit(value.mRawValue) : "";
-//        }
-//
-//        public String formatValueWithUnit(double rawValue) {
-//            return mUnit != "" ?
-//                    mInterpreter.interpret(rawValue) + mUnit :
-//                    mInterpreter.interpret(rawValue);
-//        }
     }
 
     private static class DynamicValueContainerImpl extends DynamicValueContainer<Value> {

@@ -2,13 +2,11 @@ package com.cjq.tool.qqtoolbox.switchable_fragment_manager;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.cjq.tool.qbox.ui.manager.OnDataSetChangedListener;
 import com.cjq.tool.qbox.util.ClosableLog;
 import com.cjq.tool.qqtoolbox.R;
 import com.cjq.tool.qqtoolbox.util.DebugTag;
@@ -43,17 +41,17 @@ public class VisualFragment1 extends VisualFragment {
         ClosableLog.d(DebugTag.SWITCHABLE_FRAGMENT_MANAGER, "visual fragment1 onHiddenChanged " + hidden);
     }
 
-    @Override
-    public void onDataSetChanged() {
-        String text;
-        if (mStudent == null) {
-            text = "name = null, age = null";
-            ClosableLog.d(DebugTag.SWITCHABLE_FRAGMENT_MANAGER, text);
-            mTvLabel.setText(text);
-        } else {
-            text = "name = " + mStudent.getName() + ", age = " + mStudent.getAge();
-            ClosableLog.d(DebugTag.SWITCHABLE_FRAGMENT_MANAGER, text);
-            mTvLabel.setText(text);
-        }
-    }
+//    @Override
+//    public void onDataSetChanged() {
+//        String text;
+//        if (mStudent == null) {
+//            text = "name = null, age = null";
+//            ClosableLog.d(DebugTag.SWITCHABLE_FRAGMENT_MANAGER, text);
+//            mTvLabel.setText(text);
+//        } else {
+//            text = "name = " + mStudent.getName() + ", age = " + mStudent.getAge();
+//            ClosableLog.d(DebugTag.SWITCHABLE_FRAGMENT_MANAGER, text);
+//            mTvLabel.setText(text);
+//        }
+//    }
 }

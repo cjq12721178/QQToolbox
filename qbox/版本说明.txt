@@ -315,3 +315,6 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20190131-1.7.8(89):
 1. 优化FilterDialog方法参数，添加@NonNull
+
+20190214-1.7.9(90):
+1. SwitchableFragmentManager<F>，F不再继承OnDataSetChangedListener接口，并删去该接口

@@ -20,8 +20,8 @@ public abstract class Sensor {
 
     private static final int MAX_COMMUNICATION_BREAK_TIME = 60000;
     private static OnValueAchievedListener onValueAchievedListener;
-
     private static OnDynamicValueCaptureListener onDynamicValueCaptureListener;
+    private static OnValueAlarmListener onValueAlarmListener;
 
     protected final Info mInfo;
     private long mNetInTimestamp;
@@ -114,16 +114,25 @@ public abstract class Sensor {
 
     int addDynamicMeasurementValue(@NonNull PracticalMeasurement measurement, long timestamp, double rawValue, OnValueAchievedListener listener) {
         int result = measurement.getDynamicValueContainer().addValue(timestamp);
-        if (measurement.setValueContent(measurement.getDynamicValueContainer(), result, rawValue)) {
+        PracticalMeasurement.Value value = measurement.setValueContent(measurement.getDynamicValueContainer(), result, rawValue);
+        if (value != null) {
             notifyDynamicMeasurementValueAchieved(measurement, result, listener);
+            makeValueWarnerTest(measurement, value);
             return result;
         }
         return ValueContainer.ADD_FAILED_RETURN_VALUE;
     }
 
+    private void makeValueWarnerTest(@NonNull PracticalMeasurement measurement, @NonNull DisplayMeasurement.Value value) {
+        if (onValueAlarmListener != null) {
+            onValueAlarmListener.onValueTestResult(measurement, measurement.testValue(value));
+        }
+    }
+
     int addHistoryMeasurementValue(@NonNull PracticalMeasurement measurement, long timestamp, double rawValue, OnValueAchievedListener listener) {
         int result = measurement.getHistoryValueContainer().addValue(timestamp);
-        if (measurement.setValueContent(measurement.getHistoryValueContainer(), result, rawValue)) {
+        PracticalMeasurement.Value value = measurement.setValueContent(measurement.getHistoryValueContainer(), result, rawValue);
+        if (value != null) {
             notifyHistoryMeasurementValueAchieved(measurement, result, listener);
             return result;
         }
@@ -220,6 +229,14 @@ public abstract class Sensor {
                                    double rawValue);
     }
 
+    public static void setOnValueAlarmListener(OnValueAlarmListener listener) {
+        onValueAlarmListener = listener;
+    }
+
+    public interface OnValueAlarmListener {
+        void onValueTestResult(@NonNull PracticalMeasurement measurement, int warnResult);
+    }
+
     public static class Info extends Measurement<Info.Value, Info.Configuration> {
 
         private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
@@ -271,12 +288,6 @@ public abstract class Sensor {
             return "";
         }
 
-        //        int addDynamicValue(long timestamp, float batteryVoltage) {
-//            int result = getDynamicValueContainer().addValue(timestamp);
-//            setValueContent(getValueByContainerAddMethodReturnValue(getDynamicValueContainer(), result), batteryVoltage);
-//            return result;
-//        }
-
         boolean setValueContent(@NonNull ValueContainer<Value> container, int addMethodReturnValue, float batteryVoltage) {
             Value value = getValueByContainerAddMethodReturnValue(container, addMethodReturnValue);
             if (value != null) {
@@ -288,18 +299,7 @@ public abstract class Sensor {
             return false;
         }
 
-//        public int addHistoryValue(long timestamp, float batteryVoltage) {
-//            int result = getHistoryValueContainer().addValue(timestamp);
-//            setValueContent(getValueByContainerAddMethodReturnValue(getHistoryValueContainer(), result), batteryVoltage);
-//            return result;
-//        }
-
         public static class Value extends com.cjq.lib.weisi.iot.container.Value {
-
-//            public Value(long timestamp, float batteryVoltage) {
-//                super(timestamp);
-//                mBatteryVoltage = batteryVoltage;
-//            }
 
             float mBatteryVoltage;
 

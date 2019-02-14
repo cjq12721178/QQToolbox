@@ -14,7 +14,7 @@ import android.text.TextUtils;
  * Created by CJQ on 2017/7/6.
  */
 
-public class SwitchableFragmentManager<F extends Fragment & OnDataSetChangedListener> {
+public class SwitchableFragmentManager<F extends Fragment> {
 
     private static final int MESSAGE_DATA_SET_CHANGED = 1;
 
@@ -61,8 +61,7 @@ public class SwitchableFragmentManager<F extends Fragment & OnDataSetChangedList
         }
         for (int i = 0;i < classes.length;++i) {
             if (classes[i] == null ||
-                    !Fragment.class.isAssignableFrom(classes[i]) ||
-                    !OnDataSetChangedListener.class.isAssignableFrom(classes[i])) {
+                    !Fragment.class.isAssignableFrom(classes[i])) {
                 return true;
             }
         }
@@ -121,18 +120,18 @@ public class SwitchableFragmentManager<F extends Fragment & OnDataSetChangedList
         return null;
     }
 
-    public void notifyDataSetChanged() {
-        mHandler.sendEmptyMessage(MESSAGE_DATA_SET_CHANGED);
-    }
+//    public void notifyDataSetChanged() {
+//        mHandler.sendEmptyMessage(MESSAGE_DATA_SET_CHANGED);
+//    }
 
-    private final Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == MESSAGE_DATA_SET_CHANGED) {
-                if (mCurrentFragment != null) {
-                    mCurrentFragment.onDataSetChanged();
-                }
-            }
-        }
-    };
+//    private final Handler mHandler = new Handler() {
+//        @Override
+//        public void handleMessage(Message msg) {
+//            if (msg.what == MESSAGE_DATA_SET_CHANGED) {
+//                if (mCurrentFragment != null) {
+//                    mCurrentFragment.onDataSetChanged();
+//                }
+//            }
+//        }
+//    };
 }
