@@ -17,7 +17,7 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
     protected final int MAX_VALUE_SIZE;
     private final List<V> mValues;
     private int mValueHead;
-    private int mOnceExistValueSize;
+    //private int mOnceExistValueSize;
 
     public DynamicValueContainer() {
         this(DEFAULT_MAX_VALUE_SIZE);
@@ -30,7 +30,7 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
         MAX_VALUE_SIZE = maxValueSize;
         mValues = new ArrayList<>(maxValueSize);
         mValueHead = 0;
-        mOnceExistValueSize = 0;
+        //mOnceExistValueSize = 0;
     }
 
     @Override
@@ -64,29 +64,33 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                         }
                         v.mTimestamp = timestamp;
                         int position = MAX_VALUE_SIZE - (mValueHead - i);
+                        //int position = mOnceExistValueSize - (mValueHead - 1 - i) + 1;
                         increaseDynamicValueHead();
-                        return position;
+                        return position + MAX_VALUE_SIZE;
                     } else if (timestamp == v.mTimestamp) {
                         return encodePosition(MAX_VALUE_SIZE - 1
                                 - (mValueHead - 1 - i));
+                        //return encodePosition(mOnceExistValueSize - (mValueHead - 1 - i));
                     }
                 }
                 for (int i = MAX_VALUE_SIZE - 1; i >= mValueHead; --i) {
                     v = mValues.get(i);
                     if (timestamp > v.mTimestamp) {
                         int position = i - mValueHead;
+                        //int position = mOnceExistValueSize - (MAX_VALUE_SIZE - 1 - i + mValueHead) + 1;
                         if (i == MAX_VALUE_SIZE - 1) {
                             v = mValues.get(mValueHead);
                             increaseDynamicValueHead();
                         } else {
                             v = mValues.remove(mValueHead);
                             mValues.add(i, v);
-                            increaseOnceExistValueSize();
+                            //increaseOnceExistValueSize();
                         }
                         v.mTimestamp = timestamp;
-                        return position;
+                        return position + MAX_VALUE_SIZE;
                     } else if (timestamp == v.mTimestamp) {
                         return encodePosition(i - mValueHead);
+                        //return encodePosition(mOnceExistValueSize - (MAX_VALUE_SIZE - 1 - i + mValueHead));
                     }
                 }
                 return ADD_FAILED_RETURN_VALUE;
@@ -94,22 +98,22 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
         }
     }
 
-    @Override
-    public V createValue(long timestamp) {
-        increaseOnceExistValueSize();
-        return super.createValue(timestamp);
-    }
+//    @Override
+//    public V createValue(long timestamp) {
+//        increaseOnceExistValueSize();
+//        return super.createValue(timestamp);
+//    }
 
     private void increaseDynamicValueHead() {
-        increaseOnceExistValueSize();
+        //increaseOnceExistValueSize();
         if (++mValueHead == MAX_VALUE_SIZE) {
             mValueHead = 0;
         }
     }
 
-    private void increaseOnceExistValueSize() {
-        ++mOnceExistValueSize;
-    }
+//    private void increaseOnceExistValueSize() {
+//        ++mOnceExistValueSize;
+//    }
 
     @Override
     public int interpretAddResult(int logicalPosition) {
@@ -118,10 +122,30 @@ public abstract class DynamicValueContainer<V extends Value> extends BaseValueCo
                     ? ADD_VALUE_FAILED
                     : VALUE_UPDATED;
         }
-        if (mOnceExistValueSize > MAX_VALUE_SIZE) {
-            return LOOP_VALUE_ADDED;
+        return logicalPosition >= MAX_VALUE_SIZE
+                ? LOOP_VALUE_ADDED
+                : NEW_VALUE_ADDED;
+//        if (logicalPosition < 0) {
+//            return decodePosition(logicalPosition) >= MAX_VALUE_SIZE
+//                    ? ADD_VALUE_FAILED
+//                    : VALUE_UPDATED;
+//        }
+//        if (mOnceExistValueSize > MAX_VALUE_SIZE) {
+//            return LOOP_VALUE_ADDED;
+//        }
+//        return NEW_VALUE_ADDED;
+    }
+
+    @Override
+    public int getPhysicalPositionByLogicalPosition(int logicalPosition) {
+        if (logicalPosition < 0) {
+            return logicalPosition == ADD_FAILED_RETURN_VALUE
+                    ? -1
+                    : decodePosition(logicalPosition);
         }
-        return NEW_VALUE_ADDED;
+        return logicalPosition >= MAX_VALUE_SIZE
+                ? logicalPosition - MAX_VALUE_SIZE
+                : logicalPosition;
     }
 
     @Override

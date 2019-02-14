@@ -69,8 +69,7 @@ public interface ValueContainer<V extends Value> {
      * 解析{@link #addValue}的返回值
      * @param logicalPosition {@link #addValue}的返回值
      * @return 若logicalPosition大于等于0，返回 {@link #NEW_VALUE_ADDED}，
-     *          此处有特殊情况，若容器采用了循环存储的方式，则返回 {@link #LOOP_VALUE_ADDED}
-     * @see DynamicValueContainer
+     *          此处有特殊情况，若容器采用了循环存储的方式，则返回 {@link #LOOP_VALUE_ADDED}，详见 {@link DynamicValueContainer}
      *          若logicalPosition等于{@link #ADD_FAILED_RETURN_VALUE}，返回 {@link #ADD_VALUE_FAILED}
      *          其余情况表示数据更新，返回 {@link #VALUE_UPDATED}
      * @see AddResult

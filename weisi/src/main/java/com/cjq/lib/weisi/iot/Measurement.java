@@ -193,12 +193,16 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
     }
 
     public V getValueByContainerAddMethodReturnValue(@NonNull ValueContainer<V> container, int addMethodReturnValue) {
-        if (addMethodReturnValue >= 0) {
-            return container.getValue(addMethodReturnValue);
-        } else if (addMethodReturnValue != ValueContainer.ADD_FAILED_RETURN_VALUE) {
-            return container.getValue(- addMethodReturnValue - 1);
-        }
-        return null;
+        int position = container.getPhysicalPositionByLogicalPosition(addMethodReturnValue);
+        return position != -1
+                ? container.getValue(position)
+                : null;
+//        if (addMethodReturnValue >= 0) {
+//            return container.getValue(addMethodReturnValue);
+//        } else if (addMethodReturnValue != ValueContainer.ADD_FAILED_RETURN_VALUE) {
+//            return container.getValue(- addMethodReturnValue - 1);
+//        }
+//        return null;
     }
 
     public boolean hasRealTimeValue() {

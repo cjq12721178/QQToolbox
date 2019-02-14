@@ -595,3 +595,8 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 3. 新增Storage.contains方法，用于穷举查询对象自身
 4. 修复Storage.reFiltrate方法未排序的问题
 5. 添加Storage.remove、Storage.removeAt、Sorter.remove、Sorter.removeAt方法
+
+20190214-7.1.10(153):
+1. 修复DynamicValueContainer.interpretAddResult在多线程时可能会将NEW_VALUE_ADDED解析为LOOP_VALUE_ADDED的问题
+2. 去除DynamicValueContainer多余字段mOnceExistValueSize
+3. 修复Measurement.getValueByContainerAddMethodReturnValue当container为DynamicValueContainer时，获取循环数据数组越界的问题
