@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.cjq.lib.weisi.data.Filter;
+import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.corrector.ScriptValueCorrector;
 import com.cjq.lib.weisi.iot.interpreter.CalendarInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ErrorStateInterpreter;
@@ -751,6 +752,7 @@ public class SensorManager {
 
     public interface MeasurementConfigurationProvider {
         <C extends Configuration> C getConfiguration(ID id);
+        @NonNull List<Configuration<?>> getConfigurations();
     }
 
     private static class ConfigurationImporter extends com.wsn.lib.wsb.config.ConfigurationImporter {

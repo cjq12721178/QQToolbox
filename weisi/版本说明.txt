@@ -603,3 +603,8 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20190214-7.2.0(154):
 1. Sensor新增OnValueAlarmListener接口，及方法setOnValueAlarmListener，提供实时数据告警接口
+
+20190215-7.2.1(155):
+1. 修改DisplayMeasurement.SwitchWarner.RESULT_IN_ABNORMAL_STATE名称为RESULT_ABNORMAL，并去除RESULT_IN_NORMAL_STATE，以RESULT_NORMAL替代
+2. 增加Sensor.OnValueAlarmListener.onValueTestResult方法参数Sensor.Info和DisplayMeasurement.Value
+3. SensorManager.MeasurementConfigurationProvider接口增加方法@NonNull List<Configuration<?>> getConfigurations()

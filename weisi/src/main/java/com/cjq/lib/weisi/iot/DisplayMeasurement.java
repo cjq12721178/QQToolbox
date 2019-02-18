@@ -103,13 +103,12 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
     }
 
     public interface SwitchWarner extends Warner<Value> {
-        @IntDef({RESULT_IN_NORMAL_STATE, RESULT_IN_ABNORMAL_STATE})
+        @IntDef({RESULT_NORMAL, RESULT_ABNORMAL})
         @Retention(RetentionPolicy.SOURCE)
         @interface Result {
         }
 
-        int RESULT_IN_NORMAL_STATE = RESULT_NORMAL;
-        int RESULT_IN_ABNORMAL_STATE = 1;
+        int RESULT_ABNORMAL = 3;
 
         @Override
         @SwitchWarner.Result

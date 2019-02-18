@@ -125,7 +125,7 @@ public abstract class Sensor {
 
     private void makeValueWarnerTest(@NonNull PracticalMeasurement measurement, @NonNull DisplayMeasurement.Value value) {
         if (onValueAlarmListener != null) {
-            onValueAlarmListener.onValueTestResult(measurement, measurement.testValue(value));
+            onValueAlarmListener.onValueTestResult(getInfo(), measurement, value, measurement.testValue(value));
         }
     }
 
@@ -234,7 +234,10 @@ public abstract class Sensor {
     }
 
     public interface OnValueAlarmListener {
-        void onValueTestResult(@NonNull PracticalMeasurement measurement, int warnResult);
+        void onValueTestResult(@NonNull Info info,
+                               @NonNull PracticalMeasurement measurement,
+                               @NonNull DisplayMeasurement.Value value,
+                               int warnResult);
     }
 
     public static class Info extends Measurement<Info.Value, Info.Configuration> {

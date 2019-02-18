@@ -1,5 +1,8 @@
 package com.cjq.tool.qqtoolbox
 
+import com.cjq.lib.weisi.iot.Configuration
+import com.cjq.lib.weisi.iot.ID
+import com.cjq.lib.weisi.iot.container.Value
 import org.junit.Assert.*
 import org.junit.Test
 
