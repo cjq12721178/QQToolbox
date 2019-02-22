@@ -59,6 +59,8 @@
         </activity>
         <activity android:name=".activity.TestConstraintLayoutActivity">
         </activity>
+        <activity android:name=".activity.TestFileIOActivity">
+        </activity>
     </application>
 
 </manifest>

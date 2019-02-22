@@ -3,6 +3,7 @@
     <dimen name="qbox_padding">4dp</dimen>
     <dimen name="qbox_padding_toast">7dp</dimen>
     <dimen name="qbox_padding_dialog_base">9dp</dimen>
+    <dimen name="qbox_size_text_comment">11sp</dimen>
     <dimen name="qbox_size_text_dialog_view">13sp</dimen>
     <dimen name="qbox_size_text_dialog_title">17sp</dimen>
     <dimen name="qbox_list_item_interval_vertical">7dp</dimen>
@@ -16,4 +17,5 @@
     <dimen name="qbox_dialog_search_remove_size">21dp</dimen>
     <dimen name="qbox_dialog_search_record_text_size">15sp</dimen>
     <dimen name="qbox_dialog_list_item_text_size">15sp</dimen>
+    <dimen name="qbox_dialog_confirm_prompt_button_size">21dp</dimen>
 </resources>

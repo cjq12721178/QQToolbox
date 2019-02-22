@@ -77,7 +77,9 @@ public class MainActivity
         TextView.OnEditorActionListener,
         DataReceiver.Listener,
         SearchDialog.OnSearchListener,
-        Storage.ElementsProvider<PhysicalSensor> {
+        Storage.ElementsProvider<PhysicalSensor>,
+        ConfirmDialog.OnDialogConfirmListener,
+        ConfirmDialog.OnDialogCancelListener {
 
     private static final int RC_WRITE_EXTERNAL_STORAGE = 1;
     private SwitchableFragmentManager mSwitchableFragmentManager;
@@ -154,6 +156,13 @@ public class MainActivity
                 dialog.getCustomDecorator().setDrawSeparationLine(true);
                 dialog.show(getSupportFragmentManager(),
                         "test_confirm");
+            }
+            break;
+            case R.id.btn_confirm_show_no_tips: {
+                ConfirmDialog dialog = new ConfirmDialog();
+                dialog.setDrawNoPromptTag(true);
+                dialog.setTitle("显示“不再提示”选项");
+                dialog.show(getSupportFragmentManager(), "test_confirm_no_tips");
             }
             break;
             case R.id.btn_confirm_new_overall_decorator:
@@ -277,7 +286,7 @@ public class MainActivity
                         fragment.setStudent(new VisualFragment.Student("fisrt", (int) (50.0 * Math.random())));
                     }
                 }
-                mSwitchableFragmentManager.notifyDataSetChanged();
+                //mSwitchableFragmentManager.notifyDataSetChanged();
                 index += 1;
                 if (index >= 4) {
                     index = 0;
@@ -287,7 +296,7 @@ public class MainActivity
             case R.id.btn_notify_data_set_changed:
                 initSwitchableFragmentManager();
                 VisualFragment fragment = (VisualFragment) mSwitchableFragmentManager.getCurrentFragment();
-                mSwitchableFragmentManager.notifyDataSetChanged();
+                //mSwitchableFragmentManager.notifyDataSetChanged();
                 if (fragment != null) {
                     fragment.setStudent(new VisualFragment.Student("second", (int) (50.0 * Math.random())));
                 }
@@ -468,6 +477,9 @@ public class MainActivity
                 break;
             case R.id.btn_test_constraint_layout:
                 startActivity(new Intent(this, TestConstraintLayoutActivity.class));
+                break;
+            case R.id.btn_test_file_io:
+                startActivity(new Intent(this, TestFileIOActivity.class));
                 break;
         }
     }
@@ -711,6 +723,17 @@ public class MainActivity
             builder.append(", ").append(positions[i]);
         }
         Log.d(GENERAL_LOG_TAG, builder.toString());
+    }
+
+    @Override
+    public boolean onConfirm(@NonNull ConfirmDialog dialog, boolean noTips) {
+        Log.d(GENERAL_LOG_TAG, "onConfirm no tips: " + noTips);
+        return true;
+    }
+
+    @Override
+    public void onCancel(@NonNull ConfirmDialog dialog, boolean noTips) {
+        Log.d(GENERAL_LOG_TAG, "onCancel no tips: " + noTips);
     }
 
     private static class Value extends com.cjq.lib.weisi.iot.container.Value {

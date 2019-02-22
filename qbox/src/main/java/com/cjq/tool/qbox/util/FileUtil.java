@@ -51,22 +51,46 @@ public class FileUtil {
     //要复制的目录下的所有非子目录(文件夹)文件拷贝
     public static boolean copyOnlyFile(String fromFile, String toFile) {
         try {
-            InputStream fosfrom = new FileInputStream(fromFile);
+            InputStream fosFrom = new FileInputStream(fromFile);
             File file = new File(toFile);
             if (file.exists()) {
                 file.delete();
             }
-            OutputStream fosto = new FileOutputStream(toFile);
+            OutputStream fosTo = new FileOutputStream(toFile);
             byte bt[] = new byte[1024];
             int c;
-            while ((c = fosfrom.read(bt)) > 0) {
-                fosto.write(bt, 0, c);
+            while ((c = fosFrom.read(bt)) > 0) {
+                fosTo.write(bt, 0, c);
             }
-            fosfrom.close();
-            fosto.close();
+            fosFrom.close();
+            fosTo.close();
             return true;
         } catch (Exception ex) {
         }
         return false;
+    }
+
+    public static File openOrCreate(String path) {
+        try {
+            File file = new File(path);
+            if (file.exists()) {
+                return file;
+            }
+            int nameBefore = path.lastIndexOf('/');
+            File directory = openOrCreate(path.substring(0, nameBefore));
+            if (directory != null) {
+                if (path.indexOf('.', nameBefore + 1) != -1) {
+                    if (file.createNewFile()) {
+                        return file;
+                    }
+                } else {
+                    if (file.mkdir()) {
+                        return file;
+                    }
+                }
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 }

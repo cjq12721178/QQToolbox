@@ -752,7 +752,11 @@ public class SensorManager {
 
     public interface MeasurementConfigurationProvider {
         <C extends Configuration> C getConfiguration(ID id);
-        @NonNull List<Configuration<?>> getConfigurations();
+        @NonNull List<ID> getConfigurationIds();
+        //按ID从小到大排列
+        @NonNull List<Configuration<?>> getConfigurationsSortedById();
+        @NonNull List<Sensor.Info.Configuration> getSensorInfoConfigurations();
+        @NonNull List<DisplayMeasurement.Configuration> getDisplayMeasurementConfigurations();
     }
 
     private static class ConfigurationImporter extends com.wsn.lib.wsb.config.ConfigurationImporter {

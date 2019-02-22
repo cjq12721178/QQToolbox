@@ -318,3 +318,9 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20190214-1.7.9(90):
 1. SwitchableFragmentManager<F>，F不再继承OnDataSetChangedListener接口，并删去该接口
+
+20190219-1.7.10(91):
+1. FileUtil新增方法openOrCreate，以便于确保打开一个文件或文件夹
+
+20190222-1.8.0(92):
+1. ConfirmDialog新增功能：显示“不再提示”选项及其设置功能
