@@ -12,7 +12,6 @@ dependencies {
 sourceCompatibility = "1.7"
 targetCompatibility = "1.7"
 buildscript {
-    ext.kotlin_version = '1.2.71'
     ext.versionName = '0.1.1'
     ext.versionCode = 2
     repositories {

@@ -64,7 +64,7 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
         }
     }
 
-    public interface Configuration extends com.cjq.lib.weisi.iot.Configuration<Value> {
+    public interface Configuration extends com.cjq.lib.weisi.iot.container.Configuration<Value> {
 
         Warner<Value> getWarner();
 

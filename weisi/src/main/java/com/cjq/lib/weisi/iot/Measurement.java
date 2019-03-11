@@ -4,7 +4,9 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.cjq.lib.weisi.iot.container.SubValueContainer;
+import com.cjq.lib.weisi.iot.container.Configuration;
+import com.cjq.lib.weisi.iot.container.Corrector;
+import com.cjq.lib.weisi.iot.container.Decorator;
 import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
 
@@ -137,7 +139,28 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
         if (v == null) {
             return "";
         }
-        return formatValue(v.getRawValue(para), para);
+        //不使用formatValue(getCorrectedValue(v), para)，
+        // 而使用如下方式是为了提高效率
+        return formatValue(getCorrectedValue(v.getRawValue(para), para), para);
+    }
+
+    public double getCorrectedValue(@NonNull V v) {
+        return getCorrectedValue(v, 0);
+    }
+
+    public double getCorrectedValue(@NonNull V v, int para) {
+        return getCorrectedValue(v.getRawValue(para), para);
+    }
+
+    public double getCorrectedValue(double rawValue) {
+        return getCorrectedValue(rawValue, 0);
+    }
+
+    public double getCorrectedValue(double rawValue, int para) {
+        Corrector corrector = mConfiguration.getCorrector();
+        return corrector != null
+                ? corrector.correctValue(rawValue, para)
+                : rawValue;
     }
 
     public @NonNull String formatValue(double rawValue) {
@@ -154,7 +177,8 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
         if (v == null) {
             return "";
         }
-        return decorateValue(v.getRawValue(para), para);
+        //同formatValue
+        return decorateValue(getCorrectedValue(v.getRawValue(para), para), para);
     }
 
     public @NonNull String decorateValue(double rawValue, int para) {
@@ -264,6 +288,16 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
         @Override
         public Decorator getDecorator() {
             return null;
+        }
+
+        @Override
+        public Corrector getCorrector() {
+            return null;
+        }
+
+        @Override
+        public void setCorrector(Corrector corrector) {
+            throw new UnsupportedOperationException("inner configuration can not set corrector");
         }
 
         @Override

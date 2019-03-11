@@ -333,7 +333,7 @@ public abstract class Sensor {
             }
         }
 
-        public interface Configuration extends com.cjq.lib.weisi.iot.Configuration<Value> {
+        public interface Configuration extends com.cjq.lib.weisi.iot.container.Configuration<Value> {
         }
 
         private static class EmptyConfiguration

@@ -611,3 +611,7 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20190219-7.2.2(156):
 1. SensorManager.MeasurementConfigurationProvider新增方法@NonNull List<Sensor.Info.Configuration> getSensorInfoConfigurations()、@NonNull List<DisplayMeasurement.Configuration> getDisplayMeasurementConfigurations()和 @NonNull List<ID> getConfigurationIds()
+
+20190311-7.3.0(157):
+1. 新增Corrector接口，用于修正原始数据
+2. Configuration接口新增方法getCorrector和setCorrector

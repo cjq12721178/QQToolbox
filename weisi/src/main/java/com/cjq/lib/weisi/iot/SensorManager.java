@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.cjq.lib.weisi.data.Filter;
-import com.cjq.lib.weisi.iot.container.Value;
+import com.cjq.lib.weisi.iot.container.Configuration;
 import com.cjq.lib.weisi.iot.corrector.ScriptValueCorrector;
 import com.cjq.lib.weisi.iot.interpreter.CalendarInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ErrorStateInterpreter;
