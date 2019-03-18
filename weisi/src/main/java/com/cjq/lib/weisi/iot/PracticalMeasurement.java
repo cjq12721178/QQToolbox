@@ -12,8 +12,6 @@ import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
 
 public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.Configuration> {
 
-    private static final Configuration EMPTY_CONFIGURATION = new DisplayMeasurement.EmptyConfiguration();
-
     private final DataType mDataType;
 
     protected PracticalMeasurement(@NonNull ID id, @NonNull DataType dataType, String name, boolean hidden) {
@@ -22,8 +20,8 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     }
 
     @Override
-    public @NonNull String formatValue(double rawValue, int para) {
-        return mDataType.formatValue(rawValue);
+    public @NonNull String formatValue(double correctedValue, int index) {
+        return mDataType.formatValue(correctedValue);
     }
 
     @Override
@@ -46,7 +44,7 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     @NonNull
     @Override
     protected Configuration getEmptyConfiguration() {
-        return EMPTY_CONFIGURATION;
+        return EmptyConfiguration.INSTANCE;
     }
 
     public DataType getDataType() {

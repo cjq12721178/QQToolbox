@@ -3,6 +3,8 @@ package com.cjq.lib.weisi.iot;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 
+import com.cjq.lib.weisi.iot.container.Corrector;
+
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
@@ -23,13 +25,22 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
         return mHidden;
     }
 
-    public int testValue(@NonNull Warner<Value> warner, @NonNull Value value) {
-        return warner.test(value);
+    @Override
+    public Corrector getCorrector(int index) {
+        return getConfiguration().getCorrector();
     }
 
     public int testValue(@NonNull Value value) {
         Warner<Value> warner = getConfiguration().getWarner();
-        return warner != null ? warner.test(value) : Warner.RESULT_NORMAL;
+        return warner != null ? testValue(warner, value) : Warner.RESULT_NORMAL;
+    }
+
+    public int testValue(@NonNull Warner<Value> warner, @NonNull Value value) {
+        return testValue(warner, value, getCorrector(0));
+    }
+
+    public int testValue(@NonNull Warner<Value> warner, @NonNull Value value, Corrector corrector) {
+        return warner.test(value, corrector);
     }
 
     public int testRealTimeValue() {
@@ -59,21 +70,33 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
         }
 
         @Override
-        public double getRawValue(int para) {
+        public double getRawValue(int index) {
             return mRawValue;
         }
     }
 
-    public interface Configuration extends com.cjq.lib.weisi.iot.container.Configuration<Value> {
-
+    public interface Configuration extends com.cjq.lib.weisi.iot.Configuration {
+        Corrector getCorrector();
+        void setCorrector(Corrector corrector);
         Warner<Value> getWarner();
-
         void setWarner(Warner<Value> warner);
     }
 
     protected static class EmptyConfiguration
-            extends Measurement.EmptyConfiguration<Value>
+            extends Measurement.EmptyConfiguration
             implements Configuration {
+
+        static final EmptyConfiguration INSTANCE = new EmptyConfiguration();
+
+        @Override
+        public Corrector getCorrector() {
+            return null;
+        }
+
+        @Override
+        public void setCorrector(Corrector corrector) {
+            throw new UnsupportedOperationException("inner configuration can not set corrector");
+        }
 
         @Override
         public Warner<Value> getWarner() {
@@ -99,7 +122,7 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
 
         @Override
         @SingleRangeWarner.Result
-        int test(Value value);
+        int test(@NonNull Value value, Corrector corrector);
     }
 
     public interface SwitchWarner extends Warner<Value> {
@@ -112,6 +135,6 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
 
         @Override
         @SwitchWarner.Result
-        int test(Value value);
+        int test(@NonNull Value value, Corrector corrector);
     }
 }

@@ -4,16 +4,14 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.cjq.lib.weisi.iot.container.Configuration;
 import com.cjq.lib.weisi.iot.container.Corrector;
-import com.cjq.lib.weisi.iot.container.Decorator;
 import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-public abstract class Measurement<V extends Value, C extends Configuration<V>> implements Comparable<Measurement<V, C>> {
+public abstract class Measurement<V extends Value, C extends Configuration> implements Comparable<Measurement<V, C>> {
 
     protected static final int CURVE_TYPE_INVALID = 0;
     protected static final int CURVE_TYPE_SENSOR_INFO = 0x10001;
@@ -110,7 +108,7 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
     }
 
     public @NonNull String getDecoratedName() {
-        Decorator<V> decorator = mConfiguration.getDecorator();
+        Decorator decorator = mConfiguration.getDecorator();
         return decorator != null ? decorator.decorateName(getDefaultName()) : "";
     }
 
@@ -119,7 +117,7 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
         return decoratedName.isEmpty() ? getDefaultName() : decoratedName;
     }
 
-    public @NonNull String getValueLabel(int para) {
+    public @NonNull String getValueLabel(int index) {
         return getName();
     }
 
@@ -131,76 +129,71 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
         return formatValue(getRealTimeValue());
     }
 
-    public @NonNull String formatValue(V v) {
-        return formatValue(v, 0);
-    }
-
-    public @NonNull String formatValue(V v, int para) {
-        if (v == null) {
-            return "";
-        }
-        //不使用formatValue(getCorrectedValue(v), para)，
-        // 而使用如下方式是为了提高效率
-        return formatValue(getCorrectedValue(v.getRawValue(para), para), para);
+    public Corrector getCorrector(int index) {
+        return null;
     }
 
     public double getCorrectedValue(@NonNull V v) {
         return getCorrectedValue(v, 0);
     }
 
-    public double getCorrectedValue(@NonNull V v, int para) {
-        return getCorrectedValue(v.getRawValue(para), para);
+    public double getCorrectedValue(@NonNull V v, int index) {
+        return v.getCorrectedValue(getCorrector(index), index);
     }
 
-    public double getCorrectedValue(double rawValue) {
-        return getCorrectedValue(rawValue, 0);
+    public @NonNull String formatValue(V v) {
+        return formatValue(v, 0);
     }
 
-    public double getCorrectedValue(double rawValue, int para) {
-        Corrector corrector = mConfiguration.getCorrector();
-        return corrector != null
-                ? corrector.correctValue(rawValue, para)
-                : rawValue;
+    public @NonNull String formatValue(V v, int index) {
+        if (v == null) {
+            return "";
+        }
+        return formatValue(v.getCorrectedValue(getCorrector(index), index), index);
     }
 
-    public @NonNull String formatValue(double rawValue) {
-        return formatValue(rawValue, 0);
+    public @NonNull String formatValue(double correctedValue) {
+        return formatValue(correctedValue, 0);
     }
 
-    public abstract @NonNull String formatValue(double rawValue, int para);
+    public abstract @NonNull String formatValue(double correctedValue, int index);
 
     public @NonNull String decorateValue(V v) {
         return decorateValue(v, 0);
     }
 
-    public @NonNull String decorateValue(V v, int para) {
+    public @NonNull String decorateValue(V v, int index) {
         if (v == null) {
             return "";
         }
         //同formatValue
-        return decorateValue(getCorrectedValue(v.getRawValue(para), para), para);
+        return decorateValue(v.getCorrectedValue(getCorrector(index), index), index);
     }
 
-    public @NonNull String decorateValue(double rawValue, int para) {
-        Decorator<V> decorator = mConfiguration.getDecorator();
+    public @NonNull String decorateValue(double correctedValue) {
+        return decorateValue(correctedValue, 0);
+    }
+
+    public @NonNull String decorateValue(double correctedValue, int index) {
+        Decorator decorator = mConfiguration.getDecorator();
         if (decorator != null) {
-            String result = decorator.decorateValue(rawValue, para);
+            String result = decorator.decorateValue(correctedValue, index);
             if (!result.isEmpty()) {
                 return result;
             }
         }
-        return formatValue(rawValue, para);
+        return formatValue(correctedValue, index);
     }
 
     public @NonNull String getDecoratedRealTimeValue() {
         return getDecoratedRealTimeValue(0);
     }
 
-    public @NonNull String getDecoratedRealTimeValue(int para) {
-        return decorateValue(getRealTimeValue(), para);
+    public @NonNull String getDecoratedRealTimeValue(int index) {
+        return decorateValue(getRealTimeValue(), index);
 //        V v = mDynamicValueContainer.getLatestValue();
 //        return v != null
-//                ? decorateValue(v, para)
+//                ? decorateValue(v, index)
 //                : null;
     }
 
@@ -283,21 +276,13 @@ public abstract class Measurement<V extends Value, C extends Configuration<V>> i
         return mId.compareTo(o.mId);
     }
 
-    protected static class EmptyConfiguration<V extends Value> implements Configuration<V> {
+    protected static class EmptyConfiguration implements Configuration {
+
+        static final EmptyConfiguration INSTANCE = new EmptyConfiguration();
 
         @Override
         public Decorator getDecorator() {
             return null;
-        }
-
-        @Override
-        public Corrector getCorrector() {
-            return null;
-        }
-
-        @Override
-        public void setCorrector(Corrector corrector) {
-            throw new UnsupportedOperationException("inner configuration can not set corrector");
         }
 
         @Override

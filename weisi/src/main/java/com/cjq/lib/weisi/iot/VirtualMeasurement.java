@@ -23,8 +23,8 @@ public abstract class VirtualMeasurement<C extends DisplayMeasurement.Configurat
     }
 
     @Override
-    public @NonNull String formatValue(double rawValue, int para) {
-        return mValueInterpreter.interpret(rawValue);
+    public @NonNull String formatValue(double correctedValue, int index) {
+        return mValueInterpreter.interpret(correctedValue);
     }
 
     @Override

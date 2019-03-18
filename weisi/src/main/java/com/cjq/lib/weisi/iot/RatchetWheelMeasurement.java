@@ -8,7 +8,6 @@ import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
 
 public abstract class RatchetWheelMeasurement extends VirtualMeasurement<RatchetWheelMeasurement.Configuration> {
 
-    private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
     protected final PracticalMeasurement mDistanceRecorder;
 
     protected RatchetWheelMeasurement(@NonNull ID id,
@@ -25,7 +24,7 @@ public abstract class RatchetWheelMeasurement extends VirtualMeasurement<Ratchet
     @NonNull
     @Override
     protected Configuration getEmptyConfiguration() {
-        return EMPTY_CONFIGURATION;
+        return EmptyConfiguration.INSTANCE;
     }
 
     @Override
@@ -54,6 +53,8 @@ public abstract class RatchetWheelMeasurement extends VirtualMeasurement<Ratchet
     protected static class EmptyConfiguration
             extends DisplayMeasurement.EmptyConfiguration
             implements Configuration {
+
+        static final EmptyConfiguration INSTANCE = new EmptyConfiguration();
 
         @Override
         public double getInitialDistance() {

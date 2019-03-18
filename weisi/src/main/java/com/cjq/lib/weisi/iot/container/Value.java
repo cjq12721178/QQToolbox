@@ -44,8 +44,14 @@ public class Value implements Cloneable {
         mTimestamp = timeStamp;
     }
 
-    public double getRawValue(int para) {
+    public double getRawValue(int index) {
         return 0;
+    }
+
+    public double getCorrectedValue(Corrector corrector, int index) {
+        return corrector != null
+                ? corrector.correctValue(getRawValue(index))
+                : getRawValue(index);
     }
 
     @Override

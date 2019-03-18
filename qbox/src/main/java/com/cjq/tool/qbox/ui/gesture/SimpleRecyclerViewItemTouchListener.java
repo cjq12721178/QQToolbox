@@ -26,6 +26,7 @@ public abstract class SimpleRecyclerViewItemTouchListener
     private final RecyclerView mRecyclerView;
     private final GestureDetectorCompat mDetector;
     private Set<Integer> mChildViewIds;
+    private Set<Object> mChildViewTags;
     private boolean mMinRangeEnable;
 
     public SimpleRecyclerViewItemTouchListener(@NonNull RecyclerView rv) {
@@ -48,6 +49,14 @@ public abstract class SimpleRecyclerViewItemTouchListener
             mChildViewIds = new HashSet<>();
         }
         mChildViewIds.add(id);
+        return this;
+    }
+
+    public SimpleRecyclerViewItemTouchListener addItemChildViewTouchEnabled(@NonNull Object tag) {
+        if (mChildViewTags == null) {
+            mChildViewTags = new HashSet<>();
+        }
+        mChildViewTags.add(tag);
         return this;
     }
 
@@ -128,14 +137,7 @@ public abstract class SimpleRecyclerViewItemTouchListener
     }
 
     private View correctView(View vItem, MotionEvent e) {
-        if (mMinRangeEnable) {
-            if (vItem instanceof ViewGroup) {
-                View target = findTouchedView((ViewGroup) vItem, e);
-                if (target != null) {
-                    return target;
-                }
-            }
-        } else if (mChildViewIds != null) {
+        if (mChildViewIds != null) {
             for (int id : mChildViewIds) {
                 View vChild = vItem.findViewById(id);
                 if (vChild != null && inRangeOfView(vChild, e)) {
@@ -143,6 +145,37 @@ public abstract class SimpleRecyclerViewItemTouchListener
                 }
             }
         }
+        if (mChildViewTags != null) {
+            for (Object tag: mChildViewTags) {
+                View vChild = vItem.findViewWithTag(tag);
+                if (vChild != null && inRangeOfView(vChild, e)) {
+                    return vChild;
+                }
+            }
+        }
+        if (mMinRangeEnable) {
+            if (vItem instanceof ViewGroup) {
+                View target = findTouchedView((ViewGroup) vItem, e);
+                if (target != null) {
+                    return target;
+                }
+            }
+        }
+//        if (mMinRangeEnable) {
+//            if (vItem instanceof ViewGroup) {
+//                View target = findTouchedView((ViewGroup) vItem, e);
+//                if (target != null) {
+//                    return target;
+//                }
+//            }
+//        } else if (mChildViewIds != null) {
+//            for (int id : mChildViewIds) {
+//                View vChild = vItem.findViewById(id);
+//                if (vChild != null && inRangeOfView(vChild, e)) {
+//                    return vChild;
+//                }
+//            }
+//        }
         return vItem;
     }
 

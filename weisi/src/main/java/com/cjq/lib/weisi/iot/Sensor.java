@@ -240,9 +240,7 @@ public abstract class Sensor {
                                int warnResult);
     }
 
-    public static class Info extends Measurement<Info.Value, Info.Configuration> {
-
-        private static final Configuration EMPTY_CONFIGURATION = new EmptyConfiguration();
+    public static class Info extends Measurement<Info.Value, Configuration> {
 
         protected Info(@NonNull ID id, String name) {
             super(id, TextUtils.isEmpty(name) ? "未知传感器" : name);
@@ -271,21 +269,21 @@ public abstract class Sensor {
         @NonNull
         @Override
         protected Configuration getEmptyConfiguration() {
-            return EMPTY_CONFIGURATION;
+            return EmptyConfiguration.INSTANCE;
         }
 
         @Override
-        public @NonNull String formatValue(double rawValue, int para) {
-            if (para == 0) {
-                return Value.getFormattedBatteryVoltage(rawValue);
+        public @NonNull String formatValue(double correctedValue, int index) {
+            if (index == 0) {
+                return Value.getFormattedBatteryVoltage(correctedValue);
             } else {
                 return "";
             }
         }
 
         @Override
-        public @NonNull String getValueLabel(int para) {
-            if (para == 0) {
+        public @NonNull String getValueLabel(int index) {
+            if (index == 0) {
                 return "电源电压";
             }
             return "";
@@ -319,8 +317,8 @@ public abstract class Sensor {
             }
 
             @Override
-            public double getRawValue(int para) {
-                if (para == 0) {
+            public double getRawValue(int index) {
+                if (index == 0) {
                     return mBatteryVoltage;
                 }
                 return 0;
@@ -331,14 +329,6 @@ public abstract class Sensor {
                         ? String.format("%d%%", ((int) voltage) & 0x7F)
                         : String.format("%.2fV", voltage);
             }
-        }
-
-        public interface Configuration extends com.cjq.lib.weisi.iot.container.Configuration<Value> {
-        }
-
-        private static class EmptyConfiguration
-                extends Measurement.EmptyConfiguration<Value>
-                implements Configuration{
         }
 
         private static class DynamicValueContainerImpl extends DynamicValueContainer<Value> {

@@ -3,6 +3,7 @@ package com.cjq.tool.qbox.ui.dialog;
 import android.os.Bundle;
 import android.support.annotation.DimenRes;
 import android.support.annotation.IdRes;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.StringRes;
 import android.util.TypedValue;
@@ -19,7 +20,7 @@ import com.cjq.tool.qbox.R;
 public class EditDialog extends BaseEditDialog<EditDialog.Decorator> {
 
     public interface OnContentReceiver {
-        boolean onReceive(EditDialog dialog, String oldValue, String newValue);
+        boolean onReceive(@NonNull EditDialog dialog, String oldValue, String newValue);
     }
 
 //    private static final String ARGUMENT_KEY_CONTENT_STRING = "in_content_str";

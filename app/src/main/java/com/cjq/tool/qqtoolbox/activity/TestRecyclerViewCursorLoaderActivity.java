@@ -67,6 +67,15 @@ public class TestRecyclerViewCursorLoaderActivity
         rvStudents.addOnItemTouchListener(new SimpleRecyclerViewItemTouchListener(rvStudents) {
             @Override
             public void onItemClick(View v, int position) {
+                if ("sex".equals(v.getTag())) {
+                    ListDialog dialog = new ListDialog();
+                    //Cursor cursor = mAdapter.getCursor();
+                    dialog.setTitle("修改性别");
+                    dialog.setItems(new String[] { "男", "女" });
+                    dialog.getArguments().putInt("position", position);
+                    //dialog.setContent(cursor.getString(cursor.getColumnIndex("sex")));
+                    dialog.show(getSupportFragmentManager(), "modify_sex");
+                }
                 switch (v.getId()) {
                     case R.id.tv_name: {
                         EditDialog dialog = new EditDialog();
@@ -77,15 +86,15 @@ public class TestRecyclerViewCursorLoaderActivity
                         dialog.getArguments().putInt("position", position);
                         dialog.show(getSupportFragmentManager(), "modify_name");
                     } break;
-                    case R.id.tv_sex: {
-                        ListDialog dialog = new ListDialog();
-                        //Cursor cursor = mAdapter.getCursor();
-                        dialog.setTitle("修改性别");
-                        dialog.setItems(new String[] { "男", "女" });
-                        dialog.getArguments().putInt("position", position);
-                        //dialog.setContent(cursor.getString(cursor.getColumnIndex("sex")));
-                        dialog.show(getSupportFragmentManager(), "modify_sex");
-                    } break;
+//                    case R.id.tv_sex: {
+//                        ListDialog dialog = new ListDialog();
+//                        //Cursor cursor = mAdapter.getCursor();
+//                        dialog.setTitle("修改性别");
+//                        dialog.setItems(new String[] { "男", "女" });
+//                        dialog.getArguments().putInt("position", position);
+//                        //dialog.setContent(cursor.getString(cursor.getColumnIndex("sex")));
+//                        dialog.show(getSupportFragmentManager(), "modify_sex");
+//                    } break;
                     case R.id.tv_age: {
                         EditDialog dialog = new EditDialog();
                         Cursor cursor = mAdapter.getCursor();
@@ -114,10 +123,12 @@ public class TestRecyclerViewCursorLoaderActivity
                     } break;
                 }
             }
-        }.addItemChildViewTouchEnabled(R.id.tv_name)
-                .addItemChildViewTouchEnabled(R.id.tv_sex)
-                .addItemChildViewTouchEnabled(R.id.tv_age)
-                .addItemChildViewTouchEnabled(R.id.btn_remove));
+        }.setMinRangeEnable(true)
+                .addItemChildViewTouchEnabled("sex"));
+//        .addItemChildViewTouchEnabled(R.id.tv_name)
+//                .addItemChildViewTouchEnabled(R.id.tv_sex)
+//                .addItemChildViewTouchEnabled(R.id.tv_age)
+//                .addItemChildViewTouchEnabled(R.id.btn_remove));
         rvStudents.setAdapter(mAdapter);
 
         getSupportLoaderManager().initLoader(0, null, this);
@@ -445,6 +456,7 @@ class MyRecyclerViewCursorAdapter extends RecyclerViewCursorAdapter {
             mTvId = itemView.findViewById(R.id.tv_id);
             mTvName = itemView.findViewById(R.id.tv_name);
             mTvSex = itemView.findViewById(R.id.tv_sex);
+            mTvSex.setTag("sex");
             mTvAge = itemView.findViewById(R.id.tv_age);
             mBtnRemove = itemView.findViewById(R.id.btn_remove);
 //            if (listener != null) {

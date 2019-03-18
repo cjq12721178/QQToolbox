@@ -993,10 +993,10 @@ public abstract class BaseDialog<D extends BaseDialog.Decorator>
     }
 
     public interface OnDialogConfirmListener {
-        boolean onConfirm(BaseDialog dialog);
+        boolean onConfirm(@NonNull BaseDialog dialog);
     }
 
     public interface OnDialogCancelListener {
-        void onCancel(BaseDialog dialog);
+        void onCancel(@NonNull BaseDialog dialog);
     }
 }

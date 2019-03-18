@@ -9,3 +9,6 @@
 
 20190128-0.1.3(4):
 1. 修改ConfigurationImporter.endElement，添加elementConsumed属性以提高解析效率
+
+20190316-0.1.4(5):
+1. 修复NumericConverter.floatToBytesByLSB和floatToBytesByMSB方法解析错误的问题

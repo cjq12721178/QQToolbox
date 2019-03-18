@@ -45,6 +45,7 @@ public class FloatInterpreter implements ValueInterpreter {
 
     @Override
     public @NonNull String interpret(double value) {
+
         return String.format(mFormat, value);
     }
 }

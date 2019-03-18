@@ -615,3 +615,6 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 20190311-7.3.0(157):
 1. 新增Corrector接口，用于修正原始数据
 2. Configuration接口新增方法getCorrector和setCorrector
+
+20190316-7.3.2(159):
+1. 基础wsb.lib改

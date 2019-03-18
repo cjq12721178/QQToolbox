@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.cjq.lib.weisi.data.Filter;
-import com.cjq.lib.weisi.iot.container.Configuration;
 import com.cjq.lib.weisi.iot.corrector.ScriptValueCorrector;
 import com.cjq.lib.weisi.iot.interpreter.CalendarInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ErrorStateInterpreter;
@@ -754,8 +753,8 @@ public class SensorManager {
         <C extends Configuration> C getConfiguration(ID id);
         @NonNull List<ID> getConfigurationIds();
         //按ID从小到大排列
-        @NonNull List<Configuration<?>> getConfigurationsSortedById();
-        @NonNull List<Sensor.Info.Configuration> getSensorInfoConfigurations();
+        @NonNull List<Configuration> getConfigurationsSortedById();
+        @NonNull List<Configuration> getSensorInfoConfigurations();
         @NonNull List<DisplayMeasurement.Configuration> getDisplayMeasurementConfigurations();
     }
 

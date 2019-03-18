@@ -155,7 +155,7 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
         if (listener != null) {
             int selectedId = getSelectedId();
             if (selectedId != -1) {
-                listener.onSortTypeChanged(selectedId, isAscend);
+                listener.onSortTypeChanged(this, selectedId, isAscend);
             }
         }
         return true;
@@ -192,7 +192,7 @@ public class SortDialog extends BaseDialog<SortDialog.Decorator> implements Radi
     }
 
     public interface OnSortTypeChangedListener {
-        void onSortTypeChanged(@IdRes int checkedId, boolean isAscending);
+        void onSortTypeChanged(@NonNull SortDialog dialog, @IdRes int checkedId, boolean isAscending);
     }
 
     public static class SortType implements Parcelable {

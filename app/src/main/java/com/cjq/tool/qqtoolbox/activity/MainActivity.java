@@ -19,6 +19,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.cjq.lib.weisi.iot.container.Corrector;
 import com.cjq.tool.qqtoolbox.util.DebugTag;
 import com.wsn.lib.wsb.communicator.receiver.DataReceiver;
 import com.cjq.lib.weisi.communicator.SerialPortKit;
@@ -597,7 +598,7 @@ public class MainActivity
     }
 
     @Override
-    public void onSortTypeChanged(@IdRes int checkedId, boolean isAscending) {
+    public void onSortTypeChanged(@NonNull SortDialog dialog, @IdRes int checkedId, boolean isAscending) {
         ClosableLog.d(SortDialog.TAG, "R.id.address = " + R.id.address
                 + "R.id.time = " + R.id.time
                 + "R.id.name = " + R.id.name
@@ -746,7 +747,7 @@ public class MainActivity
     private static class WarnerImpl implements Warner<Value> {
 
         @Override
-        public int test(Value value) {
+        public int test(Value value, Corrector corrector) {
             return RESULT_NORMAL;
         }
     }
@@ -754,7 +755,7 @@ public class MainActivity
     private static class SingleValueDomainWarnerImpl implements DisplayMeasurement.SingleRangeWarner {
 
         @Override
-        public int test(DisplayMeasurement.Value value) {
+        public int test(DisplayMeasurement.Value value, Corrector corrector) {
             return RESULT_ABOVE_HIGH_LIMIT;
         }
     }

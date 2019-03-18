@@ -111,13 +111,18 @@ object NumericConverter {
     @JvmStatic
     fun floatToBytesByMSB(f: Float, bytes: ByteArray, pos: Int) {
         val intBits = java.lang.Float.floatToIntBits(f)
-        var i = 0
-        var mask = -0x1000000
-        while (i < FLOAT_BYTES) {
-            bytes[pos + i] = (intBits and mask).toByte()
-            ++i
-            mask = mask shr 8
-        }
+        var offset = pos
+        bytes[offset++] = (intBits ushr 24).toByte()
+        bytes[offset++] = ((intBits and 0x00FF0000) ushr 16).toByte()
+        bytes[offset++] = ((intBits and 0x0000FF00) ushr 8).toByte()
+        bytes[offset] = (intBits and 0xFF).toByte()
+//        var i = 0
+//        var mask = -0x1000000
+//        while (i < FLOAT_BYTES) {
+//            bytes[pos + i] = (intBits and mask).toByte()
+//            ++i
+//            mask = mask ushr 8
+//        }
     }
 
     @JvmStatic
@@ -130,13 +135,18 @@ object NumericConverter {
     @JvmStatic
     fun floatToBytesByLSB(f: Float, bytes: ByteArray, pos: Int) {
         val intBits = java.lang.Float.floatToIntBits(f)
-        var i = 0
-        var mask = 0xff
-        while (i < FLOAT_BYTES) {
-            bytes[pos + i] = (intBits and mask).toByte()
-            ++i
-            mask = mask shl 8
-        }
+        var offset = pos
+        bytes[offset++] = (intBits and 0xFF).toByte()
+        bytes[offset++] = ((intBits and 0x0000FF00) ushr 8).toByte()
+        bytes[offset++] = ((intBits and 0x00FF0000) ushr 16).toByte()
+        bytes[offset] = (intBits ushr 24).toByte()
+//        var i = 0
+//        var mask = 0xff
+//        while (i < FLOAT_BYTES) {
+//            bytes[pos + i] = (intBits and mask).toByte()
+//            ++i
+//            mask = mask shl 8
+//        }
     }
 
     @JvmStatic

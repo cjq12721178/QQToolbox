@@ -324,3 +324,10 @@ dialog系列，其中主要有ConfirmDialog、EditDialog和ListDialog，以及�
 
 20190222-1.8.0(92):
 1. ConfirmDialog新增功能：显示“不再提示”选项及其设置功能
+
+20190315-1.8.1(93):
+1. SimpleRecyclerViewItemTouchListener新增方法addItemChildViewTouchEnabled(@NonNull Object tag)，并修改点击函数判断顺序
+
+20190318-1.8.2(94):
+1. 为部分BaseDialog及其子类回调接口dialog参数前增加@NonNull
+2. SortDialog.OnSortTypeChangedListener增加参数SortDialog
