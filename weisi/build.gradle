@@ -1,4 +1,7 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-android'
+apply plugin: 'maven'
 
 android {
     compileSdkVersion 28
@@ -7,8 +10,8 @@ android {
     defaultConfig {
         minSdkVersion 18
         targetSdkVersion 28
-        versionCode 159
-        versionName "7.3.2"
+        versionCode 162
+        versionName "7.5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
@@ -56,6 +59,7 @@ dependencies {
     implementation 'io.apisense:rhino-android:1.0'
     testImplementation 'junit:junit:4.12'
     implementation 'com.android.support:support-annotations:28.0.0'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 //task copyAar(type: Copy) {
@@ -86,6 +90,20 @@ task copyAar << {
     println "weisi back-up completed"
 }
 
+uploadArchives {
+    repositories.mavenDeployer {
+        // 本地仓库路径D:\WorkSpace
+//        repository(url: uri('../repository'))
+        repository(url: 'file://D://cjq/repository')
+        // 唯一标识
+        pom.groupId = "com.cjq.lib"
+        // 项目名称
+        pom.artifactId = "weisi"
+        // 版本号
+        pom.version = android.defaultConfig.versionName
+    }
+}
+
 afterEvaluate {
     tasks.matching {
         // 以process开头以ReleaseJavaRes或DebugJavaRes结尾的task
@@ -97,4 +115,8 @@ afterEvaluate {
             tasks.copyAar.execute()
         }
     }
+}
+
+repositories {
+    mavenCentral()
 }

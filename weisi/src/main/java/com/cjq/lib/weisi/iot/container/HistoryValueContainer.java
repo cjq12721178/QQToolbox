@@ -11,7 +11,7 @@ import static com.cjq.lib.weisi.iot.container.Value.SEARCH_HELPER;
  * Created by CJQ on 2018/3/23.
  */
 
-public abstract class HistoryValueContainer<V extends Value> extends BaseValueContainer<V> {
+public abstract class HistoryValueContainer<V extends Value> extends MultipleValueContainer<V> {
 
     private final List<V> mValues = new ArrayList<>();
 

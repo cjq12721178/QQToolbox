@@ -1,12 +1,11 @@
 package com.cjq.lib.weisi.iot;
 
-import android.support.annotation.IntDef;
+import android.os.Parcel;
 import android.support.annotation.NonNull;
 
-import com.cjq.lib.weisi.iot.container.Corrector;
-
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import com.cjq.lib.weisi.iot.config.Corrector;
+import com.cjq.lib.weisi.iot.config.Decorator;
+import com.cjq.lib.weisi.iot.config.Warner;
 
 public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configuration> extends Measurement<DisplayMeasurement.Value, C> {
 
@@ -65,6 +64,7 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
             mRawValue = rawValue;
         }
 
+        @Override
         public double getRawValue() {
             return mRawValue;
         }
@@ -75,22 +75,73 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
         }
     }
 
-    public interface Configuration extends com.cjq.lib.weisi.iot.Configuration {
-        Corrector getCorrector();
-        void setCorrector(Corrector corrector);
-        Warner<Value> getWarner();
-        void setWarner(Warner<Value> warner);
+    public static class Configuration extends com.cjq.lib.weisi.iot.config.Configuration {
+
+        private Corrector mCorrector;
+        private Warner<Value> mWarner;
+
+        public Configuration() {
+            super();
+        }
+
+        protected Configuration(Parcel in) {
+            super(in);
+            mCorrector = in.readParcelable(Corrector.class.getClassLoader());
+            mWarner = in.readParcelable(Warner.class.getClassLoader());
+        }
+
+        public Corrector getCorrector() {
+            return mCorrector;
+        }
+
+        public void setCorrector(Corrector corrector) {
+            mCorrector = corrector;
+        }
+
+        public Warner<Value> getWarner() {
+            return mWarner;
+        }
+
+        public void setWarner(Warner<Value> warner) {
+            mWarner = warner;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeParcelable(mCorrector, flags);
+            dest.writeParcelable(mWarner, flags);
+        }
+
+        public static final Creator<Configuration> CREATOR = new Creator<Configuration>() {
+            @Override
+            public Configuration createFromParcel(Parcel in) {
+                return new Configuration(in);
+            }
+
+            @Override
+            public Configuration[] newArray(int size) {
+                return new Configuration[size];
+            }
+        };
     }
 
     protected static class EmptyConfiguration
-            extends Measurement.EmptyConfiguration
-            implements Configuration {
+            extends Configuration {
 
         static final EmptyConfiguration INSTANCE = new EmptyConfiguration();
 
+        public EmptyConfiguration() {
+            super();
+        }
+
+        protected EmptyConfiguration(Parcel in) {
+            super(in);
+        }
+
         @Override
-        public Corrector getCorrector() {
-            return null;
+        public void setDecorator(Decorator decorator) {
+            throw new UnsupportedOperationException("inner configuration can not set decorator");
         }
 
         @Override
@@ -99,42 +150,131 @@ public abstract class DisplayMeasurement<C extends DisplayMeasurement.Configurat
         }
 
         @Override
-        public Warner<Value> getWarner() {
-            return null;
-        }
-
-        @Override
         public void setWarner(Warner<Value> warner) {
             throw new UnsupportedOperationException("inner configuration can not set warner");
         }
+
+        public static final Creator<EmptyConfiguration> CREATOR = new Creator<EmptyConfiguration>() {
+            @Override
+            public EmptyConfiguration createFromParcel(Parcel in) {
+                return new EmptyConfiguration(in);
+            }
+
+            @Override
+            public EmptyConfiguration[] newArray(int size) {
+                return new EmptyConfiguration[size];
+            }
+        };
     }
 
-    public interface SingleRangeWarner extends Warner<Value> {
-        @IntDef({RESULT_NORMAL,
-                RESULT_ABOVE_HIGH_LIMIT,
-                RESULT_BELOW_LOW_LIMIT})
-        @Retention(RetentionPolicy.SOURCE)
-        @interface Result {
+    public static class SingleRangeWarner implements Warner<Value> {
+
+        private final double mHighLimit;
+        private final double mLowLimit;
+
+        public SingleRangeWarner(double highLimit, double lowLimit) {
+            if (highLimit < lowLimit) {
+                throw new IllegalArgumentException("high limit: " + highLimit + " less than low limit: " + lowLimit);
+            }
+            mHighLimit = highLimit;
+            mLowLimit = lowLimit;
         }
 
-        int RESULT_ABOVE_HIGH_LIMIT = 1;
-        int RESULT_BELOW_LOW_LIMIT = 2;
+        protected SingleRangeWarner(Parcel in) {
+            mHighLimit = in.readDouble();
+            mLowLimit = in.readDouble();
+        }
 
         @Override
-        @SingleRangeWarner.Result
-        int test(@NonNull Value value, Corrector corrector);
+        @Result
+        public int test(@NonNull Value value, Corrector corrector) {
+            double testingValue = Warner.getTestingValue(value, corrector);
+            if (testingValue > mHighLimit) {
+                return RESULT_ABOVE_HIGH_LIMIT;
+            } else if (testingValue < mLowLimit) {
+                return RESULT_BELOW_LOW_LIMIT;
+            }
+            return RESULT_NORMAL;
+        }
+
+        public double getHighLimit() {
+            return mHighLimit;
+        }
+
+        public double getLowLimit() {
+            return mLowLimit;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeDouble(mHighLimit);
+            dest.writeDouble(mLowLimit);
+        }
+
+        public static final Creator<SingleRangeWarner> CREATOR = new Creator<SingleRangeWarner>() {
+            @Override
+            public SingleRangeWarner createFromParcel(Parcel in) {
+                return new SingleRangeWarner(in);
+            }
+
+            @Override
+            public SingleRangeWarner[] newArray(int size) {
+                return new SingleRangeWarner[size];
+            }
+        };
     }
 
-    public interface SwitchWarner extends Warner<Value> {
-        @IntDef({RESULT_NORMAL, RESULT_ABNORMAL})
-        @Retention(RetentionPolicy.SOURCE)
-        @interface Result {
+    public static class SwitchWarner implements Warner<Value> {
+
+        private final double mAbnormalValue;
+
+        public SwitchWarner(double abnormalValue) {
+            mAbnormalValue = abnormalValue;
         }
 
-        int RESULT_ABNORMAL = 3;
+        protected SwitchWarner(Parcel in) {
+            mAbnormalValue = in.readDouble();
+        }
 
         @Override
-        @SwitchWarner.Result
-        int test(@NonNull Value value, Corrector corrector);
+        @Result
+        public int test(@NonNull Value value, Corrector corrector) {
+            if (Warner.getTestingValue(value, corrector)
+                    == mAbnormalValue) {
+                return RESULT_ABNORMAL;
+            }
+            return RESULT_NORMAL;
+        }
+
+        public double getAbnormalValue() {
+            return mAbnormalValue;
+        }
+
+        @Override
+        public int describeContents() {
+            return 0;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            dest.writeDouble(mAbnormalValue);
+        }
+
+        public static final Creator<SwitchWarner> CREATOR = new Creator<SwitchWarner>() {
+            @Override
+            public SwitchWarner createFromParcel(Parcel in) {
+                return new SwitchWarner(in);
+            }
+
+            @Override
+            public SwitchWarner[] newArray(int size) {
+                return new SwitchWarner[size];
+            }
+        };
     }
 }

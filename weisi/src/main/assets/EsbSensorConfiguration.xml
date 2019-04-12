@@ -2155,10 +2155,10 @@
 					<DataTypeValue>05</DataTypeValue>
 				</measurement>
 				<measurement>
-					<DataTypeValue>1A</DataTypeValue>
+					<DataTypeValue>11</DataTypeValue>
 				</measurement>
 				<measurement>
-					<DataTypeValue>11</DataTypeValue>
+					<DataTypeValue>1A</DataTypeValue>
 				</measurement>
 			</measurements>
 		</SensorType>

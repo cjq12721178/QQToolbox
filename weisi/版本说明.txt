@@ -618,3 +618,14 @@ weisi.aar是我在维思公司工作时用到的与其业务相关的工具包�
 
 20190316-7.3.2(159):
 1. 基础wsb.lib改
+
+20190325-7.3.3(160):
+1. wsb.lib版本由'0.1.4'升至'0.1.5'
+
+20190409-7.4.0(161):
+1. iot包新增config包，将Corrector、Decorator、Warner移至该包
+2. config包下的大部分接口改为类，并实现Parcelable接口
+
+20190412-7.5.0(162):
+1. 新增EmptyValueContainer、RealTimeValueContainer，将原来的BaseValueContainer重命名为MultipleValueContainer，继承自新的BaseValueContainer
+2. SensorManager新增使用模式和init方法，使用任何该类方法之前均应先调用init方法，且之后不再调用。目前使用模式主要分为手机端和手表端，主要影响为Measurement所包含的DynamicValueContainer和HistoryValueContainer有所不同

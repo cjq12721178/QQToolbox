@@ -1,5 +1,6 @@
 package com.cjq.lib.weisi.iot;
 
+import android.os.Parcel;
 import android.support.annotation.NonNull;
 
 import com.cjq.lib.weisi.iot.container.ValueContainer;
@@ -45,26 +46,62 @@ public abstract class RatchetWheelMeasurement extends VirtualMeasurement<Ratchet
         }
     }
 
-    public interface Configuration extends DisplayMeasurement.Configuration {
-        double getInitialDistance();
-        double getInitialValue();
+    public static class Configuration extends DisplayMeasurement.Configuration {
+
+        private final double mInitialDistance;
+        private final double mInitialValue;
+
+        public Configuration(double initialDistance, double initialValue) {
+            mInitialDistance = initialDistance;
+            mInitialValue = initialValue;
+        }
+
+        protected Configuration(Parcel in) {
+            super(in);
+            mInitialDistance = in.readDouble();
+            mInitialValue = in.readDouble();
+        }
+
+        public double getInitialDistance() {
+            return mInitialDistance;
+        }
+
+        public double getInitialValue() {
+            return mInitialValue;
+        }
+
+        @Override
+        public void writeToParcel(Parcel dest, int flags) {
+            super.writeToParcel(dest, flags);
+            dest.writeDouble(mInitialDistance);
+            dest.writeDouble(mInitialValue);
+        }
     }
 
     protected static class EmptyConfiguration
-            extends DisplayMeasurement.EmptyConfiguration
-            implements Configuration {
+            extends Configuration {
 
-        static final EmptyConfiguration INSTANCE = new EmptyConfiguration();
+        static final EmptyConfiguration INSTANCE = new EmptyConfiguration(0.0, 0.0);
 
-        @Override
-        public double getInitialDistance() {
-            return 0;
+        public EmptyConfiguration(double initialDistance, double initialValue) {
+            super(initialDistance, initialValue);
         }
 
-        @Override
-        public double getInitialValue() {
-            return 0;
+        protected EmptyConfiguration(Parcel in) {
+            super(in);
         }
+
+        public static final Creator<EmptyConfiguration> CREATOR = new Creator<EmptyConfiguration>() {
+            @Override
+            public EmptyConfiguration createFromParcel(Parcel in) {
+                return new EmptyConfiguration(in);
+            }
+
+            @Override
+            public EmptyConfiguration[] newArray(int size) {
+                return new EmptyConfiguration[size];
+            }
+        };
     }
 
     protected static abstract class ValueContainerImpl extends ValueContainerWrapper<DisplayMeasurement.Value> {

@@ -1,5 +1,6 @@
 package com.cjq.lib.weisi.iot.container;
 
+import com.cjq.lib.weisi.iot.config.Corrector;
 import com.wsn.lib.wsb.util.ExpandComparator;
 
 import java.lang.reflect.Constructor;
@@ -48,10 +49,18 @@ public class Value implements Cloneable {
         return 0;
     }
 
+    public double getRawValue() {
+        return getRawValue(0);
+    }
+
     public double getCorrectedValue(Corrector corrector, int index) {
         return corrector != null
                 ? corrector.correctValue(getRawValue(index))
                 : getRawValue(index);
+    }
+
+    public double getCorrectedValue(Corrector corrector) {
+        return getCorrectedValue(corrector, 0);
     }
 
     @Override

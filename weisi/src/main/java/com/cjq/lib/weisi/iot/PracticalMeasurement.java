@@ -4,7 +4,9 @@ import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
 import com.cjq.lib.weisi.iot.container.DynamicValueContainer;
+import com.cjq.lib.weisi.iot.container.EmptyValueContainer;
 import com.cjq.lib.weisi.iot.container.HistoryValueContainer;
+import com.cjq.lib.weisi.iot.container.RealTimeValueContainer;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
 import com.cjq.lib.weisi.iot.corrector.ValueCorrector;
 import com.cjq.lib.weisi.iot.interpreter.DefaultInterpreter;
@@ -12,6 +14,7 @@ import com.cjq.lib.weisi.iot.interpreter.ValueInterpreter;
 
 public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.Configuration> {
 
+    private static final EmptyValueContainer<Value> EMPTY_VALUE_CONTAINER = new EmptyValueContainer<>();
     private final DataType mDataType;
 
     protected PracticalMeasurement(@NonNull ID id, @NonNull DataType dataType, String name, boolean hidden) {
@@ -32,12 +35,18 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     @NonNull
     @Override
     protected ValueContainer<Value> onCreateDynamicValueContainer() {
+        if (SensorManager.mode == SensorManager.USE_MODE_WEAR) {
+            return new RealTimeValueContainerImpl();
+        }
         return new DynamicValueContainerImpl();
     }
 
     @NonNull
     @Override
     protected ValueContainer<Value> onCreateHistoryValueContainer() {
+        if (SensorManager.mode == SensorManager.USE_MODE_WEAR) {
+            return EMPTY_VALUE_CONTAINER;
+        }
         return new HistoryValueContainerImpl();
     }
 
@@ -124,5 +133,8 @@ public class PracticalMeasurement extends DisplayMeasurement<DisplayMeasurement.
     }
 
     private static class HistoryValueContainerImpl extends HistoryValueContainer<Value> {
+    }
+
+    private static class RealTimeValueContainerImpl extends RealTimeValueContainer<Value> {
     }
 }

@@ -11,7 +11,7 @@ import static com.cjq.lib.weisi.iot.container.Value.SEARCH_HELPER;
  * Created by CJQ on 2018/3/16.
  */
 
-public abstract class DynamicValueContainer<V extends Value> extends BaseValueContainer<V> {
+public abstract class DynamicValueContainer<V extends Value> extends MultipleValueContainer<V> {
 
     private static final int DEFAULT_MAX_VALUE_SIZE = 50;
     protected final int MAX_VALUE_SIZE;

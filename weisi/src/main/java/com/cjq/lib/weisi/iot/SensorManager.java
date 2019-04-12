@@ -1,10 +1,12 @@
 package com.cjq.lib.weisi.iot;
 
 import android.content.Context;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.cjq.lib.weisi.data.Filter;
+import com.cjq.lib.weisi.iot.config.Configuration;
 import com.cjq.lib.weisi.iot.corrector.ScriptValueCorrector;
 import com.cjq.lib.weisi.iot.interpreter.CalendarInterpreter;
 import com.cjq.lib.weisi.iot.interpreter.ErrorStateInterpreter;
@@ -32,6 +34,10 @@ import java.util.Map;
 
 public class SensorManager {
 
+    public static final int USE_MODE_MOBILE = 0;
+    public static final int USE_MODE_WEAR = 1;
+    static int mode = USE_MODE_MOBILE;
+
     private static final Map<Long, Measurement> MEASUREMENT_MAP = new HashMap<>();
     private static final Map<Long, Sensor> SENSOR_MAP = new HashMap<>();
     private static final Map<Byte, PracticalMeasurement.DataType> BLE_DATA_TYPES = new HashMap<>();
@@ -54,6 +60,13 @@ public class SensorManager {
     };
 
     private SensorManager() {
+        throw new UnsupportedOperationException("SensorManager is not allowed to instantiate");
+    }
+
+    //注意：该方法最好在所有SensorManager方法被调用之前使用
+    public static boolean init(@NonNull Context context, int useMode) {
+        mode = useMode;
+        return importEsbConfiguration(context) && importBleConfiguration(context);
     }
 
     public static void addDynamicSensorValue(int address,
@@ -749,7 +762,7 @@ public class SensorManager {
         return configurationProvider;
     }
 
-    public interface MeasurementConfigurationProvider {
+    public interface MeasurementConfigurationProvider extends Parcelable {
         <C extends Configuration> C getConfiguration(ID id);
         @NonNull List<ID> getConfigurationIds();
         //按ID从小到大排列

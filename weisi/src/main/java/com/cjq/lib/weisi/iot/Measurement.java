@@ -1,10 +1,13 @@
 package com.cjq.lib.weisi.iot;
 
+import android.os.Parcel;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 
-import com.cjq.lib.weisi.iot.container.Corrector;
+import com.cjq.lib.weisi.iot.config.Configuration;
+import com.cjq.lib.weisi.iot.config.Decorator;
+import com.cjq.lib.weisi.iot.config.Corrector;
 import com.cjq.lib.weisi.iot.container.Value;
 import com.cjq.lib.weisi.iot.container.ValueContainer;
 
@@ -109,7 +112,7 @@ public abstract class Measurement<V extends Value, C extends Configuration> impl
 
     public @NonNull String getDecoratedName() {
         Decorator decorator = mConfiguration.getDecorator();
-        return decorator != null ? decorator.decorateName(getDefaultName()) : "";
+        return decorator != null ? decorator.decorateName() : "";
     }
 
     public @NonNull String getName() {
@@ -127,6 +130,10 @@ public abstract class Measurement<V extends Value, C extends Configuration> impl
 
     public @NonNull String getFormattedRealTimeValue() {
         return formatValue(getRealTimeValue());
+    }
+
+    public Corrector getCorrector() {
+        return getCorrector(0);
     }
 
     public Corrector getCorrector(int index) {
@@ -276,18 +283,33 @@ public abstract class Measurement<V extends Value, C extends Configuration> impl
         return mId.compareTo(o.mId);
     }
 
-    protected static class EmptyConfiguration implements Configuration {
+    protected static class EmptyConfiguration extends Configuration {
 
         static final EmptyConfiguration INSTANCE = new EmptyConfiguration();
 
-        @Override
-        public Decorator getDecorator() {
-            return null;
+        public EmptyConfiguration() {
+            super();
+        }
+
+        protected EmptyConfiguration(Parcel in) {
+            super(in);
         }
 
         @Override
         public void setDecorator(Decorator decorator) {
             throw new UnsupportedOperationException("inner configuration can not set decorator");
         }
+
+        public static final Creator<EmptyConfiguration> CREATOR = new Creator<EmptyConfiguration>() {
+            @Override
+            public EmptyConfiguration createFromParcel(Parcel in) {
+                return new EmptyConfiguration(in);
+            }
+
+            @Override
+            public EmptyConfiguration[] newArray(int size) {
+                return new EmptyConfiguration[size];
+            }
+        };
     }
 }

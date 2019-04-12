@@ -1,6 +1,5 @@
 package com.wsn.lib.wsb.protocol
 
-import com.sun.istack.internal.NotNull
 import com.wsn.lib.wsb.util.NumericConverter
 
 
@@ -87,6 +86,7 @@ abstract class ControllableSensorProtocol<A : Analyzable> protected constructor(
         val end = offset + length
         var realDataZoneLength: Int
         var realDataLength: Int
+        var handledPosition = 0
         while (start < end) {
             //查找起始字符位置
             while (start < end) {
@@ -143,8 +143,9 @@ abstract class ControllableSensorProtocol<A : Analyzable> protected constructor(
 
             analyzeDataZone(data, start + DATA_ZONE_POSITION, realDataZoneLength, listener)
             start += realDataLength
+            handledPosition = start
         }
-        return start - offset
+        return handledPosition - offset
     }
 
     protected abstract fun onDataAnalyzed(data: ByteArray,
